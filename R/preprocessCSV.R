@@ -1,10 +1,63 @@
+#' Pre-process scRNA-seq Count Matrix in CSV File
+#'
+#' A function that reads a CSV file containing scRNA-seq counts
+#' and pre-process the scRNA-seq matrix with the given criteria.
+#' before feeding it to the scGNN framework for analysis.
+#'
+#' @param path A string the represents the path to the input file, where
+#'     directories in the path are separated by "/", and the input data file
+#'     should have extension .csv or .gz
+#' @param log_transform A Boolean value indicating whether to perform natural
+#'     logarithmic transformation for every value of the data at the end of
+#'     pre-processing or not. If TRUE, the log(x+1) of the original expression
+#'     level will be calculated.
+#' @param cell_ratio A double-precision value strictly greater than 0 and
+#'     less than 1. It defines the maximum ratio of genes with zeros in cells.
+#'     Default is 0.99, which means cells with more than 99% genes that are
+#'     zeros will be filtered out.
+#' @param gene_ratio A double-precision value strictly greater than 0 and
+#'     less than 1. It defines the maximum ratio of zeros in genes.
+#'     Default is 0.99, which means genes with more than 99% zero values
+#'     will be filtered out.
+#' @param geneSelectNum A positive integer that defines how many most variant
+#'     genes to keep. The default is 2000, which 2000 genes, ranked from
+#'     most variant to least by their variances of expression values in each
+#'     sample, will be retained in the final pre-processed data and be used
+#'     for later analysis.
+#' @param LTMG A Boolean value indicating whether to discretise regulatory
+#'     signal using Left-Trunctruncated-Mixed-Gaussian(LTMG) model.
+#'     If TRUE, LTMG inferring will be performed and can take 10-15 minutes.
+#'     Although default is FALSE, it is highly recommended to perform LTMG
+#'     inferring prior to analysis.
+#' @param transpose A Boolean value telling the function whether the input
+#'     scRNA-seq matrix is given in a transposed manner, i.e.
+#'     cells as rows and genes as columns.
+#'     If TRUE, a transpose operation will be performed. Default is FALSE.
+#' @param toCSV A Boolean value indicating whether to save the pre-processed
+#'     expression matrix to a CSV file. If TRUE a CSV file with <savename> will
+#'     be saved to /output directory under user's current working directory.
+#' @param savename A string representing the name of the csv file that saves
+#'     pre-processed scRNA-seq data. There is no strict rule for this. However,
+#'     it is highly recommended to give it a meaningful name.
+#'
+#' @return Returns a matrix with the pre-processed scRNA-seq expression values,
+#'     where row names are genes and column names are cells.
+#'
+#' @references
+#' \insertRef{scGNN}{scRGNet}
+#'
 #' @export
-#' @import data.table
+#' @import R.utils
+#' @importClassesFrom data.table data.table
+#' @importFrom Rdpack reprompt
+#' @importFrom data.table fread transpose
+#' @importFrom stats var
+#' @importFrom utils write.csv
 preprocessCSV <- function(path,
                           log_transform = TRUE,
                           cell_ratio    = 0.99,
                           gene_ratio    = 0.99,
-                          geneSelectNum = 2000,
+                          geneSelectNum = 2000L,
                           LTMG          = FALSE,
                           transpose     = FALSE,
                           toCSV         = TRUE,
@@ -109,3 +162,6 @@ preprocessCSV <- function(path,
 
     return(counts_processed)
 }
+
+
+# [END]

@@ -1,0 +1,13 @@
+citHeader("To cite scRGNet in publications use:")
+
+citEntry(
+  entry    = "unpublished",
+  title    = "scRGNet: An R implementation of the scGNN framework",
+  author   = "Feifei Li",
+  year     = "2021",
+  url      = "https://github.com/ff98li/scRGNet.git",
+  textVersion = paste(
+        "Li, F. (2021) scRGNet: An R implementation of the scGNN framework. Unpublished. URL: https://github.com/ff98li/scRGNet.git"
+  ),
+  note     = "On-going development. Initial stage of the package for BCB410 course project submission."
+)

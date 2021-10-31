@@ -13,8 +13,10 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends: R (>= 4.1.0)
+RdMacros: Rdpack
 Imports: 
     R.utils,
     data.table,
     stats,
-    utils
+    utils,
+    Rdpack
