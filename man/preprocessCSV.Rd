@@ -10,9 +10,9 @@ preprocessCSV(
   cell_ratio = 0.99,
   gene_ratio = 0.99,
   geneSelectNum = 2000L,
-  LTMG = FALSE,
   transpose = FALSE,
   toCSV = TRUE,
+  outdir_path = file.path(getwd(), "output"),
   savename = "preprocessedCSV"
 )
 }
@@ -42,12 +42,6 @@ most variant to least by their variances of expression values in each
 sample, will be retained in the final pre-processed data and be used
 for later analysis.}
 
-\item{LTMG}{A Boolean value indicating whether to discretise regulatory
-signal using Left-Trunctruncated-Mixed-Gaussian(LTMG) model.
-If TRUE, LTMG inferring will be performed and can take 10-15 minutes.
-Although default is FALSE, it is highly recommended to perform LTMG
-inferring prior to analysis.}
-
 \item{transpose}{A Boolean value telling the function whether the input
 scRNA-seq matrix is given in a transposed manner, i.e.
 cells as rows and genes as columns.
@@ -56,6 +50,13 @@ If TRUE, a transpose operation will be performed. Default is FALSE.}
 \item{toCSV}{A Boolean value indicating whether to save the pre-processed
 expression matrix to a CSV file. If TRUE a CSV file with <savename> will
 be saved to /output directory under user's current working directory.}
+
+\item{outdir_path}{A string that designates the path to the directory where
+the output CSV will be saved if toCSV is TRUE. This argument won't be
+used if toCSV is FALSE. There must be no path separator at the end.
+If the designated does not exist in the parent directory,
+it will create one automatically. Default is a directory named "output"
+under user's current R working directory.}
 
 \item{savename}{A string representing the name of the csv file that saves
 pre-processed scRNA-seq data. There is no strict rule for this. However,

@@ -24,11 +24,6 @@
 #'     most variant to least by their variances of expression values in each
 #'     sample, will be retained in the final pre-processed data and be used
 #'     for later analysis.
-#' @param LTMG A Boolean value indicating whether to discretise regulatory
-#'     signal using Left-Trunctruncated-Mixed-Gaussian(LTMG) model.
-#'     If TRUE, LTMG inferring will be performed and can take 10-15 minutes.
-#'     Although default is FALSE, it is highly recommended to perform LTMG
-#'     inferring prior to analysis.
 #' @param transpose A Boolean value telling the function whether the input
 #'     scRNA-seq matrix is given in a transposed manner, i.e.
 #'     cells as rows and genes as columns.
@@ -36,6 +31,12 @@
 #' @param toCSV A Boolean value indicating whether to save the pre-processed
 #'     expression matrix to a CSV file. If TRUE a CSV file with <savename> will
 #'     be saved to /output directory under user's current working directory.
+#' @param outdir_path A string that designates the path to the directory where
+#'     the output CSV will be saved if toCSV is TRUE. This argument won't be
+#'     used if toCSV is FALSE. There must be no path separator at the end.
+#'     If the designated does not exist in the parent directory,
+#'     it will create one automatically. Default is a directory named "output"
+#'     under user's current R working directory.
 #' @param savename A string representing the name of the csv file that saves
 #'     pre-processed scRNA-seq data. There is no strict rule for this. However,
 #'     it is highly recommended to give it a meaningful name.
@@ -58,12 +59,13 @@ preprocessCSV <- function(path,
                           cell_ratio    = 0.99,
                           gene_ratio    = 0.99,
                           geneSelectNum = 2000L,
-                          LTMG          = FALSE,
                           transpose     = FALSE,
                           toCSV         = TRUE,
+                          outdir_path   = file.path(getwd(), "output"),
                           savename      = "preprocessedCSV") {
 
-    ## TODO: add dependency R.utils
+    ## TODO: Add argument validity condition check
+
     ## check whether given data file is in csv format
     if (!grepl(pattern = "\\.(csv|gz)$", path)) {
         stop("Input file is not a valid csv file.")
@@ -73,9 +75,8 @@ preprocessCSV <- function(path,
             stop(paste("No such file found in the path:"), path)
     }
 
-    message("CSV file found. Start processing data...")
+    message("CSV file found. Start pre-processing data...")
     start_time <- Sys.time() ## measure CSV processing time
-    message("Step 1: filtering data by input criteria...")
 
     ## Load scRNA-seq matrix if file exists
     counts_raw <- as.matrix(data.table::fread(path), rownames = 1)
@@ -127,7 +128,6 @@ preprocessCSV <- function(path,
     ## filters out cells with more than (cell_ratio x 100%) genes that are zeros
     counts_filtered_cell <- counts_filtered_gene[, -which(zeroCell)]
 
-
     ## free up memory
     rm(list = c("counts_filtered_gene", "zeroCell"))
     invisible(gc())
@@ -144,16 +144,11 @@ preprocessCSV <- function(path,
     if (log_transform)
         counts_processed <- log1p(counts_processed)
 
-    if (LTMG) {
-        ; ##TODO: Implement LTMG module
-    }
-
     if (toCSV) {
-        output_dir <- paste0(getwd(),"/output")
-        if (!dir.exists(output_dir))
-            dir.create(output_dir)
+        if (!dir.exists(outdir_path))
+            dir.create(outdir_path)
         utils::write.csv(counts_processed,
-                         file = paste0(output_dir, "/", savename))
+                         file = file.path(outdir_path, savename))
     }
 
     finish_time <- Sys.time()
@@ -163,5 +158,39 @@ preprocessCSV <- function(path,
     return(counts_processed)
 }
 
+#' Get discretised regulatory signals from LTMG model
+#'
+#' A wrapper function for running scGNNLTMG that uses
+#' the Left-Trunctruncated-Mixed-Gaussian(LTMG) model to
+#' translate the input gene expression data pre-processed by preprocessCSV into
+#' a discretised regulatory signal as the regularizer for
+#' the feature autoencoder of scGNN.
+#' It will take around 10-15 minutes for inferring LTMG tags.
+#' This step is optional but highly recommended prior to scGNN analysis.
+#'
+#' @param expr_mat A data frame or a matrix
+#' @param fromFile A Boolean value
+#' @param readPath A string
+#' @param toFile   A Boolean value
+#' @param outdir_path A string
+#' @param saveName A string
+#'
+#' @return Returns an LTMG object
+#'
+#' @references
+#' \insertRef{LTMG}{scRGNet}
+#' \insertRef{scGNN}{scRGNet}
+#'
+#' @export
+#' @importFrom Rdpack reprompt
+#' @import scGNNLTMG
+runLTMG <- function(expr_mat = NULL,
+                    fromFile = FALSE,
+                    readPath = NULL,
+                    toFile   = TRUE,
+                    outdir_path = file.path(getwd(), "output"),
+                    saveName = "ltmg") {
+
+}
 
 # [END]
