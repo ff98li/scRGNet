@@ -31,13 +31,13 @@
 #' @param toCSV A Boolean value indicating whether to save the pre-processed
 #'     expression matrix to a CSV file. If TRUE a CSV file with <savename> will
 #'     be saved to /output directory under user's current working directory.
-#' @param outdir_path A string that designates the path to the directory where
+#' @param outdir_path A character vector that designates the path to the directory where
 #'     the output CSV will be saved if toCSV is TRUE. This argument won't be
 #'     used if toCSV is FALSE. There must be no path separator at the end.
 #'     If the designated does not exist in the parent directory,
 #'     it will create one automatically. Default is a directory named "output"
 #'     under user's current R working directory.
-#' @param savename A string representing the name of the csv file that saves
+#' @param savename A character vector representing the name of the csv file that saves
 #'     pre-processed scRNA-seq data. There is no strict rule for this. However,
 #'     it is highly recommended to give it a meaningful name.
 #'
@@ -65,26 +65,31 @@ preprocessCSV <- function(path,
                           savename      = "preprocessedCSV") {
 
     ## TODO: Add argument validity condition check
-
-    ## check whether given data file is in csv format
-    if (!grepl(pattern = "\\.(csv|gz)$", path)) {
-        stop("Input file is not a valid csv file.")
+    if (!(is.character(path) & (nchar(path) > 0))) {
+        stop("Invalid file path. Must be a string of non-zero length.")
     } else {
-        ## check whether file exists in directory
-        if (!file.exists(path))
-            stop(paste("No such file found in the path:"), path)
+        if (file.exists(path)) {
+            ## check whether given data file is in csv format
+            if (!grepl(pattern = "\\.(csv|gz)$", path))
+                stop("Input file is not a valid csv file.")
+        } else {
+            stop(paste("File not found:", path, "does not exist."))
+        }
     }
+
 
     message("CSV file found. Start pre-processing data...")
     start_time <- Sys.time() ## measure CSV processing time
 
-    ## Load scRNA-seq matrix if file exists
-    counts_raw <- as.matrix(data.table::fread(path), rownames = 1)
-    rownames(counts_raw) <- counts_raw[ , 1]
-
+    ## Load scRNA-seq matrix using data.table for faster loading time
+    counts_raw <- data.table::fread(path)
     ## transpose data table if raw matrix given in transposed manner
     if (transpose)
         counts_raw <- data.table::transpose(counts_raw)
+
+    ## using matrix for consequential processing
+    ## since data.table doesn't support row names indexing
+    counts_raw <- as.matrix(counts_raw, rownames = 1)
 
     ## Find genes with zero ratio over gene_ratio
     zeroGene <- apply(
@@ -132,6 +137,13 @@ preprocessCSV <- function(path,
     rm(list = c("counts_filtered_gene", "zeroCell"))
     invisible(gc())
 
+    message(
+        sprintf(
+            "After preprocessing, %i cells have at most %f zero",
+            ncol(counts_filtered_gene), gene_ratio
+            )
+        )
+
     ## select <geneSelectNum> of most variant genes
     varGene <- apply(counts_filtered_cell, MARGIN = 1, FUNC = stats::var)
     varGene <- names(sort(varGene, decreasing = TRUE)[1:geneSelectNum])
@@ -165,17 +177,30 @@ preprocessCSV <- function(path,
 #' translate the input gene expression data pre-processed by preprocessCSV into
 #' a discretised regulatory signal as the regularizer for
 #' the feature autoencoder of scGNN.
-#' It will take around 10-15 minutes for inferring LTMG tags.
+#' It will take around 10-15 minutes for inferring LTMG tags, depending on
+#' the dataset.
 #' This step is optional but highly recommended prior to scGNN analysis.
 #'
-#' @param expr_mat A data frame or a matrix
-#' @param fromFile A Boolean value
-#' @param readPath A string
-#' @param toFile   A Boolean value
-#' @param outdir_path A string
-#' @param saveName A string
+#' @param expr_mat A matrix or a data frame with row names as genes
+#'     and column names as cell samples containing scRNA-seq expression values
+#'     pre-processed by preprocessCSV. If reading from a expression file,
+#'     this argument needs not be provided.
+#' @param fromFile A Boolean value indicating whether to read RNA-seq matrix
+#'     from a expression file. If TRUE, expr_mat needs not be provided, and
+#'     it will check whether the expression file exists in readPath.
+#'     If FALSE, expr_mat must be provided.
+#' @param readPath A character vector representing path to the expression file.
+#'     If fromFile is TRUE, it must be provided. Otherwise optional.
+#' @param toFile   A Boolean value indicating whether to write the returned
+#'     LTMG object to file. If TRUE, outdir_path and savename must be provided.
+#' @param outdir_path A character vector representing the path to the parent
+#'     directory where the object will be saved as a file. If toFile is TRUE,
+#'     it must be provided. Otherwise optional.
+#' @param savename A character vector representing the name of the saved
+#'     LTMG object file. If toFile is TRUE, it must be provided.
+#'     Otherwise optional.
 #'
-#' @return Returns an LTMG object
+#' @return Returns an LTMG object containing the inferred LTMG tags of expr_mat.
 #'
 #' @references
 #' \insertRef{LTMG}{scRGNet}
@@ -184,13 +209,61 @@ preprocessCSV <- function(path,
 #' @export
 #' @importFrom Rdpack reprompt
 #' @import scGNNLTMG
-runLTMG <- function(expr_mat = NULL,
-                    fromFile = FALSE,
-                    readPath = NULL,
-                    toFile   = TRUE,
+#' @importClassesFrom data.table data.table
+#' @importFrom data.table fread
+runLTMG <- function(expr_mat    = NULL,
+                    fromFile    = FALSE,
+                    readPath    = NULL,
+                    toFile      = FALSE,
                     outdir_path = file.path(getwd(), "output"),
-                    saveName = "ltmg") {
+                    savename    = "ltmg") {
+    ## checking validity for inputs
+    if (is.logical(fromFile) && !is.na(fromFile)) {
+        if (fromFile) {
+            if (is.null(readPath)) {
+                stop("No path to data file provided for argument readPath.")
+            } else if (is.character(readPath)) {
+                stop("Invalid argument for readPath. Must be a character vector.")
+            } else {
+                if (file.exists(readPath)) {
+                    expr_mat = as.matrix(data.table::fread(readPath),
+                                         rownames = 1)
+                } else {
+                    stop(paste("File not found:", readPath, "does not exist."))
+                }
+            }
+        } else {
+            if (is.null(expr_mat))
+                stop("No expression matrix or data frame provided for argument expr_mat.")
+        }
+    } else {
+        stop("Invalid argument fromFile. Must be a boolean value.")
+    }
 
+    if (is.logical(toFile) & !is.na(toFile)) {
+        if (toFile) {
+            ## validate save path and save name only if user choose to save file.
+            if (!(is.character(outdir_path) & (nchar(outdir_path) > 0)))
+                stop("Invalid argument outdir_path. Must be a string of non-zero length.")
+            if (!(is.character(savename) & (nchar(savename) > 0)))
+                stop("Invalid argument savename. Must be a string of non-zero length.")
+        }
+    }
+
+    message("Starting inferring LTMG from expression matrix...")
+    start_time <- Sys.time()
+    LTMGObject <- scGNNLTMG::CreateLTMGObject(expr_mat)
+    LTMGObject <- scGNNLTMG::RunLTMG(LTMGObject, Gene_use = 'all')
+    if (toFile) {
+        message("Writing LTMG object to file...")
+        scGNNLTMG::WriteSparse(LTMGObject, gene.name=FALSE, cell.name=FALSE)
+    }
+
+    finish_time  <- Sys.time()
+    process_time <- finish_time - start_time
+    message(sprintf("Time taken for inferring LTMG: %f", process_time))
+
+    return(LTMGObject)
 }
 
 # [END]
