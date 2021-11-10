@@ -123,17 +123,22 @@ preprocessCSV <- function(path,
     ## filters out genes with more than (gene_ratio x 100%) genes that are zeros
     counts_filtered_gene <- counts_raw[which(valid_gene), ]
 
-    ## free up memory
-    rm(list = c("valid_gene", "counts_raw"))
-    invisible(gc())
-
-    message(
+    n_gene <- dim(counts_filtered_gene)[1] ## number of genes after filtering
+    if (n_gene == 0) {
+        stop("No genes left after filtering. Consider using a higher gene_zero_ratio.")
+    } else {
+        message(
         sprintf(
             "After preprocessing, %i genes with at most %f zero count remaining",
-            dim(counts_filtered_gene)[1],
+            n_gene,
             gene_zero_ratio
             )
         )
+    }
+
+    ## free up memory
+    rm(list = c("valid_gene", "counts_raw"))
+    invisible(gc())
 
     valid_cell <- apply(
         counts_filtered_gene,
@@ -152,16 +157,22 @@ preprocessCSV <- function(path,
     ## filters out cells with more than (cell_ratio x 100%) genes that are zeros
     counts_filtered_cell <- counts_filtered_gene[, which(valid_cell)]
 
+    ## number of cell samples remaining after filtering
+    n_cell <- dim(counts_filtered_cell)[2]
+    if (n_cell == 0) {
+        stop("No cell left after filtering. Consider using a higher cell_zero_ratio.")
+    } else {
+        message(
+        sprintf(
+            "After preprocessing, %i cells have at most %f zero gene counts",
+            n_cell, cell_zero_ratio
+            )
+        )
+    }
+
     ## free up memory
     rm(list = c("counts_filtered_gene", "valid_cell"))
     invisible(gc())
-
-    message(
-        sprintf(
-            "After preprocessing, %i cells have at most %f zero gene counts",
-            dim(counts_filtered_cell)[2], gene_zero_ratio
-            )
-        )
 
     ## Manually compute gene-wise variance rather than using apply + stats::var
     ## 200x faster than apply(counts_filtered_cell, 1, stats::var)
@@ -171,12 +182,23 @@ preprocessCSV <- function(path,
     gene_means <- rowMeans(counts_filtered_cell)
     n_cell     <- dim(counts_filtered_cell)[2]
     varGene    <- rowSums((counts_filtered_cell - gene_means)^2)/(n_cell - 1)
+
+    ## Check how many genes available to select
+    n_gene <-dim(counts_filtered_cell)[1]
+    if (geneSelectNum < n_gene) {
+        message(
+            sprintf("Remaining genes are fewer than %i. All remaining %i genes will be selected.",
+                    geneSelectNum, n_gene)
+            )
+        geneSelectNum <- n_gene
+    }
+
     ## select <geneSelectNum> of most variant genes
     varGene <- names(sort(varGene, decreasing = TRUE)[1:geneSelectNum])
     counts_processed <- counts_filtered_cell[varGene, ]
 
     ## free up memory
-    rm(list = c("gene_means", "varGene", "counts_filtered_cell"))
+    rm(list = c("gene_means", "varGene", "counts_filtered_cell", "n_cell", "n_gene"))
     invisible(gc())
 
     if (log_transform)
@@ -193,7 +215,7 @@ preprocessCSV <- function(path,
                          )
     }
 
-    finish_time <- Sys.time()
+    finish_time  <- Sys.time()
     process_time <- finish_time - start_time
     message(sprintf("Time taken for pre-processing data: %f", process_time))
 
