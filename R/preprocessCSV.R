@@ -44,6 +44,21 @@
 #' @return Returns a matrix with the pre-processed scRNA-seq expression values,
 #'     where row names are genes and column names are cells.
 #'
+#' @examples
+#' # Example 1:
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath, toCSV = FALSE, geneSelectNum = 50)
+#'
+#' # Example 2:
+#' # Preprocess the whole scRNA-seq dataset
+#' \dontrun{
+#' inputCountsPath <- system.file("extdata", "GSE138852_counts.csv.gz", package = "scRGNet")
+#' counts <- preprocessCSV(path = inputCountsPath, savename = "GSE138852_preprocessed")
+#' # Take ~40 seconds to process. If log_transform = FALSE then ~20 seconds
+#' }
+#'
 #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'
@@ -216,6 +231,26 @@ preprocessCSV <- function(path,
 #'     Otherwise optional.
 #'
 #' @return Returns an LTMG object containing the inferred LTMG tags of expr_mat.
+#'
+#' @examples
+#' # Example 1:
+#' # Tested examples. Not run for fast package compiling
+#' \dontrun{
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath, toCSV = FALSE, geneSelectNum = 50)
+#' LTMG <- runLTMG(expr_mat = counts, toFile = FALSE)
+#' # ~75 seconds
+#'}
+#' # Example 2:
+#' # Preprocess the whole scRNA-seq dataset
+#' \dontrun{
+#' inputCountsPath <- system.file("extdata", "GSE138852_counts.csv.gz", package = "scRGNet")
+#' counts <- preprocessCSV(path = inputCountsPath, savename = "GSE138852_preprocessed")
+#' LTMG <- runLTMG(expr_mat = counts)
+#' # Take 10-14 minutes to finish running
+#' }
 #'
 #' @references
 #' \insertRef{LTMG}{scRGNet}

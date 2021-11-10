@@ -51,6 +51,27 @@ It will take around 10-15 minutes for inferring LTMG tags, depending on
 the dataset.
 This step is optional but highly recommended prior to scGNN analysis.
 }
+\examples{
+# Example 1:
+# Tested examples. Not run for fast package compiling
+\dontrun{
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath, toCSV = FALSE, geneSelectNum = 50)
+LTMG <- runLTMG(expr_mat = counts, toFile = FALSE)
+# ~75 seconds
+}
+# Example 2:
+# Preprocess the whole scRNA-seq dataset
+\dontrun{
+inputCountsPath <- system.file("extdata", "GSE138852_counts.csv.gz", package = "scRGNet")
+counts <- preprocessCSV(path = inputCountsPath, savename = "GSE138852_preprocessed")
+LTMG <- runLTMG(expr_mat = counts)
+# Take 10-14 minutes to finish running
+}
+
+}
 \references{
 \insertRef{LTMG}{scRGNet}
 \insertRef{scGNN}{scRGNet}

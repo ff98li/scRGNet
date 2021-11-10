@@ -71,6 +71,22 @@ A function that reads a CSV file containing scRNA-seq counts
 and pre-process the scRNA-seq matrix with the given criteria.
 before feeding it to the scGNN framework for analysis.
 }
+\examples{
+# Example 1:
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath, toCSV = FALSE, geneSelectNum = 50)
+
+# Example 2:
+# Preprocess the whole scRNA-seq dataset
+\dontrun{
+inputCountsPath <- system.file("extdata", "GSE138852_counts.csv.gz", package = "scRGNet")
+counts <- preprocessCSV(path = inputCountsPath, savename = "GSE138852_preprocessed")
+# Take ~40 seconds to process. If log_transform = FALSE then ~20 seconds
+}
+
+}
 \references{
 \insertRef{scGNN}{scRGNet}
 }
