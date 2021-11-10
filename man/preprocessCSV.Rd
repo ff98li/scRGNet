@@ -7,8 +7,8 @@
 preprocessCSV(
   path,
   log_transform = TRUE,
-  cell_ratio = 0.99,
-  gene_ratio = 0.99,
+  cell_zero_ratio = 0.99,
+  gene_zero_ratio = 0.99,
   geneSelectNum = 2000L,
   transpose = FALSE,
   toCSV = TRUE,
@@ -26,13 +26,13 @@ logarithmic transformation for every value of the data at the end of
 pre-processing or not. If TRUE, the log(x+1) of the original expression
 level will be calculated.}
 
-\item{cell_ratio}{A double-precision value strictly greater than 0 and
-less than 1. It defines the maximum ratio of genes with zeros in cells.
+\item{cell_zero_ratio}{A double-precision value strictly greater than 0 and
+less than 1. It defines the maximum proportion of genes with zeros in cells.
 Default is 0.99, which means cells with more than 99\% genes that are
 zeros will be filtered out.}
 
-\item{gene_ratio}{A double-precision value strictly greater than 0 and
-less than 1. It defines the maximum ratio of zeros in genes.
+\item{gene_zero_ratio}{A double-precision value strictly greater than 0 and
+less than 1. It defines the maximum proportion of zeros in genes.
 Default is 0.99, which means genes with more than 99\% zero values
 will be filtered out.}
 

@@ -11,12 +11,12 @@
 #'     logarithmic transformation for every value of the data at the end of
 #'     pre-processing or not. If TRUE, the log(x+1) of the original expression
 #'     level will be calculated.
-#' @param cell_ratio A double-precision value strictly greater than 0 and
-#'     less than 1. It defines the maximum ratio of genes with zeros in cells.
+#' @param cell_zero_ratio A double-precision value strictly greater than 0 and
+#'     less than 1. It defines the maximum proportion of genes with zeros in cells.
 #'     Default is 0.99, which means cells with more than 99% genes that are
 #'     zeros will be filtered out.
-#' @param gene_ratio A double-precision value strictly greater than 0 and
-#'     less than 1. It defines the maximum ratio of zeros in genes.
+#' @param gene_zero_ratio A double-precision value strictly greater than 0 and
+#'     less than 1. It defines the maximum proportion of zeros in genes.
 #'     Default is 0.99, which means genes with more than 99% zero values
 #'     will be filtered out.
 #' @param geneSelectNum A positive integer that defines how many most variant
@@ -55,14 +55,14 @@
 #' @importFrom stats var
 #' @importFrom utils write.csv
 preprocessCSV <- function(path,
-                          log_transform = TRUE,
-                          cell_ratio    = 0.99,
-                          gene_ratio    = 0.99,
-                          geneSelectNum = 2000L,
-                          transpose     = FALSE,
-                          toCSV         = TRUE,
-                          outdir_path   = file.path(getwd(), "output"),
-                          savename      = "preprocessedCSV") {
+                          log_transform   = TRUE,
+                          cell_zero_ratio = 0.99,
+                          gene_zero_ratio = 0.99,
+                          geneSelectNum   = 2000L,
+                          transpose       = FALSE,
+                          toCSV           = TRUE,
+                          outdir_path     = file.path(getwd(), "output"),
+                          savename        = "preprocessedCSV") {
 
     ## TODO: Add argument validity condition check
     if (!(is.character(path) & (nchar(path) > 0))) {
@@ -92,11 +92,13 @@ preprocessCSV <- function(path,
     counts_raw <- as.matrix(counts_raw, rownames = 1)
 
     ## Find genes with zero ratio over gene_ratio
-    zeroGene <- apply(
+    valid_gene <- apply(
         counts_raw,
         MARGIN = 1,
         function(x){
-            if (mean(as.logical(x)) >= (1 - gene_ratio)) {
+            ## Proportion of non-zero counts for a gene
+            nonzero_ratio <- mean(as.logical(x))
+            if (nonzero_ratio >= (1 - gene_zero_ratio)) {
                 return(TRUE)
             } else {
                 return(FALSE)
@@ -105,24 +107,27 @@ preprocessCSV <- function(path,
     )
 
     ## filters out genes with more than (gene_ratio x 100%) genes that are zeros
-    counts_filtered_gene <- counts_raw[which(zeroGene), ]
+    counts_filtered_gene <- counts_raw[which(valid_gene), ]
 
     ## free up memory
-    rm(list = c("zeroGene", "counts_raw"))
+    rm(list = c("valid_gene", "counts_raw"))
     invisible(gc())
 
     message(
         sprintf(
-            "After pre-processing, %i genes remaining",
-            nrow(counts_filtered_gene)
+            "After preprocessing, %i genes with at most %f zero count remaining",
+            nrow(counts_filtered_gene),
+            gene_zero_ratio
             )
         )
 
-    zeroCell <- apply(
+    valid_cell <- apply(
         counts_filtered_gene,
         MARGIN = 2,
         function(x) {
-            if (mean(as.logical(x)) >= (1 - cell_ratio)) {
+            ## Proportion of non-zero genes in a cell
+            cell_non_zero_gene_ratio <- mean(as.logical(x))
+            if (cell_non_zero_gene_ratio >= (1 - cell_zero_ratio)) {
                 return(TRUE)
             } else {
                 return(FALSE)
@@ -131,16 +136,16 @@ preprocessCSV <- function(path,
     )
 
     ## filters out cells with more than (cell_ratio x 100%) genes that are zeros
-    counts_filtered_cell <- counts_filtered_gene[, which(zeroCell)]
+    counts_filtered_cell <- counts_filtered_gene[, which(valid_cell)]
 
     ## free up memory
-    rm(list = c("counts_filtered_gene", "zeroCell"))
+    rm(list = c("counts_filtered_gene", "valid_cell"))
     invisible(gc())
 
     message(
         sprintf(
-            "After preprocessing, %i cells have at least %f non-zero gene counts",
-            ncol(counts_filtered_cell), gene_ratio
+            "After preprocessing, %i cells have at most %f zero gene counts",
+            ncol(counts_filtered_cell), gene_zero_ratio
             )
         )
 
