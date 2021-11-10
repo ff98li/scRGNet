@@ -52,7 +52,6 @@
 #' @importClassesFrom data.table data.table
 #' @importFrom Rdpack reprompt
 #' @importFrom data.table fread transpose
-#' @importFrom stats var
 #' @importFrom utils write.csv
 preprocessCSV <- function(path,
                           log_transform   = TRUE,
@@ -116,7 +115,7 @@ preprocessCSV <- function(path,
     message(
         sprintf(
             "After preprocessing, %i genes with at most %f zero count remaining",
-            nrow(counts_filtered_gene),
+            dim(counts_filtered_gene)[1],
             gene_zero_ratio
             )
         )
@@ -145,17 +144,20 @@ preprocessCSV <- function(path,
     message(
         sprintf(
             "After preprocessing, %i cells have at most %f zero gene counts",
-            ncol(counts_filtered_cell), gene_zero_ratio
+            dim(counts_filtered_cell)[2], gene_zero_ratio
             )
         )
 
+    ## Manually compute gene-wise variance rather than using apply()
+    gene_means <- rowMeans(counts_filtered_cell)
+    n_cell     <- dim(counts_filtered_cell)[2]
+    varGene    <- rowSums((counts_filtered_cell - gene_means)^2)/(n_cell - 1)
     ## select <geneSelectNum> of most variant genes
-    varGene <- apply(counts_filtered_cell, MARGIN = 1, FUNC = var)
     varGene <- names(sort(varGene, decreasing = TRUE)[1:geneSelectNum])
     counts_processed <- counts_filtered_cell[varGene, ]
 
     ## free up memory
-    rm(list = c("varGene", "counts_filtered_cell"))
+    rm(list = c("gene_means", "varGene", "counts_filtered_cell"))
     invisible(gc())
 
     if (log_transform)
@@ -164,8 +166,12 @@ preprocessCSV <- function(path,
     if (toCSV) {
         if (!dir.exists(outdir_path))
             dir.create(outdir_path)
+
         utils::write.csv(counts_processed,
-                         file = file.path(outdir_path, savename))
+                         file = file.path(outdir_path,
+                                          paste(savename, "csv", sep = ".")
+                                          )
+                         )
     }
 
     finish_time <- Sys.time()
