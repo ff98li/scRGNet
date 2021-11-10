@@ -96,7 +96,7 @@ preprocessCSV <- function(path,
         counts_raw,
         MARGIN = 1,
         function(x){
-            if (mean(as.logical(x)) >= gene_ratio) {
+            if (mean(as.logical(x)) >= (1 - gene_ratio)) {
                 return(TRUE)
             } else {
                 return(FALSE)
@@ -105,7 +105,7 @@ preprocessCSV <- function(path,
     )
 
     ## filters out genes with more than (gene_ratio x 100%) genes that are zeros
-    counts_filtered_gene <- counts_raw[-which(zeroGene), ]
+    counts_filtered_gene <- counts_raw[which(zeroGene), ]
 
     ## free up memory
     rm(list = c("zeroGene", "counts_raw"))
@@ -122,7 +122,7 @@ preprocessCSV <- function(path,
         counts_filtered_gene,
         MARGIN = 2,
         function(x) {
-            if (mean(as.logical(x)) >= cell_ratio) {
+            if (mean(as.logical(x)) >= (1 - cell_ratio)) {
                 return(TRUE)
             } else {
                 return(FALSE)
@@ -131,7 +131,7 @@ preprocessCSV <- function(path,
     )
 
     ## filters out cells with more than (cell_ratio x 100%) genes that are zeros
-    counts_filtered_cell <- counts_filtered_gene[, -which(zeroCell)]
+    counts_filtered_cell <- counts_filtered_gene[, which(zeroCell)]
 
     ## free up memory
     rm(list = c("counts_filtered_gene", "zeroCell"))
@@ -139,13 +139,13 @@ preprocessCSV <- function(path,
 
     message(
         sprintf(
-            "After preprocessing, %i cells have at most %f zero",
+            "After preprocessing, %i cells have at least %f non-zero gene counts",
             ncol(counts_filtered_cell), gene_ratio
             )
         )
 
     ## select <geneSelectNum> of most variant genes
-    varGene <- apply(counts_filtered_cell, MARGIN = 1, FUNC = stats::var)
+    varGene <- apply(counts_filtered_cell, MARGIN = 1, FUNC = var)
     varGene <- names(sort(varGene, decreasing = TRUE)[1:geneSelectNum])
     counts_processed <- counts_filtered_cell[varGene, ]
 
