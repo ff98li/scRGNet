@@ -78,7 +78,6 @@ preprocessCSV <- function(path,
                           outdir_path     = file.path(getwd(), "output"),
                           savename        = "preprocessedCSV") {
 
-    ## TODO: Add argument validity condition check
     if (!(is.character(path) & (nchar(path) > 0))) {
         stop("Invalid file path. Must be a string of non-zero length.")
     } else {
@@ -89,6 +88,35 @@ preprocessCSV <- function(path,
         } else {
             stop(paste("File not found:", path, "does not exist."))
         }
+    }
+
+    if (is.numeric(gene_zero_ratio)) {
+        if (gene_zero_ratio <= 0 || gene_zero_ratio >= 1)
+            stop("gene_zero_ratio out of range: Must be within 0 to 1")
+    } else {
+        stop("Invalid input for gene_zero_ratio: Must be numeric")
+    }
+    if (is.numeric(cell_zero_ratio)) {
+        if (cell_zero_ratio <= 0 || cell_zero_ratio >= 1)
+            stop("cell_zero_ratio out of range: Must be within 0 to 1")
+    } else {
+        stop("Invalid input for cell_zero_ratio: Must be numeric")
+    }
+
+    if (!is.logical(log_transform))
+        stop("Invalid input for log_transform: Must be logical")
+    if (!is.logical(transpose))
+        stop("Invalid input for transpose: Must be logical")
+
+    if (is.logical(toCSV)) {
+        if (toCSV) {
+            if (!is.character(savename))
+                stop("Invalid input for savename: Must be a string")
+            if (!is.character(outdir_path))
+                stop("Invalid input for output directory path: Must be a string")
+        }
+    } else {
+        stop("Invalid input for toCSV: Must be logical")
     }
 
 
