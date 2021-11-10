@@ -51,14 +51,14 @@ If TRUE, a transpose operation will be performed. Default is FALSE.}
 expression matrix to a CSV file. If TRUE a CSV file with <savename> will
 be saved to /output directory under user's current working directory.}
 
-\item{outdir_path}{A string that designates the path to the directory where
+\item{outdir_path}{A character vector that designates the path to the directory where
 the output CSV will be saved if toCSV is TRUE. This argument won't be
 used if toCSV is FALSE. There must be no path separator at the end.
 If the designated does not exist in the parent directory,
 it will create one automatically. Default is a directory named "output"
 under user's current R working directory.}
 
-\item{savename}{A string representing the name of the csv file that saves
+\item{savename}{A character vector representing the name of the csv file that saves
 pre-processed scRNA-seq data. There is no strict rule for this. However,
 it is highly recommended to give it a meaningful name.}
 }

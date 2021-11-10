@@ -140,7 +140,7 @@ preprocessCSV <- function(path,
     message(
         sprintf(
             "After preprocessing, %i cells have at most %f zero",
-            ncol(counts_filtered_gene), gene_ratio
+            ncol(counts_filtered_cell), gene_ratio
             )
         )
 

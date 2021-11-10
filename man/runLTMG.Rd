@@ -8,26 +8,38 @@ runLTMG(
   expr_mat = NULL,
   fromFile = FALSE,
   readPath = NULL,
-  toFile = TRUE,
+  toFile = FALSE,
   outdir_path = file.path(getwd(), "output"),
-  saveName = "ltmg"
+  savename = "ltmg"
 )
 }
 \arguments{
-\item{expr_mat}{A data frame or a matrix}
+\item{expr_mat}{A matrix or a data frame with row names as genes
+and column names as cell samples containing scRNA-seq expression values
+pre-processed by preprocessCSV. If reading from a expression file,
+this argument needs not be provided.}
 
-\item{fromFile}{A Boolean value}
+\item{fromFile}{A Boolean value indicating whether to read RNA-seq matrix
+from a expression file. If TRUE, expr_mat needs not be provided, and
+it will check whether the expression file exists in readPath.
+If FALSE, expr_mat must be provided.}
 
-\item{readPath}{A string}
+\item{readPath}{A character vector representing path to the expression file.
+If fromFile is TRUE, it must be provided. Otherwise optional.}
 
-\item{toFile}{A Boolean value}
+\item{toFile}{A Boolean value indicating whether to write the returned
+LTMG object to file. If TRUE, outdir_path and savename must be provided.}
 
-\item{outdir_path}{A string}
+\item{outdir_path}{A character vector representing the path to the parent
+directory where the object will be saved as a file. If toFile is TRUE,
+it must be provided. Otherwise optional.}
 
-\item{saveName}{A string}
+\item{savename}{A character vector representing the name of the saved
+LTMG object file. If toFile is TRUE, it must be provided.
+Otherwise optional.}
 }
 \value{
-Returns an LTMG object
+Returns an LTMG object containing the inferred LTMG tags of expr_mat.
 }
 \description{
 A wrapper function for running scGNNLTMG that uses
@@ -35,7 +47,8 @@ the Left-Trunctruncated-Mixed-Gaussian(LTMG) model to
 translate the input gene expression data pre-processed by preprocessCSV into
 a discretised regulatory signal as the regularizer for
 the feature autoencoder of scGNN.
-It will take around 10-15 minutes for inferring LTMG tags.
+It will take around 10-15 minutes for inferring LTMG tags, depending on
+the dataset.
 This step is optional but highly recommended prior to scGNN analysis.
 }
 \references{
