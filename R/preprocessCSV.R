@@ -148,7 +148,11 @@ preprocessCSV <- function(path,
             )
         )
 
-    ## Manually compute gene-wise variance rather than using apply()
+    ## Manually compute gene-wise variance rather than using apply + stats::var
+    ## 200x faster than apply(counts_filtered_cell, 1, stats::var)
+    ## Improved computation run-time
+    ## Source:
+    ## https://stackoverflow.com/questions/25099825/row-wise-variance-of-a-matrix-in-r
     gene_means <- rowMeans(counts_filtered_cell)
     n_cell     <- dim(counts_filtered_cell)[2]
     varGene    <- rowSums((counts_filtered_cell - gene_means)^2)/(n_cell - 1)
