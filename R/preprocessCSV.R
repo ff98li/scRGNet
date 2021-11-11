@@ -103,6 +103,12 @@ preprocessCSV <- function(path,
         stop("Invalid input for cell_zero_ratio: Must be numeric")
     }
 
+    if (is.numeric(geneSelectNum)) {
+        geneSelectNum <- as.integer(geneSelectNum)
+    } else {
+        stop("Invalid input for geneSelectNum: Must be numeric")
+    }
+
     if (!is.logical(log_transform))
         stop("Invalid input for log_transform: Must be logical")
     if (!is.logical(transpose))
