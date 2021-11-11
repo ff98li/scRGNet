@@ -42,8 +42,8 @@ GraphCovolution <- torch::nn_module(
         self$dropout      <- dropout
         self$act          <- act
         self$weight       <- torch::nn_parameter(torch::torch_tensor(
-            ## TODO: test it
-            data  = matrix(c(in_features, out_features), nrow = 2, ncol = 1),
+            ## TODO: test it in model training
+            data  = matrix(c(in_features, out_features)),
             dtype = torch::torch_float()
             )
         )
@@ -75,5 +75,40 @@ GraphCovolution <- torch::nn_module(
             as.character(self$out_features),
             ")"
         )
+    }
+)
+
+
+#' GCN Model Auto-enccoder
+#'
+#' Auto-encoder for GCN
+#'
+#' #' @references
+#' \insertRef{GCN}{scRGNet}
+#'
+#' @export
+#' @import R6
+#' @import torch
+GCNModelAE <- torch::nn_module(
+    classname = "GCNModelAE",
+    inherit = GraphCovolution,
+    public = list(
+        gc1 = NULL,
+        gc2 = NULL,
+        dc = NULL
+    ),
+    initialize <- function(input_feat_dim,
+                           hidden_dim1,
+                           hidden_dim2,
+                           dropout) {
+        self$gc1 <- GraphCovolution(input_feat_dim,
+                                    hidden_dim1,
+                                    dropout,
+                                    act = torch::nnf_relu)
+        self$gc2 <- GraphCovolution(hidden_dim1,
+                                    hidden_dim2,
+                                    dropout,
+                                    act = function(x) return(x))
+        self.dc <- .
     }
 )
