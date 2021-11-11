@@ -79,6 +79,42 @@ GraphCovolution <- torch::nn_module(
 )
 
 
+#' Inner Product Decoder
+#'
+#' Decoder using inner product for prediction.
+#'
+#' #' @references
+#' \insertRef{GCN}{scRGNet}
+#'
+#' @export
+#' @import R6
+#' @import torch
+InnerProductDecoder <- torch::nn_module(
+    classname = "InnerProductDecoder",
+    public    = list(
+        #' @field dropout dropout
+        dropout = NULL,
+
+        #' @field act activation function of the neuron
+        act     = NULL
+    ),
+
+    #' @description
+    #' Create an inner product decoder object.
+    #' @param dropout dropout
+    #' @param act The activation function used by the neuron. Default sigmoid.
+    #' @return A new `InnerProductDecoder` object.
+    initialize = function(dropout, act = torch::torch_sigmoid) {
+        self$dropout <- dropout
+        self$act     <- act
+    },
+    forward = function(z) {
+        z   = torch::nnf_dropout(z, self$dropout, training = self$training)
+        adj = self$act(torch::torch_mm(z, torch::torch_transpose(z)))
+        return(adj)
+    }
+)
+
 #' GCN Model Auto-enccoder
 #'
 #' Auto-encoder for GCN
@@ -93,11 +129,21 @@ GCNModelAE <- torch::nn_module(
     classname = "GCNModelAE",
     inherit = GraphCovolution,
     public = list(
+        #' @field gc1 the first GCN layer
         gc1 = NULL,
+        #' @field gc2 the second GCN layer
         gc2 = NULL,
-        dc = NULL
+        #' @field dc Decoder using inner product for prediction
+        dc  = NULL
     ),
-    initialize <- function(input_feat_dim,
+    #' @description
+    #' Create an GCN auto-encoder object.
+    #' @param input_feat_dim dimension of input feature matrix
+    #' @param hidden_dim1 dimension of matrix in the first hidden layer
+    #' @param hidden_dim2 dimension of matrix in the second hidden layer
+    #' @param dropout dropout
+    #' @return A new `GCNModelAE` object.
+    initialize = function(input_feat_dim,
                            hidden_dim1,
                            hidden_dim2,
                            dropout) {
@@ -109,6 +155,7 @@ GCNModelAE <- torch::nn_module(
                                     hidden_dim2,
                                     dropout,
                                     act = function(x) return(x))
-        self.dc <- .
+        self.dc  <- InnerProductDecoder(dropout, act = function(x) return(x))
     }
 )
+## TODO: Add Auto-Encoding Variational Bayes as an better alternative to this
