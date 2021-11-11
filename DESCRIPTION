@@ -20,6 +20,8 @@ Imports:
     stats,
     utils,
     Rdpack,
-    scGNNLTMG (>= 0.1.0)
-Remotes:  
+    scGNNLTMG (>= 0.1.0),
+    R6,
+    torch
+Remotes: 
     BMEngineeR/scGNNLTMG
