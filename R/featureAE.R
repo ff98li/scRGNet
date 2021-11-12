@@ -49,7 +49,8 @@ AE <- torch::nn_module(
     #' @description
     #' Forward feeding
     forward = function(x) {
-        z <- self$encode(x$view(-1, self$dim))
+        ## If unused arg pop-up, check view here
+        z <- self$encode(x$view(c(-1, self$dim)))
         return(self$decode(z))
     }
 )
