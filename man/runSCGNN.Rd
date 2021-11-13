@@ -5,7 +5,7 @@
 \title{Main function of running scGNN framework for analysis}
 \usage{
 runSCGNN(
-  dataset,
+  scDataset,
   outputDir,
   LTMG_mat = NULL,
   hyperParams = list(batch_size = 12800L, EM_iteration = 10L, regu_epochs = 500L,
@@ -14,7 +14,7 @@ runSCGNN(
 )
 }
 \arguments{
-\item{dataset}{A scDataset object containing scRNA-seq data}
+\item{scDataset}{A scDataset object containing scRNA-seq data}
 
 \item{outputDir}{Path to the output directory}
 

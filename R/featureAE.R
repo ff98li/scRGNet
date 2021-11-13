@@ -51,7 +51,12 @@ AE <- torch::nn_module(
     forward = function(x) {
         ## If unused arg pop-up, check view here
         z <- self$encode(x$view(c(-1, self$dim)))
-        return(self$decode(z))
+        return(
+            list(
+                "recon" = self$decode(z),
+                "z"     = z
+            )
+        )
     }
 )
 # TODO: if have time, do a variational auto-encoder

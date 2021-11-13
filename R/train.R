@@ -54,12 +54,22 @@ gcn_loss_function <- function(VAE    = FALSE,
 #' @param epoch epoch
 #' @param train_loader A torch dataloader loaded with an scDataset object
 #' @param model A feature auto-encoder object
+#' @param optimiser Optimiser
 #' @param device hardware to train the model
+#' @param EMflag Emflag
 #'
 #' #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'
-train <- function(epoch, train_loader, model, device) {
+#' @importFrom coro loop
+train <- function(epoch, train_loader, model, optimiser, device, EMflag = FALSE) {
     model$train()
     train_loss <- 0
+    coro::loop(
+        for (batch in train_loader) {
+            # optimiser$zero_grad()
+            ## if (is(model, "AE"))
+            print(model(batch))
+        }
+    )
 }

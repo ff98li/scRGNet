@@ -4,7 +4,7 @@
 \alias{train}
 \title{Training Model}
 \usage{
-train(epoch, train_loader, model, device)
+train(epoch, train_loader, model, optimiser, device, EMflag = FALSE)
 }
 \arguments{
 \item{epoch}{epoch}
@@ -13,7 +13,11 @@ train(epoch, train_loader, model, device)
 
 \item{model}{A feature auto-encoder object}
 
-\item{device}{hardware to train the model
+\item{optimiser}{Optimiser}
+
+\item{device}{hardware to train the model}
+
+\item{EMflag}{Emflag
 
 #' @references
 \insertRef{scGNN}{scRGNet}}

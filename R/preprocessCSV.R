@@ -45,20 +45,14 @@
 #'     where row names are cells and column names are genes.
 #'
 #' @examples
+#'
 #' # Example 1:
-#' # Accessing the demo gene_counts_small dataset available with the package
-#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
-#' # Preprocess the raw counts
-#' counts <- preprocessCSV(path = inputCountsPath, toCSV = FALSE, geneSelectNum = 50)
-#'
-#' # Example 2:
-#' # Preprocess the whole scRNA-seq dataset
 #' \dontrun{
+#' # Preprocess the whole scRNA-seq dataset
 #' inputCountsPath <- system.file("extdata", "GSE138852_counts.csv.gz", package = "scRGNet")
-#' counts <- preprocessCSV(path = inputCountsPath, savename = "GSE138852_preprocessed")
-#' # Take ~40 seconds to process. If log_transform = FALSE then ~20 seconds
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' # Take ~20 seconds to process.
 #' }
-#'
 #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'
@@ -74,7 +68,7 @@ preprocessCSV <- function(path,
                           gene_zero_ratio = 0.99,
                           geneSelectNum   = 2000L,
                           transpose       = FALSE,
-                          toCSV           = TRUE,
+                          toCSV           = FALSE,
                           outdir_path     = file.path(getwd(), "output"),
                           savename        = "preprocessedCSV") {
 

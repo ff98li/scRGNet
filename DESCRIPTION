@@ -23,6 +23,7 @@ Imports:
     scGNNLTMG (>= 0.1.0),
     R6,
     torch,
-    Matrix
+    Matrix,
+    coro
 Remotes: 
     BMEngineeR/scGNNLTMG
