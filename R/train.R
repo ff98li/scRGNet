@@ -67,9 +67,9 @@ train <- function(epoch, train_loader, model, optimiser, device, EMflag = FALSE)
     train_loss <- 0
     coro::loop(
         for (batch in train_loader) {
-            # optimiser$zero_grad()
+            optimiser$zero_grad()
             ## if (is(model, "AE"))
-            print(model(batch))
+            train_output <- model(batch)
         }
     )
 }

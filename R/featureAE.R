@@ -49,7 +49,7 @@ AE <- torch::nn_module(
     #' @description
     #' Forward feeding
     forward = function(x) {
-        ## If unused arg pop-up, check view here
+        ## If shape invalid, check view here
         z <- self$encode(x$view(c(-1, self$dim)))
         return(
             list(

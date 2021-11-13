@@ -51,8 +51,8 @@ runSCGNN <- function(scDataset,
     }
 
     ## TODO: Add option to use variational feature auto-encoder
-    model     <- AE(length(scDataset))$to(device = device)
-    optimiser <- torch::optim_adam(params = model$parameters(), lr = 1e-3)
+    model     <- AE(scDataset$features@Dim[2])$to(device = device)
+    optimiser <- torch::optim_adam(params = model$parameters, lr = 1e-3)
     message("Torch Model Ready...")
 
     message("Start training...")
