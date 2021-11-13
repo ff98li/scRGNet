@@ -63,8 +63,8 @@ pre-processed scRNA-seq data. There is no strict rule for this. However,
 it is highly recommended to give it a meaningful name.}
 }
 \value{
-Returns a matrix with the pre-processed scRNA-seq expression values,
-where row names are genes and column names are cells.
+Returns a scDataset with the pre-processed scRNA-seq expression values,
+where row names are cells and column names are genes.
 }
 \description{
 A function that reads a CSV file containing scRNA-seq counts

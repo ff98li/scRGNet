@@ -22,6 +22,7 @@ Imports:
     Rdpack,
     scGNNLTMG (>= 0.1.0),
     R6,
-    torch
+    torch,
+    Matrix
 Remotes: 
     BMEngineeR/scGNNLTMG

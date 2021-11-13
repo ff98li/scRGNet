@@ -18,7 +18,7 @@ scDataset <- torch::dataset(
     #' @param transform A function to transform the matrix
     #' @return A new `scDataset` object.
     initialize = function(data, transform = NULL) {
-        self$feature <- t(data)
+        self$feature <- Matrix::t(data)
         self$transform <- transform
     },
     #' @description

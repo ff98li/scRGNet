@@ -51,6 +51,11 @@ gcn_loss_function <- function(VAE    = FALSE,
 #'
 #' Train in main
 #'
+#' @param epoch epoch
+#' @param train_loader A torch dataloader loaded with an scDataset object
+#' @param model A feature auto-encoder object
+#' @param device hardware to train the model
+#'
 #' #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'

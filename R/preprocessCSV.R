@@ -41,8 +41,8 @@
 #'     pre-processed scRNA-seq data. There is no strict rule for this. However,
 #'     it is highly recommended to give it a meaningful name.
 #'
-#' @return Returns a matrix with the pre-processed scRNA-seq expression values,
-#'     where row names are genes and column names are cells.
+#' @return Returns a scDataset with the pre-processed scRNA-seq expression values,
+#'     where row names are cells and column names are genes.
 #'
 #' @examples
 #' # Example 1:
@@ -63,7 +63,7 @@
 #' \insertRef{scGNN}{scRGNet}
 #'
 #' @export
-#' @import R.utils
+#' @import R.utils Matrix
 #' @importClassesFrom data.table data.table
 #' @importFrom Rdpack reprompt
 #' @importFrom data.table fread transpose
@@ -233,7 +233,6 @@ preprocessCSV <- function(path,
 
     ## free up memory
     rm(list = c("gene_means", "varGene", "counts_filtered_cell", "n_cell", "n_gene"))
-    invisible(gc())
 
     if (log_transform)
         counts_processed <- log1p(counts_processed)
@@ -249,11 +248,17 @@ preprocessCSV <- function(path,
                          )
     }
 
+    counts_processed <- Matrix::Matrix(counts_processed, sparse = TRUE)
+    scData           <- scDataset(data = counts_processed)
+
+    rm(counts_processed)
+    invisible(gc())
+
     finish_time  <- Sys.time()
     process_time <- finish_time - start_time
     message(sprintf("Time taken for pre-processing data: %f", process_time))
 
-    return(counts_processed)
+    return(scData)
 }
 
 #' Get discretised regulatory signals from LTMG model
