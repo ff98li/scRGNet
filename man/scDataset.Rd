@@ -26,11 +26,3 @@ Get the expression values of a cell
 \details{
 An R6 class to store scRNA-seq data for analysis using Torch
 }
-\section{Fields}{
-
-\describe{
-\item{\code{features}}{A feature matrix with rows as cells and column as genes}
-
-\item{\code{Any}}{function to transform the matrix. Optional.}
-}}
-
