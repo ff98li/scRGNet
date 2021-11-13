@@ -2,24 +2,56 @@
 #'
 #' Main
 #'
-#' @param datasetName A character vector representing the name of the dataset used
+#' @param dataset A scDataset object containing scRNA-seq data
 #' @param outputDir Path to the output directory
-#' @param LTMGregularized Whether to use LTMG tags as regularizer
-#' @param LTMGpath Path to the LTMG sparse mtx file
+#' @param LTMG_mat LTMG sparse matrix. If provided, then LTMG regularisation will be applied. Optional.
 #' @param hyperParams A list of hyperparameter to tune the model. Optional.
-runSCGNN <- function(datasetName,
+#' @param hardwareSetup A list of parameters to setup the hardware on which the model runs. Optional.
+#'
+#' @export
+#' @import torch
+runSCGNN <- function(dataset,
                      outputDir,
-                     LTMGregularized = FALSE,
-                     LTMGpath        = NULL,
+                     LTMG_mat        = NULL,
                      hyperParams     = list(
-                         "EM_iteration" = 10,
-                         "regu_epochs" = 500,
-                         "EM_epochs" = 200,
-                         "k" = 7,
-                         "GAEepochs" = 200,
+                         "batch_size" = 12800L,
+                         "EM_iteration" = 10L,
+                         "regu_epochs" = 500L,
+                         "EM_epochs" = 200L,
+                         "K" = 7L,
+                         "GAEepochs" = 200L,
                          "L1" = 1.0,
                          "L2" = 0.0
-                     )
-                     ) {
+                    ),
+                    hardwareSetup = list(
+                        "CUDA"      = FALSE,
+                        "coresUage" = 5 ## reset to 1 on submission
+                    )
+                ) {
+
+    if (hardwareSetup$CUDA){
+        device <- torch::torch_device(type = "cuda")
+    } else {
+        device <- torch::torch_device(type = "cpu")
+        torch::torch_set_num_threads(hardwareSetup$coreUsage)
+    }
+
+    train_loader <- torch::dataloader(dataset     = dataset,
+                                      batch_size  = hyperParams$batch_size,
+                                      shuffle     = FALSE,
+                                      pin_memory  = ifelse(hardwareSetup$CUDA, TRUE, FALSE),
+                                      num_workers = ifelse(hardwareSetup$CUDA, 1, 0))
+
+    start_time <- Sys.time() ## count the time to process data.
+
+    useLTMG <- FALSE
+    if (!is.null(LTMG_mat)) {
+        useLTMG <- TRUE ## TODO: if time permits, implement LTMG regularisation
+    }
+
+    ## TODO: Add option to use variational feature auto-encoder
+    model <- AE(dim = dim(dataset$features)[1])$to(device = device)
+    optimiser <- torch::optim_adam(params = model$parameters(), lr = 1e-3)
+    message("Torch Model Ready...")
 
 }

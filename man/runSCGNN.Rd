@@ -5,24 +5,24 @@
 \title{Main function of running scGNN framework for analysis}
 \usage{
 runSCGNN(
-  datasetName,
+  dataset,
   outputDir,
-  LTMGregularized = FALSE,
-  LTMGpath = NULL,
-  hyperParams = list(EM_iteration = 10, regu_epochs = 500, EM_epochs = 200, k = 7,
-    GAEepochs = 200, L1 = 1, L2 = 0)
+  LTMG_mat = NULL,
+  hyperParams = list(batch_size = 12800L, EM_iteration = 10L, regu_epochs = 500L,
+    EM_epochs = 200L, K = 7L, GAEepochs = 200L, L1 = 1, L2 = 0),
+  hardwareSetup = list(CUDA = FALSE, coresUage = 5)
 )
 }
 \arguments{
-\item{datasetName}{A character vector representing the name of the dataset used}
+\item{dataset}{A scDataset object containing scRNA-seq data}
 
 \item{outputDir}{Path to the output directory}
 
-\item{LTMGregularized}{Whether to use LTMG tags as regularizer}
-
-\item{LTMGpath}{Path to the LTMG sparse mtx file}
+\item{LTMG_mat}{LTMG sparse matrix. If provided, then LTMG regularisation will be applied. Optional.}
 
 \item{hyperParams}{A list of hyperparameter to tune the model. Optional.}
+
+\item{hardwareSetup}{A list of parameters to setup the hardware on which the model runs. Optional.}
 }
 \description{
 Main
