@@ -15,7 +15,7 @@ runSCGNN <- function(scDataset,
                      outputDir,
                      LTMG_mat        = NULL,
                      hyperParams     = list(
-                         "batch_size" = 12800L, ## must let user define this...
+                         "batch_size" = 12800L, ## default set to 1
                          "EM_iteration" = 10L,
                          "regu_epochs" = 500L,
                          "EM_epochs" = 200L,

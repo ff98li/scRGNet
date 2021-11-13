@@ -65,8 +65,10 @@ gcn_loss_function <- function(VAE    = FALSE,
 train <- function(epoch, train_loader, model, optimiser, device, EMflag = FALSE) {
     model$train()
     train_loss <- 0
+    batch_idx  <- 0
     coro::loop(
         for (batch in train_loader) {
+            batch_idx <- batch_idx + 1
             optimiser$zero_grad()
             ## if (is(model, "AE"))
             train_output <- model(batch)

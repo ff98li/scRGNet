@@ -24,14 +24,21 @@ scDataset <- torch::dataset(
     },
     #' @description
     #' Get the expression values of a cell
+    #' @return index of sample (cell) and the sample itself
     .getitem = function(idx) {
         if (is(idx, "torch_tensor"))
             idx <- torch::as_array(idx)
 
         sample <- self$features[idx, ]
+
         if (!is.null(self$transform))
             sample <- self$transform(sample)
 
-        return(sample)
+        return(
+            list(
+                "index"  = idx,
+                "sample" = sample
+            )
+        )
     }
 )
