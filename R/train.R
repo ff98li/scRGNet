@@ -17,14 +17,14 @@
 #' \insertRef{scGNN}{scRGNet}
 #'
 #' @importFrom torch torch_mean torch_pow torch_sum nnf_binary_cross_entropy_with_logits torch_exp
-loss_function <- function(VAE    = FALSE,
-                          logvar = NULL,
-                          preds,
-                          labels,
-                          mu,
-                          n_nodes,
-                          norm,
-                          pos_weight) {
+gcn_loss_function <- function(VAE    = FALSE,
+                              logvar = NULL,
+                              preds,
+                              labels,
+                              mu,
+                              n_nodes,
+                              norm,
+                              pos_weight) {
 
     cost <- norm * torch::nnf_binary_cross_entropy_with_logits(
         input      = preds,
@@ -45,4 +45,16 @@ loss_function <- function(VAE    = FALSE,
     } else {
         return(cost)
     }
+}
+
+#' Training Model
+#'
+#' Train in main
+#'
+#' #' @references
+#' \insertRef{scGNN}{scRGNet}
+#'
+train <- function(epoch, train_loader, model, device) {
+    model$train()
+    train_loss <- 0
 }

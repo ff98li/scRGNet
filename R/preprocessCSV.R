@@ -218,8 +218,8 @@ preprocessCSV <- function(path,
     varGene    <- rowSums((counts_filtered_cell - gene_means)^2)/(n_cell - 1)
 
     ## Check how many genes available to select
-    n_gene <-dim(counts_filtered_cell)[1]
-    if (geneSelectNum < n_gene) {
+    n_gene <- dim(counts_filtered_cell)[1]
+    if (geneSelectNum > n_gene) {
         message(
             sprintf("Remaining genes are fewer than %i. All remaining %i genes will be selected.",
                     geneSelectNum, n_gene)
