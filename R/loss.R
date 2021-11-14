@@ -56,7 +56,9 @@ loss_function_gcn <- function(VAE    = FALSE,
 #' @param reduction Reduction method
 #'
 #' @return tensor
+#'
 #' @export
+#' @importFrom torch torch_mean torch_sum torch_broadcast_tensors nnf_mse_loss
 vallina_mse_loss_function <- function(input, target, reduction = 'none') {
 
     if (reduction %in% c('none', 'mean', 'sum')) {
@@ -71,7 +73,7 @@ vallina_mse_loss_function <- function(input, target, reduction = 'none') {
                 sprintf(
                     "Using a target size (%i) that is different to the input size (%i).
                      This will likely lead to incorrect results due to broadcasting.
-                     Please ensure they have the same size.", input$size(), target$size()
+                     Please ensure they have the same size.", target$size(), input$size()
                 )
             )
         )
@@ -97,6 +99,48 @@ vallina_mse_loss_function <- function(input, target, reduction = 'none') {
     return(ret)
 }
 
+#' Regulation MSE Loss Function
+#'
+#' Measures the element-wise mean squared error for regulation input, now only support LTMG.
+#'
+#' @param input tensor
+#' @param target tensor
+#' @param regu_mat Matrix
+#' @param reduction String
+#'
+#' @return tensor
+#'
+#' @export
+regulation_mse_loss_function <- function(input, target, regu_mat, reduction = 'none') {
+
+    if (reduction %in% c('none', 'mean', 'sum')) {
+        ;
+    } else {
+        stop(sprintf("%s is not a valid value for reduction", reduction))
+    }
+
+    if (input$size() != target$size()) {
+        message(
+            cat(
+                sprintf(
+                    "Using a target size (%i) that is different to the input size (%i).
+                     This will likely lead to incorrect results due to broadcasting.
+                     Please ensure they have the same size.", target$size(), input$size()
+                )
+            )
+        )
+    }
+
+    ret <- (input - target) ** 2
+    ret <- torch::torch_mul(ret, regu_mat)
+
+    if (reduction != 'none')
+        ret <- ifelse(reduction == 'mean',
+                      torch::torch_mean(ret),
+                      torch::torch_sum())
+
+    return(ret)
+}
 
 #' Loss function regularised by the graph information
 #'
@@ -118,18 +162,18 @@ vallina_mse_loss_function <- function(input, target, reduction = 'none') {
 #' #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'
-#'
+#' @export
 loss_function_graph <- function(recon_x,
                                 x,
                                 mu,
                                 logvar,
-                                graph_regu = NULL,
+                                graph_regu  = NULL,
                                 gamma_param = 1.0,
-                                regu_mat = NULL,
-                                regu_type = NULL,
-                                regu_param = 0.001,
-                                model = "AE",
-                                reduction = "sum") {
+                                regu_mat    = NULL,
+                                regu_type   = NULL,
+                                regu_param  = 0.001,
+                                model       = "AE",
+                                reduction   = "sum") {
     target <- x
     use_regu <- !(is.null(regu_type))
     if (use_regu)
