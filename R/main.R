@@ -11,26 +11,25 @@
 #' @importFrom coro loop
 #' @import torch
 runFeatureAE <- function(scDataset,
-                     LTMG_mat        = NULL,
-                     #outputDir       = file.path(getwd(), "outputDir"),
-                     #datasetName     = "scData",
-                     hyperParams     = list(
-                         "batch_size"   = 12800L, ## default set to 1
+                         LTMG_mat       = NULL,
+                         #outputDir     = file.path(getwd(), "outputDir"),
+                         #datasetName   = "scData",
+                         hyperParams    = list(
+                         "batch_size"   = 1L, ## default set to 1
                          "EM_iteration" = 10L,
                          "regu_epochs"  = 500L,
                          "EM_epochs"    = 200L,
-                         "GAEepochs"    = 200L,
+                         #"GAEepochs"    = 200L,
                          "L1"           = 1.0,
                          "L2"           = 0.0,
                          "regu_alpha"   = 0.9,
                          "reduction"    = "sum",
-                         "EMreguTag"    = TRUE
-                    ),
-                    hardwareSetup = list(
-                        "CUDA"      = FALSE,
-                        "coresUage" = 5 ## reset to 1 on submission
-                    )
-                ) {
+                         "EMreguTag"    = TRUE),
+                         hardwareSetup = list(
+                             "CUDA"      = FALSE,
+                             "coresUage" = 5L ## reset to 1 on submission
+                         )
+                        ) {
 
     #if (dir.exists(outputDir) == FALSE)
     #    dir.create(outputDir)
@@ -39,7 +38,7 @@ runFeatureAE <- function(scDataset,
         device <- torch::torch_device(type = "cuda")
     } else {
         device <- torch::torch_device(type = "cpu")
-        torch::torch_set_num_threads(hardwareSetup$coreUsage)
+        torch::torch_set_num_threads(hardwareSetup$coresUage)
     }
 
     train_loader <- torch::dataloader(dataset     = scDataset,
