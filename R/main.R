@@ -24,7 +24,8 @@ runSCGNN <- function(scDataset,
                          "L1"           = 1.0,
                          "L2"           = 0.0,
                          "regu_alpha"   = 0.9,
-                         "reduction"    = "sum"
+                         "reduction"    = "sum",
+                         "EMreguTag"    = TRUE
                     ),
                     hardwareSetup = list(
                         "CUDA"      = FALSE,
@@ -70,10 +71,15 @@ runSCGNN <- function(scDataset,
                              model        = model,
                              optimiser    = optimiser,
                              regu_mat     = LTMG_mat,
-                             regu_param   = hyperParams$regu_alpha,
-                             reduction    = hyperParams$reduction,
+                             hyperParams  = hyperParams,
                              device       = device,
                              EMflag       = FALSE)
     }
+
+
+
+
+
+
 
 }

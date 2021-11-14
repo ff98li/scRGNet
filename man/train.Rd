@@ -10,11 +10,9 @@ train(
   model,
   optimiser,
   regu_mat = NULL,
-  regu_param = 0.9,
-  reduction = "sum",
+  hyperParams,
   device,
-  EMflag = FALSE,
-  EMreguTag = FALSE
+  EMflag = FALSE
 )
 }
 \arguments{
@@ -28,15 +26,11 @@ train(
 
 \item{regu_mat}{LTMG regulation matrix}
 
-\item{regu_param}{Regularisation paramter alpha}
-
-\item{reduction}{reduction type: mean/sum, default(sum)}
+\item{hyperParams}{Hyper-parameters user defined to tune the model}
 
 \item{device}{hardware to train the model}
 
-\item{EMflag}{Emflag}
-
-\item{EMreguTag}{whether to use regu_mat in EM process
+\item{EMflag}{Emflag
 
 #' @references
 \insertRef{scGNN}{scRGNet}}
