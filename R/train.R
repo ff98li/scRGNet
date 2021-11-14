@@ -71,7 +71,7 @@ train <- function(epoch, train_loader, model, optimiser, device, EMflag = FALSE)
             batch_idx <- batch_idx + 1
             optimiser$zero_grad()
             ## if (is(model, "AE"))
-            train_output <- model(batch)
+            train_output <- model(batch$sample)
         }
     )
 }

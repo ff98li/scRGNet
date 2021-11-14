@@ -36,7 +36,7 @@ scDataset <- torch::dataset(
 
         return(
             list(
-                "index"  = idx,
+                "index"  = torch::as_array(idx),
                 "sample" = sample
             )
         )

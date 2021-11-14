@@ -15,6 +15,8 @@ scDataset(data, transform = NULL)
 A new \code{scDataset} object.
 
 number of cells
+
+index of sample (cell) and the sample itself
 }
 \description{
 Create a new scDataset object.
