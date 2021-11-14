@@ -1,27 +1,24 @@
-#' Main function of running scGNN framework for analysis
+#' Main function of running scGNN feature auto-encoder for analysis
 #'
 #' Main
 #'
 #' @param scDataset A scDataset object containing scRNA-seq data
 #' @param LTMG_mat LTMG sparse matrix. If provided, then LTMG regularisation will be applied. Optional.
-#' @param outputDir Path to directory to save output
-#' @param datasetName Name of the output file to save
 #' @param hyperParams A list of hyperparameter to tune the model. Optional.
 #' @param hardwareSetup A list of parameters to setup the hardware on which the model runs. Optional.
 #'
 #' @export
 #' @importFrom coro loop
 #' @import torch
-runSCGNN <- function(scDataset,
+runFeatureAE <- function(scDataset,
                      LTMG_mat        = NULL,
-                     outputDir       = file.path(getwd(), "outputDir"),
-                     datasetName     = "scData",
+                     #outputDir       = file.path(getwd(), "outputDir"),
+                     #datasetName     = "scData",
                      hyperParams     = list(
                          "batch_size"   = 12800L, ## default set to 1
                          "EM_iteration" = 10L,
                          "regu_epochs"  = 500L,
                          "EM_epochs"    = 200L,
-                         "K"            = 7L,
                          "GAEepochs"    = 200L,
                          "L1"           = 1.0,
                          "L2"           = 0.0,
@@ -35,8 +32,8 @@ runSCGNN <- function(scDataset,
                     )
                 ) {
 
-    if (dir.exists(outputDir) == FALSE)
-        dir.create(outputDir)
+    #if (dir.exists(outputDir) == FALSE)
+    #    dir.create(outputDir)
 
     if (hardwareSetup$CUDA){
         device <- torch::torch_device(type = "cuda")
@@ -58,21 +55,20 @@ runSCGNN <- function(scDataset,
         useLTMG <- TRUE ## TODO: if time permits, implement LTMG regularisation
     }
 
-    ## TODO: Add option to use variational feature auto-encoder
+    ## TODO: Add new function to use variational feature auto-encoder
     model     <- AE(scDataset$features@Dim[2])$to(device = device)
     optimiser <- torch::optim_adam(params = model$parameters, lr = 1e-3)
     message("Torch Model Ready...")
 
     message("Start training...")
 
-    stateStart <- list(
-        "state_dict" = model$state_dict(),
-        "optimiser"  = optimiser$state_dict()
-    )
+    #stateStart <- list(
+    #    "state_dict" = model$state_dict(),
+    #    "optimiser"  = optimiser$state_dict()
+    #)
 
-    rdaFileStart <- file.path(outputDir, paste(datasetName, "rda",sep = "."))
-
-    torch::torch_save(stateStart, rdaFileStart)
+    #rdaFileStart <- file.path(outputDir, paste(datasetName, "rda",sep = "."))
+    #torch::torch_save(stateStart, rdaFileStart)
 
     train_output <- list() ## Initialised to save model output
     for (epoch in seq(hyperParams$regu_epoch)) {
@@ -88,11 +84,13 @@ runSCGNN <- function(scDataset,
 
     zOut <- train_output$z$detach()$cpu()
 
-    rdaStatus <- model$state_dict()
+    finish_time <- Sys.time()
+    process_time <- finish_time - start_time
+    message(sprintf("Time taken for running model: %f", process_time))
 
-    ## TODO: Store reconOri for imputation
+    ## Store reconOri for imputation (currently not available)
+    #rdaStatus <- model$state_dict()
 
-    ## Step 1: Inferring cell-type
-
-
+    ## Proceed to inferring cell-type...
+    return(zOut)
 }
