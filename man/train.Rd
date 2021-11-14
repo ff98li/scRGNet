@@ -2,9 +2,18 @@
 % Please edit documentation in R/train.R
 \name{train}
 \alias{train}
-\title{Training Model}
+\title{Main Training Model}
 \usage{
-train(epoch, train_loader, model, optimiser, device, EMflag = FALSE)
+train(
+  epoch,
+  train_loader,
+  model,
+  optimiser,
+  regu_mat = NULL,
+  device,
+  EMflag = FALSE,
+  EMreguTag = FALSE
+)
 }
 \arguments{
 \item{epoch}{epoch}
@@ -15,9 +24,13 @@ train(epoch, train_loader, model, optimiser, device, EMflag = FALSE)
 
 \item{optimiser}{Optimiser}
 
+\item{regu_mat}{LTMG regulation matrix}
+
 \item{device}{hardware to train the model}
 
-\item{EMflag}{Emflag
+\item{EMflag}{Emflag}
+
+\item{EMreguTag}{whether to use regu_mat in EM process
 
 #' @references
 \insertRef{scGNN}{scRGNet}}
