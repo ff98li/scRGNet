@@ -15,14 +15,16 @@ runSCGNN <- function(scDataset,
                      outputDir,
                      LTMG_mat        = NULL,
                      hyperParams     = list(
-                         "batch_size" = 12800L, ## default set to 1
+                         "batch_size"   = 12800L, ## default set to 1
                          "EM_iteration" = 10L,
-                         "regu_epochs" = 500L,
-                         "EM_epochs" = 200L,
-                         "K" = 7L,
-                         "GAEepochs" = 200L,
-                         "L1" = 1.0,
-                         "L2" = 0.0
+                         "regu_epochs"  = 500L,
+                         "EM_epochs"    = 200L,
+                         "K"            = 7L,
+                         "GAEepochs"    = 200L,
+                         "L1"           = 1.0,
+                         "L2"           = 0.0,
+                         "regu_alpha"   = 0.9,
+                         "reduction"    = "sum"
                     ),
                     hardwareSetup = list(
                         "CUDA"      = FALSE,
@@ -63,7 +65,15 @@ runSCGNN <- function(scDataset,
     )
 
     for (epoch in seq(hyperParams$regu_epoch)) {
-        train_ouput <- train(epoch, train_loader, model, optimiser, device)
+        train_ouput <- train(epoch        = epoch,
+                             train_loader = train_loader,
+                             model        = model,
+                             optimiser    = optimiser,
+                             regu_mat     = LTMG_mat,
+                             regu_param   = hyperParams$regu_alpha,
+                             reduction    = hyperParams$reduction,
+                             device       = device,
+                             EMflag       = FALSE)
     }
 
 }

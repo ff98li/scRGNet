@@ -7,8 +7,8 @@
 loss_function_graph(
   recon_x,
   x,
-  mu,
-  logvar,
+  mu = NULL,
+  logvar = NULL,
   graph_regu = NULL,
   gamma_param = 1,
   regu_mat = NULL,

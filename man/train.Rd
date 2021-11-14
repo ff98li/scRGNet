@@ -10,6 +10,8 @@ train(
   model,
   optimiser,
   regu_mat = NULL,
+  regu_param = 0.9,
+  reduction = "sum",
   device,
   EMflag = FALSE,
   EMreguTag = FALSE
@@ -25,6 +27,10 @@ train(
 \item{optimiser}{Optimiser}
 
 \item{regu_mat}{LTMG regulation matrix}
+
+\item{regu_param}{Regularisation paramter alpha}
+
+\item{reduction}{reduction type: mean/sum, default(sum)}
 
 \item{device}{hardware to train the model}
 

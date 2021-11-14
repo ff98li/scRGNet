@@ -9,7 +9,8 @@ runSCGNN(
   outputDir,
   LTMG_mat = NULL,
   hyperParams = list(batch_size = 12800L, EM_iteration = 10L, regu_epochs = 500L,
-    EM_epochs = 200L, K = 7L, GAEepochs = 200L, L1 = 1, L2 = 0),
+    EM_epochs = 200L, K = 7L, GAEepochs = 200L, L1 = 1, L2 = 0, regu_alpha = 0.9,
+    reduction = "sum"),
   hardwareSetup = list(CUDA = FALSE, coresUage = 5)
 )
 }

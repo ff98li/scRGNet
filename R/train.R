@@ -7,6 +7,8 @@
 #' @param model A feature auto-encoder object
 #' @param optimiser Optimiser
 #' @param regu_mat LTMG regulation matrix
+#' @param regu_param Regularisation paramter alpha
+#' @param reduction reduction type: mean/sum, default(sum)
 #' @param device hardware to train the model
 #' @param EMflag Emflag
 #' @param EMreguTag whether to use regu_mat in EM process
@@ -15,7 +17,16 @@
 #' \insertRef{scGNN}{scRGNet}
 #'
 #' @importFrom coro loop
-train <- function(epoch, train_loader, model, optimiser, regu_mat = NULL, device, EMflag = FALSE, EMreguTag = FALSE) {
+train <- function(epoch,
+                  train_loader,
+                  model,
+                  optimiser,
+                  regu_mat = NULL,
+                  regu_param = 0.9,
+                  reduction = 'sum',
+                  device,
+                  EMflag = FALSE,
+                  EMreguTag = FALSE) {
     regu <- !(is.null(regu_mat))
     model$train()
     loss       <- 0
@@ -34,10 +45,19 @@ train <- function(epoch, train_loader, model, optimiser, regu_mat = NULL, device
             train_output <- model(batch$sample)
 
             if (EMflag & !EMreguTag) {
-                loss <- loss_function_graph(recon_x = train_output$recon,
-                                            x = batch$sample$view(c(-1, train_output$sample$shape[2])))
+                loss <- loss_function_graph(
+                    recon_x    = train_output$recon,
+                    x          = batch$sample$view(c(-1, train_output$sample$shape[2])),
+                    regu_param = regu_param,
+                    )
             } else {
-                loss
+                loss <- loss_function_graph(
+                    recon_x = train_output$recon,
+                    x = batch$sample$view(c(-1, train_output$sample$shape[2])),
+                    regu_mat = regu_mat_batch,
+                    regu_type = "LTMG",
+                    regu_param = regu_param
+                )
             }
         }
     )

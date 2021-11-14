@@ -165,8 +165,8 @@ regulation_mse_loss_function <- function(input, target, regu_mat, reduction = 'n
 #' @export
 loss_function_graph <- function(recon_x,
                                 x,
-                                mu,
-                                logvar,
+                                mu          = NULL,
+                                logvar      = NULL,
                                 graph_regu  = NULL,
                                 gamma_param = 1.0,
                                 regu_mat    = NULL,
@@ -189,7 +189,7 @@ loss_function_graph <- function(recon_x,
     } else if (regu_type == "LTMG") {
         penalty <- regu_param * regulation_mse_loss_function(recon_x, target, regu_mat, reduction)
         loss    <- BCE + penalty
-    }
+    } ## Other regularisation currently not supported
 
     return(loss)
 }
