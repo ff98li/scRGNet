@@ -1,53 +1,4 @@
-#' GCN Loss function
-#'
-#' Loss function for optimising GCN using either AE or VAE
-#'
-#' @param VAE Whether to use variational auto-encoder or not. Default False.
-#' @param logvar Used when VAE is set to TRUE. Default is NULL when using AE.
-#' @param preds Predictions made by GCN during training
-#' @param labels True values to checked against preds to calculate loss
-#' @param mu Mean of the Gaussian for auto-encoder
-#' @param n_nodes Number of nodes in the graph
-#' @param norm Norm
-#' @param pos_weight Weight parameter used to calculate loss
-#'
-#' @return Logistic-cross-entropy loss
-#'
-#' #' @references
-#' \insertRef{scGNN}{scRGNet}
-#'
-#' @importFrom torch torch_mean torch_pow torch_sum nnf_binary_cross_entropy_with_logits torch_exp
-gcn_loss_function <- function(VAE    = FALSE,
-                              logvar = NULL,
-                              preds,
-                              labels,
-                              mu,
-                              n_nodes,
-                              norm,
-                              pos_weight) {
-
-    cost <- norm * torch::nnf_binary_cross_entropy_with_logits(
-        input      = preds,
-        target     = labels,
-        pos_weight = labels * pos_weight
-    )
-
-    if (VAE) {
-        if (is.null(logvar)) {
-            stop("Missing argument logvar: Must provide to use GVAE")
-        }
-        KLD <- -(0.5) / n_nodes * torch::torch_mean(
-            torch::torch_sum(
-                1 + 2 * logvar - torch::torch_pow(mu, 2) - torch::torch_pow(torch::torch_exp(logvar), 2)
-            ), 1
-        )
-        return(cost + KLD)
-    } else {
-        return(cost)
-    }
-}
-
-#' Training Model
+#' Main Training Model
 #'
 #' Train in main
 #'
@@ -55,23 +6,37 @@ gcn_loss_function <- function(VAE    = FALSE,
 #' @param train_loader A torch dataloader loaded with an scDataset object
 #' @param model A feature auto-encoder object
 #' @param optimiser Optimiser
+#' @param regu_mat LTMG regulation matrix
 #' @param device hardware to train the model
 #' @param EMflag Emflag
+#' @param EMreguTag whether to use regu_mat in EM process
 #'
 #' #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'
 #' @importFrom coro loop
-train <- function(epoch, train_loader, model, optimiser, device, EMflag = FALSE) {
+train <- function(epoch, train_loader, model, optimiser, regu_mat = NULL, device, EMflag = FALSE, EMreguTag = FALSE) {
+    regu <- !(is.null(regu_mat))
     model$train()
     train_loss <- 0
     batch_idx  <- 0
     coro::loop(
         for (batch in train_loader) {
             batch_idx <- batch_idx + 1
+
+            if (regu) {
+                regu_mat_batch <- regu_mat[, batch_idx]
+                regu_mat_batch <- regu_mat_batch$to(device)
+            }
+
             optimiser$zero_grad()
-            ## if (is(model, "AE"))
+            ## if (is(model, "AE")) ## for later VAE option
             train_output <- model(batch$sample)
+            if (EMflag & !EMreguTag) {
+                loss
+            } else {
+                loss
+            }
         }
     )
 }
