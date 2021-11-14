@@ -24,6 +24,7 @@ Imports:
     R6,
     torch,
     Matrix,
-    coro
+    coro,
+    igraph
 Remotes: 
     BMEngineeR/scGNNLTMG
