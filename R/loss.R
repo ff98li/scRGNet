@@ -134,7 +134,18 @@ loss_function_graph <- function(recon_x,
     use_regu <- !(is.null(regu_type))
     if (use_regu)
         target$requires_grad <- use_regu
+
     # Euclidean
     # BCE = gammaPara * vallina_mse_loss_function(recon_x, target, reduction='sum')
     BCE <- gamma_param * vallina_mse_loss_function(recon_x, target, reduction = reduction)
+
+    loss <- 0
+    if (is.null(regu_type)) {
+        loss <- BCE
+    } else if (regu_type == "LTMG") {
+        penalty <- regu_param * regulation_mse_loss_function(recon_x, target, regu_mat, reduction)
+        loss    <- BCE + penalty
+    }
+
+    return(loss)
 }
