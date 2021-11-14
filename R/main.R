@@ -3,8 +3,9 @@
 #' Main
 #'
 #' @param scDataset A scDataset object containing scRNA-seq data
-#' @param outputDir Path to the output directory
 #' @param LTMG_mat LTMG sparse matrix. If provided, then LTMG regularisation will be applied. Optional.
+#' @param outputDir Path to directory to save output
+#' @param datasetName Name of the output file to save
 #' @param hyperParams A list of hyperparameter to tune the model. Optional.
 #' @param hardwareSetup A list of parameters to setup the hardware on which the model runs. Optional.
 #'
@@ -12,8 +13,9 @@
 #' @importFrom coro loop
 #' @import torch
 runSCGNN <- function(scDataset,
-                     outputDir,
                      LTMG_mat        = NULL,
+                     outputDir       = file.path(getwd(), "outputDir"),
+                     datasetName     = "scData",
                      hyperParams     = list(
                          "batch_size"   = 12800L, ## default set to 1
                          "EM_iteration" = 10L,
@@ -32,6 +34,9 @@ runSCGNN <- function(scDataset,
                         "coresUage" = 5 ## reset to 1 on submission
                     )
                 ) {
+
+    if (dir.exists(outputDir) == FALSE)
+        dir.create(outputDir)
 
     if (hardwareSetup$CUDA){
         device <- torch::torch_device(type = "cuda")
@@ -65,6 +70,11 @@ runSCGNN <- function(scDataset,
         "optimiser"  = optimiser$state_dict()
     )
 
+    rdaFileStart <- file.path(outputDir, paste(datasetName, "rda",sep = "."))
+
+    torch::torch_save(stateStart, rdaFileStart)
+
+    train_output <- list() ## Initialised to save model output
     for (epoch in seq(hyperParams$regu_epoch)) {
         train_ouput <- train(epoch        = epoch,
                              train_loader = train_loader,
@@ -76,10 +86,13 @@ runSCGNN <- function(scDataset,
                              EMflag       = FALSE)
     }
 
+    zOut <- train_output$z$detach()$cpu()
 
+    rdaStatus <- model$state_dict()
 
+    ## TODO: Store reconOri for imputation
 
-
+    ## Step 1: Inferring cell-type
 
 
 }

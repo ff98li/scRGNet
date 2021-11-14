@@ -6,8 +6,9 @@
 \usage{
 runSCGNN(
   scDataset,
-  outputDir,
   LTMG_mat = NULL,
+  outputDir = file.path(getwd(), "outputDir"),
+  datasetName = "scData",
   hyperParams = list(batch_size = 12800L, EM_iteration = 10L, regu_epochs = 500L,
     EM_epochs = 200L, K = 7L, GAEepochs = 200L, L1 = 1, L2 = 0, regu_alpha = 0.9,
     reduction = "sum", EMreguTag = TRUE),
@@ -17,9 +18,11 @@ runSCGNN(
 \arguments{
 \item{scDataset}{A scDataset object containing scRNA-seq data}
 
-\item{outputDir}{Path to the output directory}
-
 \item{LTMG_mat}{LTMG sparse matrix. If provided, then LTMG regularisation will be applied. Optional.}
+
+\item{outputDir}{Path to directory to save output}
+
+\item{datasetName}{Name of the output file to save}
 
 \item{hyperParams}{A list of hyperparameter to tune the model. Optional.}
 

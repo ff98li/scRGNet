@@ -39,18 +39,18 @@ train <- function(epoch,
 
             optimiser$zero_grad()
             ## if (is(model, "AE")) ## for later VAE option
-            train_output <- model(batch$sample)
+            model_output <- model(batch$sample)
 
             if (EMflag & !(hyperParams$EMreguTag)) {
                 loss <- loss_function_graph(
-                    recon_x    = train_output$recon,
-                    x          = batch$sample$view(c(-1, train_output$sample$shape[2])),
+                    recon_x    = model_output$recon,
+                    x          = batch$sample$view(c(-1, model_output$sample$shape[2])),
                     regu_param = hyperParams$regu_alpha,
                     )
             } else {
                 loss <- loss_function_graph(
-                    recon_x    = train_output$recon,
-                    x          = batch$sample$view(c(-1, train_output$sample$shape[2])),
+                    recon_x    = model_output$recon,
+                    x          = batch$sample$view(c(-1, model_output$sample$shape[2])),
                     regu_mat   = regu_mat_batch,
                     regu_type  = "LTMG",
                     regu_param = hyperParams$regu_alpha
@@ -71,13 +71,13 @@ train <- function(epoch,
             train_loss <- loss$item()
             optimiser$step()
             if (batch_idx == 0) {
-               recon_batch_all <- train_output$recon
+               recon_batch_all <- model_output$recon
                data_all        <- batch
-               z_all           <- train_output$z
+               z_all           <- model_output$z
             } else {
-                recon_batch_all <- torch::torch_cat(tensors = c(recon_batch_all, train_output$recon), dim = 1)
+                recon_batch_all <- torch::torch_cat(tensors = c(recon_batch_all, model_output$recon), dim = 1)
                 data_all        <- torch::torch_cat(tensors = c(data_all, batch), dim = 1)
-                z_all           <- torch::torch_cat(tensors = c(z_all, train_output$z), dim = 1)
+                z_all           <- torch::torch_cat(tensors = c(z_all, model_output$z), dim = 1)
             }
         }
     )
