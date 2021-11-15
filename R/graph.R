@@ -41,16 +41,16 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
 
 
 
-#' Generate a cell graph
+#' Generate a cell network
 #'
-#' Compute a cell graph from a feature matrix. More methods will be added in future.
+#' Compute a cell network from a feature matrix. More methods will be added in future.
 #'
 #' @param feature_mat A feature matrix
 #' @param k Number of neighbours
 #'
 #' @export
 #' @importFrom igraph graph_from_data_frame
-generateGraph <- function(feature_mat, k = 7) {
+generateNetwork <- function(feature_mat, k = 7) {
 
     edgeList <- calculate_knn_graph_distance_matrix_StatsSingleThread(feature_mat, k = k)
 
