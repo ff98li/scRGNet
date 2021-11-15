@@ -78,7 +78,7 @@ runFeatureAE <- function(scDataset,
         format = "  Training [:bar] :current/:total (:percent) :elapsedfull",
         total  = hyperParams$regu_epoch, clear = FALSE, width= 60, show_after = 0)
     for (epoch in seq(hyperParams$regu_epoch)) {
-        pb$tick(0)
+        pb$tick()
         train_output <- train(epoch        = epoch,
                               train_loader = train_loader,
                               model        = model,
@@ -114,7 +114,6 @@ runFeatureAE <- function(scDataset,
             "original" = original,
             "z"        = z,
             "risk"     = train_output$risk
-
         )
     )
 }

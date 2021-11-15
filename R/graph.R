@@ -5,22 +5,35 @@
 #' @param feature_mat A feature matrix based on which KNN graph is computed
 #' @param k Number of neighbours in KNN graph
 #'
+#' @return edgeList
 #'
+#' @importFrom stats sd
 calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k) {
 
     ## For each cell, calculate the distance to save memory
     start_time <- Sys.time()
+    edgeList   <- list()
 
     for (i in seq(feature_mat$shape[1])) {
         if ((i %% 10000) == 0)
-            message(sprintf("Start pruning %i th cell. Cost %f seconds...", i, start_time))
+            message(sprintf("Start pruning %i th cell. Cost %f seconds...", i, Sys.time() - start_time))
 
-        flat <- feature_mat[i, ]$reshape(c(1, -1))
-        dist_mat
+        dist_array <- array(apply(feature_mat, 1, function(x) sqrt((feature_mat[i, ] - x)**2)))
+        nn         <- order(dist_array)[k]
+        k_dist     <- dist_array[nn]
+        boundary   <- mean(k_dist) + stats::sd(k_dist)
         for (j in seq(k)) {
-            edgeList
+            if (dist_array[nn[j]] <= boundary) {
+                weight <- 1.0
+            } else {
+                weight <- 0.0
+            }
+            edgeList[[i]] <- c(i, nn[j], weight)
         }
     }
+
+    edgeList <- do.call(rbind, edgeList)
+    colnames(edgeList) <- c("V1", "V2", "weight")
 
     return(edgeList)
 }
@@ -29,7 +42,7 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
 
 #' Generate a cell graph
 #'
-#' Compute a cell graph from a feature matrix
+#' Compute a cell graph from a feature matrix. More methods will be added in future.
 #'
 #' @param feature_mat A feature matrix
 #' @param k Number of neighbours

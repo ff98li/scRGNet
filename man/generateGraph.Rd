@@ -12,5 +12,5 @@ generateGraph(feature_mat, k = 7)
 \item{k}{Number of neighbours}
 }
 \description{
-Compute a cell graph from a feature matrix
+Compute a cell graph from a feature matrix. More methods will be added in future.
 }

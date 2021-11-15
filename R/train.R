@@ -85,10 +85,10 @@ train <- function(epoch,
     risk <- train_loss / length(train_loader$dataset)
 
     output <- list(
-        "recon"   = recon_batch_all,
-        "orginal" = data_all,
-        "z"       = z_all,
-        "risk"    = risk
+        "recon"    = recon_batch_all,
+        "original" = data_all,
+        "z"        = z_all,
+        "risk"     = risk
     )
 
     return(output)

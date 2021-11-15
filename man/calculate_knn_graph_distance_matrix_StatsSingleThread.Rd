@@ -11,6 +11,9 @@ calculate_knn_graph_distance_matrix_StatsSingleThread(feature_mat, k)
 
 \item{k}{Number of neighbours in KNN graph}
 }
+\value{
+edgeList
+}
 \description{
 Calculate a KNN graph from a feature matrix using stats one-std based methods.
 }
