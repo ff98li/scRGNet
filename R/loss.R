@@ -67,7 +67,7 @@ vallina_mse_loss_function <- function(input, target, reduction = 'none') {
         stop(sprintf("%s is not a valid value for reduction", reduction))
     }
 
-    if (input$size() != target$size()) {
+    if (any(input$size() != target$size())) {
         message(
             cat(
                 sprintf(
@@ -119,7 +119,7 @@ regulation_mse_loss_function <- function(input, target, regu_mat, reduction = 'n
         stop(sprintf("%s is not a valid value for reduction", reduction))
     }
 
-    if (input$size() != target$size()) {
+    if (any(input$size() != target$size())) {
         message(
             cat(
                 sprintf(

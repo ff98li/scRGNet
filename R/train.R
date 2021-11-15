@@ -84,12 +84,11 @@ train <- function(epoch,
 
     risk <- train_loss / length(train_loader$dataset)
 
-    message(sprintf("Epoch: %i   Average Loss: %f", epoch, risk))
-
     output <- list(
         "recon"   = recon_batch_all,
         "orginal" = data_all,
-        "z"       = z_all
+        "z"       = z_all,
+        "risk"    = risk
     )
 
     return(output)

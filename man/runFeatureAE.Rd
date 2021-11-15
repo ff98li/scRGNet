@@ -7,8 +7,8 @@
 runFeatureAE(
   scDataset,
   LTMG_mat = NULL,
-  hyperParams = list(batch_size = 1L, EM_iteration = 10L, regu_epochs = 500L, EM_epochs
-    = 200L, L1 = 1, L2 = 0, regu_alpha = 0.9, reduction = "sum", EMreguTag = TRUE),
+  hyperParams = list(batch_size = 1L, EM_iteration = 10L, regu_epochs = 50L, EM_epochs
+    = 20L, L1 = 1, L2 = 0, regu_alpha = 0.9, reduction = "sum"),
   hardwareSetup = list(CUDA = FALSE, coresUage = 5L)
 )
 }

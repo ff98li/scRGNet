@@ -17,14 +17,13 @@ runFeatureAE <- function(scDataset,
                          hyperParams    = list(
                          "batch_size"   = 1L, ## default set to 1
                          "EM_iteration" = 10L,
-                         "regu_epochs"  = 500L,
-                         "EM_epochs"    = 200L,
+                         "regu_epochs"  = 50L,
+                         "EM_epochs"    = 20L,
                          #"GAEepochs"    = 200L,
                          "L1"           = 1.0,
                          "L2"           = 0.0,
                          "regu_alpha"   = 0.9,
-                         "reduction"    = "sum",
-                         "EMreguTag"    = TRUE),
+                         "reduction"    = "sum"),
                          hardwareSetup = list(
                              "CUDA"      = FALSE,
                              "coresUage" = 5L ## reset to 1 on submission
@@ -79,6 +78,10 @@ runFeatureAE <- function(scDataset,
                              hyperParams  = hyperParams,
                              device       = device,
                              EMflag       = FALSE)
+        invisible(gc())
+        message(sprintf("Epoch: %i / %i   Average Loss: %f",
+                        epoch, hyperParams$regu_epoch,
+                        train_ouput$risk))
     }
 
     zOut <- train_output$z$detach()$cpu()
