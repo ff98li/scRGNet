@@ -18,7 +18,7 @@ runFeatureAE <- function(scDataset,
                          hyperParams    = list(
                          "batch_size"   = 1L, ## default set to 1
                          "EM_iteration" = 10L,
-                         "regu_epochs"  = 2L,
+                         "regu_epochs"  = 5L,
                          "EM_epochs"    = 20L,
                          #"GAEepochs"    = 200L,
                          "L1"           = 1.0,

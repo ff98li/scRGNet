@@ -39,18 +39,18 @@ train <- function(epoch,
 
             optimiser$zero_grad()
             ## if (is(model, "AE")) ## for later VAE option
-            model_output <- model(batch$sample)
+            model_output <- model(batch$expr)
 
             if (!regu) {
                 loss <- loss_function_graph(
                     recon_x    = model_output$recon,
-                    x          = batch$sample$view(c(-1, model_output$recon$shape[2])),
+                    x          = batch$expr$view(c(-1, model_output$recon$shape[2])),
                     regu_param = hyperParams$regu_alpha,
                     )
             } else {
                 loss <- loss_function_graph(
                     recon_x    = model_output$recon,
-                    x          = batch$sample$view(c(-1, model_output$recon$shape[2])),
+                    x          = batch$expr$view(c(-1, model_output$recon$shape[2])),
                     regu_mat   = regu_mat_batch,
                     regu_type  = "LTMG",
                     regu_param = hyperParams$regu_alpha
@@ -72,11 +72,11 @@ train <- function(epoch,
             optimiser$step()
             if (batch_idx == 1) {
                recon_batch_all <- model_output$recon
-               data_all        <- batch$sample
+               data_all        <- batch$expr
                z_all           <- model_output$z
             } else {
                 recon_batch_all <- torch::torch_cat(tensors = c(recon_batch_all, model_output$recon), dim = 1)
-                data_all        <- torch::torch_cat(tensors = c(data_all, batch$sample), dim = 1)
+                data_all        <- torch::torch_cat(tensors = c(data_all, batch$expr), dim = 1)
                 z_all           <- torch::torch_cat(tensors = c(z_all, model_output$z), dim = 1)
             }
         }
