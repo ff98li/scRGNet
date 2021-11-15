@@ -14,12 +14,16 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
     start_time <- Sys.time()
     edgeList   <- list()
 
-    for (i in seq(feature_mat$shape[1])) {
+    for (i in seq(nrow(feature_mat))) {
         if ((i %% 10000) == 0)
             message(sprintf("Start pruning %i th cell. Cost %f seconds...", i, Sys.time() - start_time))
 
-        dist_array <- array(apply(feature_mat, 1, function(x) sqrt((feature_mat[i, ] - x)**2)))
-        nn         <- order(dist_array)[k]
+        dist_array <- array(
+            apply(feature_mat, 1, function(x)
+                sqrt(sum((feature_mat[i, ] - x)**2))
+                )
+            )
+        nn         <- order(dist_array)[1:k]
         k_dist     <- dist_array[nn]
         boundary   <- mean(k_dist) + stats::sd(k_dist)
         for (j in seq(k)) {
