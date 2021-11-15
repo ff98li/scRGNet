@@ -72,11 +72,11 @@ train <- function(epoch,
             optimiser$step()
             if (batch_idx == 1) {
                recon_batch_all <- model_output$recon
-               data_all        <- batch
+               data_all        <- batch$sample
                z_all           <- model_output$z
             } else {
                 recon_batch_all <- torch::torch_cat(tensors = c(recon_batch_all, model_output$recon), dim = 1)
-                data_all        <- torch::torch_cat(tensors = c(data_all, batch), dim = 1)
+                data_all        <- torch::torch_cat(tensors = c(data_all, batch$sample), dim = 1)
                 z_all           <- torch::torch_cat(tensors = c(z_all, model_output$z), dim = 1)
             }
         }
