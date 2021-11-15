@@ -41,16 +41,16 @@ train <- function(epoch,
             ## if (is(model, "AE")) ## for later VAE option
             model_output <- model(batch$sample)
 
-            if (EMflag & !(hyperParams$EMreguTag)) {
+            if (!regu) {
                 loss <- loss_function_graph(
                     recon_x    = model_output$recon,
-                    x          = batch$sample$view(c(-1, model_output$sample$shape[2])),
+                    x          = batch$sample$view(c(-1, model_output$recon$shape[2])),
                     regu_param = hyperParams$regu_alpha,
                     )
             } else {
                 loss <- loss_function_graph(
                     recon_x    = model_output$recon,
-                    x          = batch$sample$view(c(-1, model_output$sample$shape[2])),
+                    x          = batch$sample$view(c(-1, model_output$recon$shape[2])),
                     regu_mat   = regu_mat_batch,
                     regu_type  = "LTMG",
                     regu_param = hyperParams$regu_alpha
@@ -70,7 +70,7 @@ train <- function(epoch,
             loss$backward()
             train_loss <- loss$item()
             optimiser$step()
-            if (batch_idx == 0) {
+            if (batch_idx == 1) {
                recon_batch_all <- model_output$recon
                data_all        <- batch
                z_all           <- model_output$z

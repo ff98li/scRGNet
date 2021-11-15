@@ -180,7 +180,6 @@ loss_function_graph <- function(recon_x,
         target$requires_grad <- use_regu
 
     # Euclidean
-    # BCE = gammaPara * vallina_mse_loss_function(recon_x, target, reduction='sum')
     BCE <- gamma_param * vallina_mse_loss_function(recon_x, target, reduction = reduction)
 
     loss <- 0
