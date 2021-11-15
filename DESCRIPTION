@@ -22,9 +22,11 @@ Imports:
     Rdpack,
     scGNNLTMG (>= 0.1.0),
     R6,
-    torch,
     Matrix,
     coro,
-    igraph
-Remotes: 
-    BMEngineeR/scGNNLTMG
+    igraph,
+    progress,
+    torch (>= 0.6.0)
+Remotes:  
+    BMEngineeR/scGNNLTMG,
+    mlverse/torch

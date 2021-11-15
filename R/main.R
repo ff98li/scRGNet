@@ -10,6 +10,7 @@
 #' @export
 #' @importFrom coro loop
 #' @import torch
+#' @import progress
 runFeatureAE <- function(scDataset,
                          LTMG_mat       = NULL,
                          #outputDir     = file.path(getwd(), "outputDir"),
@@ -17,7 +18,7 @@ runFeatureAE <- function(scDataset,
                          hyperParams    = list(
                          "batch_size"   = 1L, ## default set to 1
                          "EM_iteration" = 10L,
-                         "regu_epochs"  = 50L,
+                         "regu_epochs"  = 2L,
                          "EM_epochs"    = 20L,
                          #"GAEepochs"    = 200L,
                          "L1"           = 1.0,
@@ -25,7 +26,7 @@ runFeatureAE <- function(scDataset,
                          "regu_alpha"   = 0.9,
                          "reduction"    = "sum"),
                          hardwareSetup = list(
-                             "CUDA"      = FALSE,
+                             "CUDA"      = F,
                              "coresUage" = 5L ## reset to 1 on submission
                          )
                         ) {
@@ -46,7 +47,6 @@ runFeatureAE <- function(scDataset,
                                       pin_memory  = ifelse(hardwareSetup$CUDA, TRUE, FALSE),
                                       num_workers = ifelse(hardwareSetup$CUDA, 1, 0))
 
-    start_time <- Sys.time() ## count the time to process data.
 
     useLTMG <- FALSE
     if (!is.null(LTMG_mat)) {
@@ -69,8 +69,13 @@ runFeatureAE <- function(scDataset,
     #torch::torch_save(stateStart, rdaFileStart)
 
     train_output <- list() ## Initialised to save model output
+
+    pb <- progress_bar$new(
+        format = "  Training [:bar] :current/:total (:percent) :elapsedfull",
+        total  = hyperParams$regu_epoch, clear = FALSE, width= 60, show_after = 0)
     for (epoch in seq(hyperParams$regu_epoch)) {
-        train_ouput <- train(epoch        = epoch,
+        pb$tick(0)
+        train_output <- train(epoch        = epoch,
                              train_loader = train_loader,
                              model        = model,
                              optimiser    = optimiser,
@@ -78,21 +83,16 @@ runFeatureAE <- function(scDataset,
                              hyperParams  = hyperParams,
                              device       = device,
                              EMflag       = FALSE)
-        invisible(gc())
-        message(sprintf("Epoch: %i / %i   Average Loss: %f",
-                        epoch, hyperParams$regu_epoch,
-                        train_ouput$risk))
+        #message(sprintf("Epoch: %i / %i   Average Loss: %f",
+        #                epoch, hyperParams$regu_epoch,
+        #                train_ouput$risk))
     }
 
-    zOut <- train_output$z$detach()$cpu()
-
-    finish_time <- Sys.time()
-    process_time <- finish_time - start_time
-    message(sprintf("Time taken for running model: %f", process_time))
+    #zOut <- train_output$z$detach()$cpu()
 
     ## Store reconOri for imputation (currently not available)
     #rdaStatus <- model$state_dict()
 
     ## Proceed to inferring cell-type...
-    return(zOut)
+    return(train_output)
 }

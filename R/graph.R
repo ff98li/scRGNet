@@ -17,7 +17,12 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
 
         flat <- feature_mat[i, ]$reshape(c(1, -1))
         dist_mat
+        for (j in seq(k)) {
+            edgeList
+        }
     }
+
+    return(edgeList)
 }
 
 
