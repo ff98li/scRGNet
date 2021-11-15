@@ -49,14 +49,14 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
 #' @param k Number of neighbours
 #'
 #' @export
+#' @importFrom igraph graph_from_data_frame
 generateGraph <- function(feature_mat, k = 7) {
 
     edgeList <- calculate_knn_graph_distance_matrix_StatsSingleThread(feature_mat, k = k)
 
-    return(
-        list(
-            "adj" = NULL,
-            "edgeList" = NULL
-        )
-    )
+    graph <- igraph::graph_from_data_frame(edgeList)
+
+    #adj   <- igraph::as_adj(graph, attr = "weight")
+    return(graph)
+
 }
