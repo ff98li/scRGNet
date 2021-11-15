@@ -11,6 +11,7 @@
 #' @importFrom coro loop
 #' @import torch
 #' @import progress
+#' @import Matrix
 runFeatureAE <- function(scDataset,
                          LTMG_mat       = NULL,
                          #outputDir     = file.path(getwd(), "outputDir"),
@@ -40,6 +41,9 @@ runFeatureAE <- function(scDataset,
         device <- torch::torch_device(type = "cpu")
         torch::torch_set_num_threads(hardwareSetup$coresUage)
     }
+
+    sample_list <- scDataset$features@Dimnames[[1]]
+    gene_list   <- scDataset$features@Dimnames[[2]]
 
     train_loader <- torch::dataloader(dataset     = scDataset,
                                       batch_size  = hyperParams$batch_size,
@@ -92,7 +96,25 @@ runFeatureAE <- function(scDataset,
 
     ## Store reconOri for imputation (currently not available)
     #rdaStatus <- model$state_dict()
+    recon           <- Matrix::as.matrix(train_output$recon)
+    rownames(recon) <- sample_list
+    colnames(recon) <- gene_list
+
+    original           <- Matrix::as.matrix(train_output$original)
+    rownames(original) <- sample_list
+    colnames(original) <- gene_list
+
+    z           <- Matrix::as.matrix(train_output$z)
+    rownames(z) <- sample_list
 
     ## Proceed to inferring cell-type...
-    return(train_output)
+    return(
+        list(
+            "recon"    = recon,
+            "original" = original,
+            "z"        = z,
+            "risk"     = train_output$risk
+
+        )
+    )
 }
