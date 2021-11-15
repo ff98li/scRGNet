@@ -76,13 +76,13 @@ runFeatureAE <- function(scDataset,
     for (epoch in seq(hyperParams$regu_epoch)) {
         pb$tick(0)
         train_output <- train(epoch        = epoch,
-                             train_loader = train_loader,
-                             model        = model,
-                             optimiser    = optimiser,
-                             regu_mat     = LTMG_mat,
-                             hyperParams  = hyperParams,
-                             device       = device,
-                             EMflag       = FALSE)
+                              train_loader = train_loader,
+                              model        = model,
+                              optimiser    = optimiser,
+                              regu_mat     = LTMG_mat,
+                              hyperParams  = hyperParams,
+                              device       = device,
+                              EMflag       = FALSE)
         #message(sprintf("Epoch: %i / %i   Average Loss: %f",
         #                epoch, hyperParams$regu_epoch,
         #                train_ouput$risk))

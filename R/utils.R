@@ -37,7 +37,8 @@ scDataset <- torch::dataset(
         return(
             list(
                 "index"  = idx,
-                "sample" = sample
+                "sample" = self$features@Dimnames[[1]][idx],
+                "expr"   = sample
             )
         )
     }
