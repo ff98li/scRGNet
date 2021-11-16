@@ -195,7 +195,7 @@ setHyperParams <- function(
         stop("Invalid argument for L2. Only in range 0 <= L2 <= 1 will be accepted.")
     }
 
-    if (regu_alpha < 0 | regu_epochs > 1) {
+    if (regu_alpha < 0 | regu_alpha > 1) {
         stop("Invalid argument for regu_alpha. Only in range 0 <= regu_alpha <= 1 will be accepted.")
     }
 
@@ -205,11 +205,11 @@ setHyperParams <- function(
 
     hyperParams <- list(
         "batch_size"   = batch_size,
-        "regu_epochs"  = 5L,
-        "L1"           = 0.5,
-        "L2"           = 0.5,
-        "regu_alpha"   = 0.9,
-        "reduction"    = "sum"
+        "regu_epochs"  = regu_epochs,
+        "L1"           = L1,
+        "L2"           = L2,
+        "regu_alpha"   = regu_alpha,
+        "reduction"    = reduction
     )
 
     return(hyperParams)
