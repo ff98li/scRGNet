@@ -27,6 +27,19 @@ runFeatureAE <- function(scDataset,
                          )
                         ) {
 
+    if (is.null(scDataset)) {
+        stop("Must provide a scDataset object to perform analysis.")
+    } else {
+        if (!is(scDataset, "scDataset"))
+            stop("Invalid input. Must provide a scDataset object.")
+    }
+
+    if(!is.null(LTMG_mat)) {
+        if (!is.matrix(LTMG_mat)) {
+            stop("Invalid argument for LTMG_mat. Must be a matrix.")
+        }
+    }
+
     #if (dir.exists(outputDir) == FALSE)
     #    dir.create(outputDir)
 
@@ -117,9 +130,9 @@ runFeatureAE <- function(scDataset,
 #' A function to set up the hyper-parameter to tune the auto-encoder
 #' @param batch_size Batch size used to train the auto-encoder
 #' @param regu_epochs Epoch of trainning; that is, the number of time the dataset is visited.
-#' @param L1 Intensity of L1 penalty on loss if LTMG matrix is used.
-#' @param L2 Intensity of L2 penalty on loss if LTMG matrix is used.
-#' @param regu_alpha Intensity of LTMG regularisation.
+#' @param L1 Intensity of L1 penalty on loss if LTMG matrix is used. Takes value in range >=0 and >= 1
+#' @param L2 Intensity of L2 penalty on loss if LTMG matrix is used. Takes value in range >=0 and >= 1
+#' @param regu_alpha Intensity of LTMG regularisation. Takes value in range >=0 and >= 1
 #' @param reduction Type of reduction used in loss functions:
 #'     available options: "mean", "sum", or "none", meaning not using reduction method.
 #' @return A list of hyper-parameters for runFeatureAE
@@ -133,6 +146,35 @@ setHyperParams <- function(
     regu_alpha   = 0.9,
     reduction    = "sum"
 ) {
+
+    if (batch_size < 1) {
+        stop("Invalid argument for batch_size. Must be at least 1.")
+    } else {
+        batch_size <- as.integer(batch_size)
+    }
+
+    if (regu_epochs < 1) {
+        stop("Invalid argument for regu_epochs. Must be at least 1.")
+    } else {
+        regu_epochs <- as.integer(regu_epochs)
+    }
+
+    if (L1 < 0 | L1 > 1) {
+        stop("Invalid argument for L1. Only in range 0 <= L1 <= 1 will be accepted.")
+    }
+
+    if (L2 < 0 | L2 > 1) {
+        stop("Invalid argument for L2. Only in range 0 <= L2 <= 1 will be accepted.")
+    }
+
+    if (regu_alpha < 0 | regu_epochs > 1) {
+        stop("Invalid argument for regu_alpha. Only in range 0 <= regu_alpha <= 1 will be accepted.")
+    }
+
+    if (!(reduction %in% c('mean', 'sum', 'none'))) {
+        stop("Invalid argument for reduction methods. Available methods: mean, sum, or none")
+    }
+
     hyperParams <- list(
         "batch_size"   = batch_size,
         "regu_epochs"  = 5L,
@@ -163,6 +205,23 @@ setHardware <- function(
     coresUsage = 1L,
     CUDA       = FALSE
 ) {
+
+    if (!is.logical(CUDA)) {
+        stop("Invalid argument for CUDA. Must be logical.")
+    }
+
+    if (!is.numeric(coresUsage)) {
+        stop("Invalid argument for coresUsage. Must be an integer number.")
+    } else {
+        if (!CUDA) {
+            if (coresUsage < 1) {
+                stop("Invalid argument for coresUsage. Must use at least 1 core.")
+            } else {
+                coresUsage <- as.integer(coresUsage)
+            }
+        }
+    }
+
     hardwareSetup = list(
         "CUDA"      = CUDA,
         "coresUage" = coresUsage

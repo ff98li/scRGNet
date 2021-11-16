@@ -10,14 +10,26 @@
 #' @importFrom graphics plot
 plotCellNet <- function(net, group = TRUE) {
 
-    if (group)
-        clp <- igraph::cluster_label_prop(net)
+    if (!is(net, "igraph"))
+        stop("Invalid argument for net. Must be an igraph object.")
 
-    plot(clp, net,
-         vertex.shape = "none",
-         vertex.label.cex = 0.5,
-         vertex.size = 9
-         )
+    if (!is.logical(group))
+        stop("Invalid argument for group. Must be logical.")
+
+    if (group) {
+        clp <- igraph::cluster_label_prop(net)
+        plot(clp, net,
+             vertex.shape = "none",
+             vertex.label.cex = 0.5,
+             vertex.size = 9
+            )
+    } else {
+        plot(net,
+             vertex.shape = "none",
+             vertex.label.cex = 0.5,
+             vertex.size = 9
+            )
+    }
 }
 
 #' Plot a cell network
@@ -31,6 +43,13 @@ plotCellNet <- function(net, group = TRUE) {
 #' @importFrom igraph degree
 #' @importFrom graphics hist
 plotDegree <- function(net, title = "Distribution of Vertices in the Cell Network") {
+
+    if (!is(net, "igraph"))
+        stop("Invalid argument for net. Must be an igraph object.")
+
+    if (!is.character(title))
+        stop("Invalid argument for title. Must be a character vector.")
+
     dg <- igraph::degree(net)
     brk <- seq(min(dg) - 0.5, max(dg) + 0.5, by = 1)
     graphics::hist(dg,
@@ -53,8 +72,16 @@ plotDegree <- function(net, title = "Distribution of Vertices in the Cell Networ
 #' @importFrom igraph degree
 #' @importFrom graphics plot
 plotLogRank <- function(net, title = "A log-log Plot of Connectivities for Cell Network") {
+
+
+    if (!is(net, "igraph"))
+        stop("Invalid argument for net. Must be an igraph object.")
+
+    if (!is.character(title))
+        stop("Invalid argument for title. Must be a character vector.")
+
     dg       <- igraph::degree(net)
-    rankFreq <- table(dg) # get rank and frequency of the graph
+    rankFreq <- table(dg) # get rank and frequency of the network
     freqRank <- as.integer(names(rankFreq)) # seperate ranks from rankFreq
     freq     <- as.integer(rankFreq) # seperate frequency from rankFreq
 
