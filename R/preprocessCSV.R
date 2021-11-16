@@ -285,7 +285,7 @@ preprocessCSV <- function(path,
 #'     LTMG object file. If toFile is TRUE, it must be provided.
 #'     Otherwise optional.
 #'
-#' @return Returns an LTMG object containing the inferred LTMG tags of expr_mat.
+#' @return Returns an LTMG matrix containing the inferred LTMG tags of expr_mat.
 #'
 #' @examples
 #' # Example 1:
@@ -371,7 +371,7 @@ runLTMG <- function(scDataset   = NULL,
     process_time <- finish_time - start_time
     message(sprintf("Time taken for inferring LTMG: %f", process_time))
 
-    return(LTMGObject)
+    return(LTMGObject@OrdinalMatrix)
 }
 
 # [END]

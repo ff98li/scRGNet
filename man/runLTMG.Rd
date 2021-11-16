@@ -39,7 +39,7 @@ LTMG object file. If toFile is TRUE, it must be provided.
 Otherwise optional.}
 }
 \value{
-Returns an LTMG object containing the inferred LTMG tags of expr_mat.
+Returns an LTMG matrix containing the inferred LTMG tags of expr_mat.
 }
 \description{
 A wrapper function for running scGNNLTMG that uses
