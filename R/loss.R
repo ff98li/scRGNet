@@ -132,10 +132,13 @@ regulation_mse_loss_function <- function(input, target, regu_mat, reduction = 'n
     ret <- (input - target) ** 2
     ret <- torch::torch_mul(ret, regu_mat)
 
-    if (reduction != 'none')
-        ret <- ifelse(reduction == 'mean',
-                      torch::torch_mean(ret),
-                      torch::torch_sum(ret))
+    if (reduction != 'none') {
+        if (reduction == 'mean') {
+            ret <- torch::torch_mean(ret)
+        } else{
+            ret <- torch::torch_sum(ret)
+        }
+    }
 
     return(ret)
 }

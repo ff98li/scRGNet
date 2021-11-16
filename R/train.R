@@ -31,10 +31,11 @@ train <- function(epoch,
     coro::loop(
         for (batch in train_loader) {
             batch_idx <- batch_idx + 1
+            #batch     <- batch$to(device = device)
 
             if (regu) {
                 regu_mat_batch <- regu_mat[, batch_idx]
-                regu_mat_batch <- regu_mat_batch$to(device)
+                #regu_mat_batch <- regu_mat_batch$to(device = device)
             }
 
             optimiser$zero_grad()

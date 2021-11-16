@@ -54,7 +54,8 @@ runFeatureAE <- function(scDataset,
 
     useLTMG <- FALSE
     if (!is.null(LTMG_mat)) {
-        useLTMG <- TRUE ## TODO: if time permits, implement LTMG regularisation
+        useLTMG  <- TRUE
+        LTMG_mat <- torch::torch_tensor(LTMG_mat)
     }
 
     ## TODO: Add new function to use variational feature auto-encoder
