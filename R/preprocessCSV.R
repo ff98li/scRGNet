@@ -266,8 +266,8 @@ preprocessCSV <- function(path,
 #' the dataset.
 #' This step is optional but highly recommended prior to scGNN analysis.
 #'
-#' @param expr_mat A matrix or a data frame with row names as genes
-#'     and column names as cell samples containing scRNA-seq expression values
+#' @param scDataset A scDataset object containing a matrix with row names as cell samples
+#'     and column names as genes containing scRNA-seq expression values
 #'     pre-processed by preprocessCSV. If reading from a expression file,
 #'     this argument needs not be provided.
 #' @param fromFile A Boolean value indicating whether to read RNA-seq matrix
@@ -316,7 +316,7 @@ preprocessCSV <- function(path,
 #' @import scGNNLTMG
 #' @importClassesFrom data.table data.table
 #' @importFrom data.table fread
-runLTMG <- function(expr_mat    = NULL,
+runLTMG <- function(scDataset   = NULL,
                     fromFile    = FALSE,
                     readPath    = NULL,
                     toFile      = FALSE,
@@ -338,8 +338,11 @@ runLTMG <- function(expr_mat    = NULL,
                 }
             }
         } else {
-            if (is.null(expr_mat))
-                stop("No expression matrix or data frame provided for argument expr_mat.")
+            if (is.null(scDataset)) {
+                stop("No scDataset object provided for argument scDataset.")
+            } else {
+                expr_mat <- Matrix::t(scDataset$features)
+            }
         }
     } else {
         stop("Invalid argument fromFile. Must be a boolean value.")

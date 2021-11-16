@@ -5,7 +5,7 @@
 \title{Get discretised regulatory signals from LTMG model}
 \usage{
 runLTMG(
-  expr_mat = NULL,
+  scDataset = NULL,
   fromFile = FALSE,
   readPath = NULL,
   toFile = FALSE,
@@ -14,8 +14,8 @@ runLTMG(
 )
 }
 \arguments{
-\item{expr_mat}{A matrix or a data frame with row names as genes
-and column names as cell samples containing scRNA-seq expression values
+\item{scDataset}{A scDataset object containing a matrix with row names as cell samples
+and column names as genes containing scRNA-seq expression values
 pre-processed by preprocessCSV. If reading from a expression file,
 this argument needs not be provided.}
 
