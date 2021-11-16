@@ -1,6 +1,6 @@
-#' Main function of running scGNN feature auto-encoder for analysis
+#' Main function of running scGNN feature auto-encoder
 #'
-#' Main
+#' The main function for performing dimensional reduction on the preprocessed scRNA-seq data
 #'
 #' @param scDataset A scDataset object containing scRNA-seq data
 #' @param LTMG_mat LTMG sparse matrix. If provided, then LTMG regularisation will be applied. Optional.

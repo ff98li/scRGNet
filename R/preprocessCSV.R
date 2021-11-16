@@ -98,7 +98,11 @@ preprocessCSV <- function(path,
     }
 
     if (is.numeric(geneSelectNum)) {
-        geneSelectNum <- as.integer(geneSelectNum)
+        if (geneSelectNum < 128) {
+            stop("Too few genes selected. Must be at least 128 genes to perform analysis.")
+        } else {
+            geneSelectNum <- as.integer(geneSelectNum)
+        }
     } else {
         stop("Invalid input for geneSelectNum: Must be numeric")
     }
@@ -213,6 +217,9 @@ preprocessCSV <- function(path,
 
     ## Check how many genes available to select
     n_gene <- dim(counts_filtered_cell)[1]
+    if (n_gene < 128) {
+        stop("Not enough genes remaining to perform analysis. Consider raising gene_zero_ratio or cell_zero_ratio")
+    }
     if (geneSelectNum > n_gene) {
         message(
             sprintf("Remaining genes are fewer than %i. All remaining %i genes will be selected.",

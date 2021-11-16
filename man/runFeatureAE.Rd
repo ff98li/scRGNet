@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.R
 \name{runFeatureAE}
 \alias{runFeatureAE}
-\title{Main function of running scGNN feature auto-encoder for analysis}
+\title{Main function of running scGNN feature auto-encoder}
 \usage{
 runFeatureAE(
   scDataset,
@@ -22,5 +22,5 @@ runFeatureAE(
 \item{hardwareSetup}{A list of parameters to setup the hardware on which the model runs. Optional.}
 }
 \description{
-Main
+The main function for performing dimensional reduction on the preprocessed scRNA-seq data
 }
