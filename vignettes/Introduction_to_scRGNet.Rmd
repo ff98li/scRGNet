@@ -10,13 +10,13 @@ bibliography: ../inst/REFERENCES.bib
 biblio-style: "apalike"
 link-citations: yes
 vignette: >
-  %\VignetteIndexEntry{Introduction_to_scRGNet}
+  %\VignetteIndexEntry{Introduction to scRGNet Workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
+#options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -27,13 +27,38 @@ knitr::opts_chunk$set(
 library(scRGNet)
 ```
 
-## Summary
+## Overview
 
-**scRGNet** 
+The goal of **scRGNet** is to explore cell-cell relationship using scRNA-seq data.
+Different from conventional dimensional reduction methods used by any existing R packages that assume statistical distribution for gene expression data,
+for scRNA-seq data analysis,
+scRGNet performs dimensional reduction by applying the feature autoencoder of
+the novel single cell graph neural network (scGNN) framework recently proposed by Wang. et al[@scGNN] that requires no statistical assumptions.
+It attempts to capture the relationships among cell samples in the scRNA-seq data through topological abstraction based on gene expression and transcriptional regulation information;
+the package also provides an option for whether to include cell-type specific regulatory signals as a regulariser in trainning the feature autoendoer using a left-truncated mixture Gaussian (LTMG) model.[@LTMG]
+Once the lower dimensional representations of the expression values for each cell sample are obtained, they will be used to fit a K-nearest neighbours (KNN)
+model to build the cell-cell network, with each node in the KNN graph representing a call sample.
+Although this tool offers a way for statistical hypothesis-free analysis,
+it comes with a price: the feature autoencoder is a neural network
+consists of 2 hidden layers, making the task computational-intensive.
+Hence, this document introduces scRGNet using a small subset of scRNA-seq data from experiment GSE138852[@GSE138852] containing only 48 cells and 1000 most variant genes is included in the package for a quick demo.
 
 ## Workflow
 
 ### Step 1. Pre-preocessing scRNA-seq data from csv file
+
+Before using the scRNA-seq data to train the feature autoencoder,
+we need to pre-process the raw data matrix first.
+The reason being is, dropout-events are rather common in scRNA-seq data,
+leading to a number of zero entries.
+The purpose of pre-processing is to retain genes and cells that are less "noisy", that is, removing genes and cells with proportion of zero expression values exceeding a certain threshold, which can be defined by the user.
+
+To load the demo data in the package:
+
+```{r load_data}
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+```
+
 
 
 ### Step 2. Infer LTMG signals (Optional)
@@ -46,4 +71,6 @@ library(scRGNet)
 
 
 ### Step 5. Plot
+
+## References
 
