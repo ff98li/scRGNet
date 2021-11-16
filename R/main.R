@@ -144,3 +144,29 @@ setHyperParams <- function(
 
     return(hyperParams)
 }
+
+#' A hardware setter to run the model
+#'
+#' Setting up your hardware to train the model faster and get a better result (if you have a powerful one)
+#'
+#' @param coresUsage The number of CPU cores you would like to use to train the model.
+#'     For Mac user, please do not change the default value of 1. This is a special case for Mac OS (sorry)
+#' @param CUDA Whther to use Nvidia GPU to train the model via CUDA.
+#'     Make sure you have CUDA 10.0 or 11.1 version installed.
+#'     Higher version of CUDA is currently not supported by torch.
+#'     If CUDA is set to TRUE, coresUsage will not be used. Default FALSE.
+#'
+#' @return A list of parameters to set up hardware
+#'
+#' @export
+setHardware <- function(
+    coresUsage = 1L,
+    CUDA       = FALSE
+) {
+    hardwareSetup = list(
+        "CUDA"      = CUDA,
+        "coresUage" = coresUsage
+    )
+
+    return(hardwareSetup)
+}
