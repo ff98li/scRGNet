@@ -45,7 +45,13 @@
 #'     where row names are cells and column names are genes.
 #'
 #' @examples
-#'
+#' # Example 2:
+#' \dontrun{
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath)
+#'}
 #' # Example 1:
 #' \dontrun{
 #' # Preprocess the whole scRNA-seq dataset
@@ -301,16 +307,16 @@ preprocessCSV <- function(path,
 #' # Accessing the demo gene_counts_small dataset available with the package
 #' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
 #' # Preprocess the raw counts
-#' counts <- preprocessCSV(path = inputCountsPath, toCSV = FALSE, geneSelectNum = 50)
-#' LTMG <- runLTMG(expr_mat = counts, toFile = FALSE)
-#' # ~75 seconds
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' LTMG <- runLTMG(counts)
+#' # ~30 seconds
 #'}
 #' # Example 2:
 #' # Preprocess the whole scRNA-seq dataset
 #' \dontrun{
 #' inputCountsPath <- system.file("extdata", "GSE138852_counts.csv.gz", package = "scRGNet")
-#' counts <- preprocessCSV(path = inputCountsPath, savename = "GSE138852_preprocessed")
-#' LTMG <- runLTMG(expr_mat = counts)
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' LTMG <- runLTMG(counts)
 #' # Take 10-14 minutes to finish running
 #' }
 #'

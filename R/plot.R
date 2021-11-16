@@ -1,16 +1,42 @@
-#' Plot a cell network
+#' Cell network plotting function
 #'
-#' plot
+#' A plotting function to plot the inferred cell net-work from generateNetwork.
 #'
-#' @param net A graph object
-#' @param group Whether to show cell community in the network
+#' @param net An igraph object generayed by generateNetwork.
+#'     It contains the inferred cell-cell relationship.
+#' @param group A logical vector indicating whether to highlight cell communities in the network.
+#'     If FALSE, they will not be highlighted. Default TRUE.
+#' @param title A character vector as the title of the network plot.
+#'
+#' @references
+#' \insertRef{igraph}{scRGNet}
+#'
+#' @examples
+#' # Example 1:
+#' # Tested examples. Not run for fast package compiling
+#' \dontrun{
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' ltmg <- runLTMG(counts)
+#' hyperParams <- setHyperParams(regu_epochs = 5L)
+#' hardwareSetup <- setHardware(coresUsage = 1L)
+#' z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+#' net <- generateNetwork(z)
+#' plotCellNet(net)
+#'}
 #'
 #' @export
 #' @import igraph
+#' @importFrom Rdpack reprompt
 #' @importFrom graphics plot
-plotCellNet <- function(net, group = TRUE) {
+#' @importFrom methods is
+plotCellNet <- function(net,
+                        group = TRUE,
+                        title = "Inferred Cell Network") {
 
-    if (!is(net, "igraph"))
+    if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
 
     if (!is.logical(group))
@@ -19,32 +45,55 @@ plotCellNet <- function(net, group = TRUE) {
     if (group) {
         clp <- igraph::cluster_label_prop(net)
         plot(clp, net,
-             vertex.shape = "none",
+             vertex.shape     = "none",
              vertex.label.cex = 0.5,
-             vertex.size = 9
+             vertex.size      = 9,
+             main             = title
             )
     } else {
         plot(net,
-             vertex.shape = "none",
+             vertex.shape     = "none",
              vertex.label.cex = 0.5,
-             vertex.size = 9
+             vertex.size      = 9,
+             main             = title
             )
     }
 }
 
-#' Plot a cell network
+#' Show Degree Distribution in Network
 #'
-#' plot
+#' Plot distribution for degrees of cells in the network.
 #'
 #' @param net A graph object
-#' @param title Title of the histogram
+#' @param title A character vector as the title of the histogram.
+#'
+#' @references
+#' \insertRef{igraph}{scRGNet}
+#'
+#' @examples
+#' # Example 1:
+#' # Tested examples. Not run for fast package compiling
+#' \dontrun{
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' ltmg <- runLTMG(counts)
+#' hyperParams <- setHyperParams(regu_epochs = 5L)
+#' hardwareSetup <- setHardware(coresUsage = 1L)
+#' z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+#' net <- generateNetwork(z)
+#' plotDegree(net)
+#'}
 #'
 #' @export
 #' @importFrom igraph degree
 #' @importFrom graphics hist
-plotDegree <- function(net, title = "Distribution of Vertices in the Cell Network") {
+#' @importFrom methods is
+plotDegree <- function(net,
+                       title = "Distribution of Vertices in the Cell Network") {
 
-    if (!is(net, "igraph"))
+    if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
 
     if (!is.character(title))
@@ -61,20 +110,41 @@ plotDegree <- function(net, title = "Distribution of Vertices in the Cell Networ
     )
 }
 
-#' Plot a cell network
+#' Log-log plot of Network
 #'
-#' plot
+#' Generate a A plot of log-frequency against log-rank for the degree distribution. It is useful in examing whether the network has a scale-free topology.
 #'
 #' @param net A graph object
-#' @param title Title of the log-log plot
+#' @param title A string vector as the title of the log-log plot
+#'
+#' @references
+#' \insertRef{igraph}{scRGNet}
+#'
+#' @examples
+#' # Example 1:
+#' # Tested examples. Not run for fast package compiling
+#' \dontrun{
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' ltmg <- runLTMG(counts)
+#' hyperParams <- setHyperParams(regu_epochs = 5L)
+#' hardwareSetup <- setHardware(coresUsage = 1L)
+#' z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+#' net <- generateNetwork(z)
+#' plotLogRank(net)
+#'}
 #'
 #' @export
 #' @importFrom igraph degree
 #' @importFrom graphics plot
-plotLogRank <- function(net, title = "A log-log Plot of Connectivities for Cell Network") {
+#' @importFrom methods is
+plotLogRank <- function(net,
+                        title = "A log-log Plot of Connectivities for Cell Network") {
 
 
-    if (!is(net, "igraph"))
+    if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
 
     if (!is.character(title))

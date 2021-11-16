@@ -2,15 +2,35 @@
 % Please edit documentation in R/plot.R
 \name{plotDegree}
 \alias{plotDegree}
-\title{Plot a cell network}
+\title{Show Degree Distribution in Network}
 \usage{
 plotDegree(net, title = "Distribution of Vertices in the Cell Network")
 }
 \arguments{
 \item{net}{A graph object}
 
-\item{title}{Title of the histogram}
+\item{title}{A character vector as the title of the histogram.}
 }
 \description{
-plot
+Plot distribution for degrees of cells in the network.
+}
+\examples{
+# Example 1:
+# Tested examples. Not run for fast package compiling
+\dontrun{
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath)
+ltmg <- runLTMG(counts)
+hyperParams <- setHyperParams(regu_epochs = 5L)
+hardwareSetup <- setHardware(coresUsage = 1L)
+z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+net <- generateNetwork(z)
+plotDegree(net)
+}
+
+}
+\references{
+\insertRef{igraph}{scRGNet}
 }

@@ -7,7 +7,32 @@
 #' @param hyperParams A list of hyperparameter to tune the model. Optional.
 #' @param hardwareSetup A list of parameters to setup the hardware on which the model runs. Optional.
 #'
+#' @return A matrix representing the encoded space of the scRNA-seq matrix.
+#'
+#' @examples
+#' # Example 1:
+#' # Tested examples. Not run for fast package compiling
+#' \dontrun{
+#' # Accessing the demo gene_counts_small dataset available with the package
+#' inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+#' # Preprocess the raw counts
+#' counts <- preprocessCSV(path = inputCountsPath)
+#' ltmg <- runLTMG(counts)
+#' hyperParams <- setHyperParams(regu_epochs = 5L)
+#' hardwareSetup <- setHardware(coresUsage = 1L)
+#' z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+#'}
+#'
+#' @references
+#' \insertRef{scGNN}{scRGNet}
+#' \insertRef{LTMG}{scRGNet}
+#' \insertRef{torch}{scRGNet}
+#' \insertRef{progress}{scRGNet}
+#' \insertRef{matrix}{scRGNet}
+#'
 #' @export
+#' @importFrom Rdpack reprompt
+#' @importFrom methods is
 #' @importFrom coro loop
 #' @import torch
 #' @import progress
@@ -30,7 +55,7 @@ runFeatureAE <- function(scDataset,
     if (is.null(scDataset)) {
         stop("Must provide a scDataset object to perform analysis.")
     } else {
-        if (!is(scDataset, "scDataset"))
+        if (!methods::is(scDataset, "scDataset"))
             stop("Invalid input. Must provide a scDataset object.")
     }
 
@@ -136,7 +161,10 @@ runFeatureAE <- function(scDataset,
 #' @param reduction Type of reduction used in loss functions:
 #'     available options: "mean", "sum", or "none", meaning not using reduction method.
 #' @return A list of hyper-parameters for runFeatureAE
-
+#'
+#' @references
+#' \insertRef{scGNN}{scRGNet}
+#'
 #' @export
 setHyperParams <- function(
     batch_size   = 1L, ## default set to 1
@@ -199,6 +227,9 @@ setHyperParams <- function(
 #'     If CUDA is set to TRUE, coresUsage will not be used. Default FALSE.
 #'
 #' @return A list of parameters to set up hardware
+#'
+#' @references
+#' \insertRef{scGNN}{scRGNet}
 #'
 #' @export
 setHardware <- function(

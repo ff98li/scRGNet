@@ -2,15 +2,39 @@
 % Please edit documentation in R/plot.R
 \name{plotCellNet}
 \alias{plotCellNet}
-\title{Plot a cell network}
+\title{Cell network plotting function}
 \usage{
-plotCellNet(net, group = TRUE)
+plotCellNet(net, group = TRUE, title = "Inferred Cell Network")
 }
 \arguments{
-\item{net}{A graph object}
+\item{net}{An igraph object generayed by generateNetwork.
+It contains the inferred cell-cell relationship.}
 
-\item{group}{Whether to show cell community in the network}
+\item{group}{A logical vector indicating whether to highlight cell communities in the network.
+If FALSE, they will not be highlighted. Default TRUE.}
+
+\item{title}{A character vector as the title of the network plot.}
 }
 \description{
-plot
+A plotting function to plot the inferred cell net-work from generateNetwork.
+}
+\examples{
+# Example 1:
+# Tested examples. Not run for fast package compiling
+\dontrun{
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath)
+ltmg <- runLTMG(counts)
+hyperParams <- setHyperParams(regu_epochs = 5L)
+hardwareSetup <- setHardware(coresUsage = 1L)
+z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+net <- generateNetwork(z)
+plotCellNet(net)
+}
+
+}
+\references{
+\insertRef{igraph}{scRGNet}
 }
