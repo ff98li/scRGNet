@@ -1,6 +1,14 @@
 ---
-title: "Introduction_to_scRGNet"
-output: rmarkdown::html_vignette
+title: "Introduction to scRGNet Workflow"
+author: "Feifei Li"
+date: "`r format(Sys.time(), '%d %b %Y')`"
+output:
+    rmarkdown::html_vignette:
+        toc: TRUE
+        toc_depth: 2
+bibliography: ../inst/REFERENCES.bib
+biblio-style: "apalike"
+link-citations: yes
 vignette: >
   %\VignetteIndexEntry{Introduction_to_scRGNet}
   %\VignetteEngine{knitr::rmarkdown}
@@ -8,6 +16,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -17,3 +26,24 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(scRGNet)
 ```
+
+## Summary
+
+**scRGNet** 
+
+## Workflow
+
+### Step 1. Pre-preocessing scRNA-seq data from csv file
+
+
+### Step 2. Infer LTMG signals (Optional)
+
+
+### Step 3. Dimensional reduction
+
+
+### Step 4. Generate a network
+
+
+### Step 5. Plot
+
