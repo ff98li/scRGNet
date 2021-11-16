@@ -27,6 +27,10 @@ Imports:
     igraph,
     progress,
     torch (>= 0.6.0)
-Remotes:  
+Remotes: 
     BMEngineeR/scGNNLTMG,
     mlverse/torch
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
