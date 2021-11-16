@@ -1,5 +1,8 @@
 ---
 output: github_document
+bibliography: ./inst/REFERENCES.bib
+biblio-style: "apalike"
+link-citations: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -53,3 +56,5 @@ plot(pressure)
 ```
 
 In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+
+## References
