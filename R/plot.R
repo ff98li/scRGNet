@@ -31,8 +31,7 @@ plotCellNet <- function(net, group = TRUE) {
 #' @importFrom graphics hist
 plotDegree <- function(net) {
     d_dist <- igraph::degree(net)
-    output <- graphics::hist(d_dist)
-    return(output)
+    graphics::hist(d_dist)
 }
 
 #' Plot a cell network
@@ -51,13 +50,11 @@ plotLogRank <- function(net, title = "A log-log Plot of Connectivities for Cell 
     freqRank <- as.integer(names(rankFreq)) # seperate ranks from rankFreq
     freq     <- as.integer(rankFreq) # seperate frequency from rankFreq
 
-    output <- plot(log10(freqRank + 1),
-                   log10(freq),
-                   type = "b", # type b means draw for both lines and dots
-                   pch  = 13,   # shape of points
-                   bg   = "#A5F5CC",
-                   xlab = "log(rank)", ylab = "log(frequency)",
-                   main = title)
-
-    return(output)
+    plot(log10(freqRank + 1),
+         log10(freq),
+         type = "b", # type b means draw for both lines and dots
+         pch  = 13,   # shape of points
+         bg   = "#A5F5CC",
+         xlab = "log(rank)", ylab = "log(frequency)",
+         main = title)
 }
