@@ -35,6 +35,7 @@ train <- function(epoch,
 
             if (regu) {
                 regu_mat_batch <- regu_mat[, batch_idx]
+                ## TODO: figire out issue in storing data to device
                 #regu_mat_batch <- regu_mat_batch$to(device = device)
             }
 
