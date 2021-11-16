@@ -96,24 +96,25 @@ runFeatureAE <- function(scDataset,
 
     ## Store reconOri for imputation (currently not available)
     #rdaStatus <- model$state_dict()
-    recon           <- Matrix::as.matrix(train_output$recon)
-    rownames(recon) <- sample_list
-    colnames(recon) <- gene_list
-
-    original           <- Matrix::as.matrix(train_output$original)
-    rownames(original) <- sample_list
-    colnames(original) <- gene_list
+    #recon           <- Matrix::as.matrix(train_output$recon)
+    #rownames(recon) <- sample_list
+    #colnames(recon) <- gene_list
+#
+    #original           <- Matrix::as.matrix(train_output$original)
+    #rownames(original) <- sample_list
+    #colnames(original) <- gene_list
 
     z           <- Matrix::as.matrix(train_output$z)
     rownames(z) <- sample_list
 
     ## Proceed to inferring cell-type...
-    return(
-        list(
-            "recon"    = recon,
-            "original" = original,
-            "z"        = z,
-            "risk"     = train_output$risk
-        )
-    )
+    #return(
+    #    list(
+    #        "recon"    = recon,
+    #        "original" = original,
+    #        "z"        = z,
+    #        "risk"     = train_output$risk
+    #    )
+    #)
+    return(z)
 }

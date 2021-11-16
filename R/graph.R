@@ -10,6 +10,7 @@
 #' @importFrom stats sd
 calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k) {
 
+    cell_list  <- rownames(feature_mat)
     ## For each cell, calculate the distance to save memory
     start_time <- Sys.time()
     edgeList   <- list()
@@ -37,6 +38,8 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
     }
 
     edgeList <- do.call(rbind, edgeList)
+    edgeList[, 1] <- cell_list[edgeList[, 1]]
+    edgeList[, 2] <- cell_list[edgeList[, 2]]
     edgeList <- as.data.frame(edgeList)
     colnames(edgeList) <- c("V1", "V2", "weight")
 
@@ -56,11 +59,10 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
 #' @importFrom igraph graph_from_data_frame
 generateNetwork <- function(feature_mat, k = 7) {
 
+    cell_list <- rownames(feature_mat)
     edgeList <- calculate_knn_graph_distance_matrix_StatsSingleThread(feature_mat, k = k)
-
     graph <- igraph::graph_from_data_frame(edgeList)
 
     #adj   <- igraph::as_adj(graph, attr = "weight")
     return(graph)
-
 }
