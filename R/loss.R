@@ -57,7 +57,6 @@ loss_function_gcn <- function(VAE    = FALSE,
 #'
 #' @return tensor
 #'
-#' @export
 #' @importFrom torch torch_mean torch_sum torch_broadcast_tensors nnf_mse_loss
 vallina_mse_loss_function <- function(input, target, reduction = 'none') {
 
@@ -110,7 +109,6 @@ vallina_mse_loss_function <- function(input, target, reduction = 'none') {
 #'
 #' @return tensor
 #'
-#' @export
 regulation_mse_loss_function <- function(input, target, regu_mat, reduction = 'none') {
 
     if (reduction %in% c('none', 'mean', 'sum')) {
@@ -162,7 +160,6 @@ regulation_mse_loss_function <- function(input, target, regu_mat, reduction = 'n
 #' #' @references
 #' \insertRef{scGNN}{scRGNet}
 #'
-#' @export
 loss_function_graph <- function(recon_x,
                                 x,
                                 mu          = NULL,

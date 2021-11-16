@@ -2,7 +2,6 @@
 #'
 #' An R6 class to store scRNA-seq data for analysis using Torch
 #'
-#' @export
 #' @importFrom torch dataset as_array
 #' @importFrom Matrix t
 scDataset <- torch::dataset(

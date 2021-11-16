@@ -5,7 +5,6 @@
 #' #' @references
 #' \insertRef{GCN}{scRGNet}
 #'
-#' @export
 #' @importFrom torch nn_module nn_linear
 AE <- torch::nn_module(
     classname = "AE",
