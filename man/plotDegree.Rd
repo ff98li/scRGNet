@@ -4,10 +4,12 @@
 \alias{plotDegree}
 \title{Plot a cell network}
 \usage{
-plotDegree(net)
+plotDegree(net, title = "Distribution of Vertices in the Cell Network")
 }
 \arguments{
 \item{net}{A graph object}
+
+\item{title}{Title of the histogram}
 }
 \description{
 plot

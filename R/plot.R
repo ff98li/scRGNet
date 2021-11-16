@@ -25,13 +25,21 @@ plotCellNet <- function(net, group = TRUE) {
 #' plot
 #'
 #' @param net A graph object
+#' @param title Title of the histogram
 #'
 #' @export
 #' @importFrom igraph degree
 #' @importFrom graphics hist
-plotDegree <- function(net) {
-    d_dist <- igraph::degree(net)
-    graphics::hist(d_dist)
+plotDegree <- function(net, title = "Distribution of Vertices in the Cell Network") {
+    dg <- igraph::degree(net)
+    brk <- seq(min(dg) - 0.5, max(dg) + 0.5, by = 1)
+    graphics::hist(dg,
+                   breaks = brk,
+                   xlim   = range(dg) + c(-1, 1),
+                   main   = title,
+                   xlab   = "Degree",
+                   ylab   = "Vertices"
+    )
 }
 
 #' Plot a cell network
