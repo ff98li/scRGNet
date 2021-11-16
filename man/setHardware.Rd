@@ -21,3 +21,6 @@ A list of parameters to set up hardware
 \description{
 Setting up your hardware to train the model faster and get a better result (if you have a powerful one)
 }
+\references{
+\insertRef{scGNN}{scRGNet}
+}

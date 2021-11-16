@@ -2,15 +2,35 @@
 % Please edit documentation in R/plot.R
 \name{plotLogRank}
 \alias{plotLogRank}
-\title{Plot a cell network}
+\title{Log-log plot of Network}
 \usage{
 plotLogRank(net, title = "A log-log Plot of Connectivities for Cell Network")
 }
 \arguments{
 \item{net}{A graph object}
 
-\item{title}{Title of the log-log plot}
+\item{title}{A string vector as the title of the log-log plot}
 }
 \description{
-plot
+Generate a A plot of log-frequency against log-rank for the degree distribution. It is useful in examing whether the network has a scale-free topology.
+}
+\examples{
+# Example 1:
+# Tested examples. Not run for fast package compiling
+\dontrun{
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath)
+ltmg <- runLTMG(counts)
+hyperParams <- setHyperParams(regu_epochs = 5L)
+hardwareSetup <- setHardware(coresUsage = 1L)
+z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+net <- generateNetwork(z)
+plotLogRank(net)
+}
+
+}
+\references{
+\insertRef{igraph}{scRGNet}
 }

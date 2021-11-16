@@ -18,11 +18,11 @@ setHyperParams(
 
 \item{regu_epochs}{Epoch of trainning; that is, the number of time the dataset is visited.}
 
-\item{L1}{Intensity of L1 penalty on loss if LTMG matrix is used.}
+\item{L1}{Intensity of L1 penalty on loss if LTMG matrix is used. Takes value in range >=0 and >= 1}
 
-\item{L2}{Intensity of L2 penalty on loss if LTMG matrix is used.}
+\item{L2}{Intensity of L2 penalty on loss if LTMG matrix is used. Takes value in range >=0 and >= 1}
 
-\item{regu_alpha}{Intensity of LTMG regularisation.}
+\item{regu_alpha}{Intensity of LTMG regularisation. Takes value in range >=0 and >= 1}
 
 \item{reduction}{Type of reduction used in loss functions:
 available options: "mean", "sum", or "none", meaning not using reduction method.}
@@ -32,4 +32,7 @@ A list of hyper-parameters for runFeatureAE
 }
 \description{
 A function to set up the hyper-parameter to tune the auto-encoder
+}
+\references{
+\insertRef{scGNN}{scRGNet}
 }

@@ -72,7 +72,13 @@ and pre-process the scRNA-seq matrix with the given criteria.
 before feeding it to the scGNN framework for analysis.
 }
 \examples{
-
+# Example 2:
+\dontrun{
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath)
+}
 # Example 1:
 \dontrun{
 # Preprocess the whole scRNA-seq dataset

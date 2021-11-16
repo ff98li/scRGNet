@@ -21,6 +21,31 @@ runFeatureAE(
 
 \item{hardwareSetup}{A list of parameters to setup the hardware on which the model runs. Optional.}
 }
+\value{
+A matrix representing the encoded space of the scRNA-seq matrix.
+}
 \description{
 The main function for performing dimensional reduction on the preprocessed scRNA-seq data
+}
+\examples{
+# Example 1:
+# Tested examples. Not run for fast package compiling
+\dontrun{
+# Accessing the demo gene_counts_small dataset available with the package
+inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
+# Preprocess the raw counts
+counts <- preprocessCSV(path = inputCountsPath)
+ltmg <- runLTMG(counts)
+hyperParams <- setHyperParams(regu_epochs = 5L)
+hardwareSetup <- setHardware(coresUsage = 1L)
+z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetup)
+}
+
+}
+\references{
+\insertRef{scGNN}{scRGNet}
+\insertRef{LTMG}{scRGNet}
+\insertRef{torch}{scRGNet}
+\insertRef{progress}{scRGNet}
+\insertRef{matrix}{scRGNet}
 }
