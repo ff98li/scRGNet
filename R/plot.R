@@ -2,9 +2,10 @@
 #'
 #' plot
 #'
-#' @param graph A graph object
+#' @param net A graph object
 #'
 #' @export
-plotCellNet <- function(graph) {
-    igraph::tkplot(graph)
+plotCellNet <- function(net) {
+    igraph::plot.igraph(net,
+                        vertex.label.cex = 0.1)
 }

@@ -61,7 +61,7 @@ generateNetwork <- function(feature_mat, k = 7) {
 
     cell_list <- rownames(feature_mat)
     edgeList <- calculate_knn_graph_distance_matrix_StatsSingleThread(feature_mat, k = k)
-    graph <- igraph::graph_from_data_frame(edgeList)
+    graph <- igraph::graph_from_data_frame(edgeList, directed = FALSE)
 
     #adj   <- igraph::as_adj(graph, attr = "weight")
     return(graph)

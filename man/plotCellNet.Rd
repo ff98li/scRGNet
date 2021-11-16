@@ -4,10 +4,10 @@
 \alias{plotCellNet}
 \title{Plot a cell network}
 \usage{
-plotCellNet(graph)
+plotCellNet(net)
 }
 \arguments{
-\item{graph}{A graph object}
+\item{net}{A graph object}
 }
 \description{
 plot
