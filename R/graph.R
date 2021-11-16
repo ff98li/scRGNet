@@ -38,9 +38,9 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
     }
 
     edgeList <- do.call(rbind, edgeList)
+    edgeList <- as.data.frame(edgeList)
     edgeList[, 1] <- cell_list[edgeList[, 1]]
     edgeList[, 2] <- cell_list[edgeList[, 2]]
-    edgeList <- as.data.frame(edgeList)
     colnames(edgeList) <- c("V1", "V2", "weight")
 
     return(edgeList)
