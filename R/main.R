@@ -75,10 +75,9 @@ runFeatureAE <- function(scDataset,
     train_output <- list() ## Initialised to save model output
 
     pb <- progress_bar$new(
-        format = "  Training [:bar] :current/:total (:percent) :elapsedfull",
-        total  = hyperParams$regu_epoch, clear = FALSE, width= 60, show_after = 0)
+        format = "  Training [:bar] :current/:total (:percent) Averaged Loss: :risk Time taken: :elapsedfull",
+        total  = hyperParams$regu_epoch, clear = FALSE, show_after = 0, width = 95)
     for (epoch in seq(hyperParams$regu_epoch)) {
-        pb$tick()
         train_output <- train(epoch        = epoch,
                               train_loader = train_loader,
                               model        = model,
@@ -87,9 +86,7 @@ runFeatureAE <- function(scDataset,
                               hyperParams  = hyperParams,
                               device       = device,
                               EMflag       = FALSE)
-        #message(sprintf("Epoch: %i / %i   Average Loss: %f",
-        #                epoch, hyperParams$regu_epoch,
-        #                train_ouput$risk))
+        pb$tick(token = list(risk = as.character(format(round(train_output$risk, 2), nsmall = 3))))
     }
 
     #zOut <- train_output$z$detach()$cpu()

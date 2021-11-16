@@ -4,10 +4,12 @@
 \alias{plotCellNet}
 \title{Plot a cell network}
 \usage{
-plotCellNet(net)
+plotCellNet(net, group = TRUE)
 }
 \arguments{
 \item{net}{A graph object}
+
+\item{group}{Whether to show cell community in the network}
 }
 \description{
 plot
