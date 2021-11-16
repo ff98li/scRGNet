@@ -14,16 +14,11 @@
 #' @import Matrix
 runFeatureAE <- function(scDataset,
                          LTMG_mat       = NULL,
-                         #outputDir     = file.path(getwd(), "outputDir"),
-                         #datasetName   = "scData",
                          hyperParams    = list(
                          "batch_size"   = 1L, ## default set to 1
-                         "EM_iteration" = 10L,
                          "regu_epochs"  = 5L,
-                         "EM_epochs"    = 20L,
-                         #"GAEepochs"    = 200L,
-                         "L1"           = 1.0,
-                         "L2"           = 0.0,
+                         "L1"           = 0.5,
+                         "L2"           = 0.5,
                          "regu_alpha"   = 0.9,
                          "reduction"    = "sum"),
                          hardwareSetup = list(
@@ -115,4 +110,37 @@ runFeatureAE <- function(scDataset,
     #    )
     #)
     return(z)
+}
+
+#' Hyper-parameter setter
+#'
+#' A function to set up the hyper-parameter to tune the auto-encoder
+#' @param batch_size Batch size used to train the auto-encoder
+#' @param regu_epochs Epoch of trainning; that is, the number of time the dataset is visited.
+#' @param L1 Intensity of L1 penalty on loss if LTMG matrix is used.
+#' @param L2 Intensity of L2 penalty on loss if LTMG matrix is used.
+#' @param regu_alpha Intensity of LTMG regularisation.
+#' @param reduction Type of reduction used in loss functions:
+#'     available options: "mean", "sum", or "none", meaning not using reduction method.
+#' @return A list of hyper-parameters for runFeatureAE
+
+#' @export
+setHyperParams <- function(
+    batch_size   = 1L, ## default set to 1
+    regu_epochs  = 5L,
+    L1           = 0.5,
+    L2           = 0.5,
+    regu_alpha   = 0.9,
+    reduction    = "sum"
+) {
+    hyperParams <- list(
+        "batch_size"   = batch_size,
+        "regu_epochs"  = 5L,
+        "L1"           = 0.5,
+        "L2"           = 0.5,
+        "regu_alpha"   = 0.9,
+        "reduction"    = "sum"
+    )
+
+    return(hyperParams)
 }
