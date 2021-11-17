@@ -22,6 +22,9 @@ It is unique from other R packages for scRNA-seq analysis in that
 scRGNet offers an option to analyse scRNA-seq data without assuming any
 statistical distribution or relationships for gene expression.
 
+-   R requirement: 4.1.1 or later version
+-   Development environment: Ubuntu 20.04 LTS
+
 ## Installation
 
 To install the latest version of scRGNet:
@@ -86,7 +89,7 @@ sparse matrix to reduce memory useage, and used to convert a tensor
 object to an R matrix. The *scDataset* object is an `R6` object([Chang
 2021](#ref-r6)) inherited from class `dataset` from `torch`. The feature
 autoencoder is also an R6 object inherited from the basic neural network
-modules `nn_module` from `torch` R package, and makes use of its
+modules `nn_module` from `torch` R package, and it makes use of its
 functional modules `nnf_linear` and `nnf_relu`.([Falbel et al.
 2021](#ref-torch)) Iteration of model training makes use of `coro::loop`
 form the `coro` R package. The model training also uses `progress` R
@@ -96,7 +99,9 @@ package to inform users the model trainning progress. The
 Nepusz 2006](#ref-igraph)) All plotting functions in this package make
 use of `graphics` R package. `cluster_label_prop` and `degree` function
 from `igraph` R package are used to compute the communities and degrees
-of the network.
+of the network. Except for the LTMG modeling in `runLTMG` uses external
+R package for computation, all other functions for data processing and
+analysis in this package are my original R implementation.
 
 ## Acknowledgements
 
