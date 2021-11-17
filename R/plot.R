@@ -42,6 +42,9 @@ plotCellNet <- function(net,
     if (!is.logical(group))
         stop("Invalid argument for group. Must be logical.")
 
+    if (!is.character(title))
+        stop("Invalid argument for title. Must be a character vector.")
+
     if (group) {
         clp <- igraph::cluster_label_prop(net)
         plot(clp, net,

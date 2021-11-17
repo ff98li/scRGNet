@@ -100,11 +100,8 @@ of the network.
 
 ## Acknowledgements
 
-This package was developed for BCB410H: Applied Bioinformatics,
-University of Toronto, Toronto, CANADA, 2021-2022. `scRGNet` welcomes
-issues, enhancement requests, and other contributions. To submit an
-issue, use the [GitHub
-issues](https://github.com/ff98li/scRGNet/issues).
+This package was developed as part of an assessment for 2021 BCB410H:
+Applied Bioinfor-matics, University of Toronto, Toronto, CANADA.
 
 ## References
 
