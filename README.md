@@ -28,7 +28,7 @@ To install the latest version of scRGNet:
 
 ``` r
 require("devtools")
-devtools::install_github("ff98li/scRGNet")
+devtools::install_github("ff98li/scRGNet", build_vignettes = TRUE)
 ```
 
 ## Overview
