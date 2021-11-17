@@ -56,7 +56,7 @@ browseVignettes(package = "scRGNet")
 ```
 
 An example of a cell-cell network produced by this package using
-`plotNetwork()` follows:
+`plotCellNet()` follows:
 ![](./inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png)
 
 The degree distribution of a network can be viewed through

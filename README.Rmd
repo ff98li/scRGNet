@@ -48,7 +48,7 @@ Note that there are two datasets included in this package `gene_counts` and `gen
 browseVignettes(package = "scRGNet")
 ```
 
-An example of a cell-cell network produced by this package using `plotNetwork()` follows:
+An example of a cell-cell network produced by this package using `plotCellNet()` follows:
 ![](./inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png)
 
 The degree distribution of a network can be viewed through `plotDegree()`:
