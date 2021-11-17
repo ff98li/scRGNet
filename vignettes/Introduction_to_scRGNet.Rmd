@@ -5,7 +5,6 @@ date: "`r format(Sys.time(), '%d %b %Y')`"
 output:
     rmarkdown::html_vignette:
         toc: TRUE
-        toc_depth: 2
 bibliography: ../inst/REFERENCES.bib
 biblio-style: "apalike"
 link-citations: yes
@@ -59,18 +58,174 @@ To load the demo data in the package:
 inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
 ```
 
+Then, we can pre-process the raw count matrix by calling
 
+```{r pre}
+counts <- scRGNet::preprocessCSV(path            = inputCountsPath,
+                                 log_transform   = TRUE,
+                                 cell_zero_ratio = 0.99,
+                                 gene_zero_ratio = 0.99,
+                                 geneSelectNum   = 2000,
+                                 transpose       = FALSE,
+                                 toCSV           = FALSE,
+                                 outdir_path     = NULL,
+                                 savename        = NULL)
+```
+
+User can define their desirable thresholds on the maximum proportion of genes with zeros in cells using argument <TT>cell_zero_ratio</TT>, whose default value is 0.99, meaning cells with more than 99% genes that are zeros will be filtered out, and threshold on the maximum proportion of zeros in genes, whose default is also 0.99, implying genes with more than 99% zero values will be filtered out. After the filtering, genes will be ranked based on the variations in their expression values. User can define the number of most variant genes they would like to select. However, it cannot be fewer than 512 genes, which is the minimum requirement for the feature autoencoder to perform dimensional reduction. If the reamining genes after filtering are fewer than the user defined value, all the remaining genes will be selected. The default value for <TT>log_transform</TT> is <TT>TRUE</TT> and it is recommended to set to <TT>TRUE</TT>. If the raw matrix was given with cells as rows and genes as columns, then <TT>transpose</TT> needs to be set to <TT>TRUE</TT> to get the correct filtered result. If you would like to save the pre-processed result for other analyses, you can set <TT>toCSV</TT> to <TT>TRUE</TT>, and enter the name of the saved file using <TT>savename</TT>, and the directory where the file will be saved using <TT>outdir_path</TT>, with no path separator <TT>"/"</TT> at the end.
+
+The function returns an R6 <TT>scDataset</TT> object containing the pre-processed scRNA-seq data in a transposed sparse matrix. User can view the number of remaining cell samples in the object using
+
+```{r}
+length(counts)
+```
+
+And index specific cell sample by simply indexing:
+
+```{r, eval=FALSE}
+counts[5]
+```
 
 ### Step 2. Infer LTMG signals (Optional)
+
+Before performing the dimensional reduction using the feature autoencoder, user can choose whether to include the LTMG signals in feature autoencoder training. To infer LTMG tags, use
+
+```{r, warning=FALSE}
+ltmg <- scRGNet::runLTMG(scDataset   = counts,
+                         fromFile    = FALSE,
+                         readPath    = NULL,
+                         toFile      = FALSE,
+                         outdir_path = NULL,
+                         savename    = NULL)
+```
+
+<TT>runLTMG</TT> takes either a <TT>scDataset</TT> object containing the data, or, if <TT>fromFile</TT> is set to <TT>TRUE</TT>, a path to an csv file containing pre-processed scRNA-seq data. If you would like to save the LTMG tags to file, set <TT>toFile</TT> to <TT>TRUE</TT> and enter the directory path to save the file using <TT>outdir_path</TT> and the name of the saved file <TT>savename</TT>.
 
 
 ### Step 3. Dimensional reduction
 
+The two subsections below are intended for advanced user. If you only want to run a quick demo, you can safely skip to the training section. If you would like to run your own dataset, please make sure that you have enough computational resources; running with a whole scRNA-seq dataset can take up 12G ram.
+
+#### Hyper-parameters
+
+The feature autoencoder is a model that requires some tuning for its hyperparameters. For user with machine learning background and familiar with the concept of hyperparameters, you can tune the hyperparameter using
+
+```{r}
+hyperParams <- scRGNet::setHyperParams(
+    batch_size  = 1L,
+    regu_epochs = 5L,
+    L1          = 0.5,
+    L2          = 0.5,
+    regu_alpha  = 0.9,
+    reduction   = "sum"
+)
+```
+Here I'm showing the default hyperparameters to run a fast demo.
+
+- <TT>batch_size</TT>: the input batch size for training the feature autoencoder
+- <TT>regu_epochs</TT>: number of epochs to train in the feature autoencoder
+- <TT>L1</TT>: the intensity of L1 regularizer
+- <TT>L2</TT>: the intensity of L2 regularizer
+- <TT>regu_alpha</TT>: intensity of LTMG regularisation
+- <TT>reduction</TT>: Type of reduction method to use in loss functions.
+
+If you would like to run your own dataset, you might want to tune these hyperparameters to  different values with less averaged loss.
+
+#### Hardware
+
+scRGNet also offers options for setting which device to use for running the model:
+
+```{r}
+hardwareSetup <- scRGNet::setHardware(
+    CUDA       = FALSE,
+    coresUsage = 1L
+)
+```
+
+If you have a powerful Nvidia graphics card and would like to use it to train the model, you might consider setting <TT>CUDA</TT> to <TT>TRUE</TT>. However, because feature autoencoder is implemented using torch neural network module, and only CUDA 10 and 11.1 are supported by torch for R[@torch], before proceeding, make sure you have the correct CUDA version installed in your computer. If you would like to run with your CPU, you can set the number of cores to train the model with <TT>coresUsage</TT>. Unfortunately this option is not available for **Mac OS** user (sorry).
+
+#### Training
+
+To run the model using our data, simply run:
+
+```{r}
+z <- scRGNet::runFeatureAE(scDataset = counts)
+```
+
+or, if you would like to run with LTMG regularisation:
+
+```{r eval = FALSE}
+z <- scRGNet::runFeatureAE(scDataset = counts,
+                           LTMG_mat  = ltmg)
+```
+
+If you would like to with your custimised settings:
+
+```{r eval = FALSE}
+z <- scRGNet::runFeatureAE(scDataset     = counts,
+                           LTMG_mat      = ltmg,
+                           hyperParams   = hyperParams,
+                           hardwareSetup = hardwareSetup)
+```
+
+where <TT>hyperParams</TT> and <TT>hardwareSetup</TT> are user-defined.
+
+At the end of training, <TT>runFeatureAE</TT> returns a matrix of the low-dimensional representation of the dataset in scDataset.
+Again, note that in scDataset, the pre-processed matrix has been transposed, meaning that now rows are cells and columns are genes. Hence, the selected genes are used as our "features" in the feature auto-encoder, and it finds the low-dimensional features from the gene expression values for each cell.
 
 ### Step 4. Generate a network
 
+After we have found the lower dimensional feature matrix, scRGNet fits this feature matrix to a KNN model: for a user defined value of $K$ (default 7), for each cell sample, this KNN model selects K cells neartest in Euclidean distance, and then computes the mean and standard deviation of the distances from the current cell sample to the K selected cells. If the pair-wise distance between two cells are lower than the mean plus one standard deviation, then an edge will be assigned to the two cells:
 
-### Step 5. Plot
+```{r}
+net <- scRGNet::generateNetwork(feature_mat = z, k = 7)
+```
+### Step 5. Plot and analysis
+
+scRGNet offers 3 visualisations for analysis
+
+#### Cell-Cell Network
+
+The most straight-forward visualisation is the cell-cell network.
+It shows the topological structure representing the cell-cell relationship inferred from the low-dimensional feature matrix:
+
+```{r, fig.width=8, fig.height=5}
+scRGNet::plotCellNet(net = net)
+```
+
+It also highlights clusters in the network. If you would like to view a plot without the highlight, and set your own title for the network, you can set <TT>group</TT> to <TT>FALSE</TT> and enter your <TT>title</TT>:
+
+```{r, fig.width=8, fig.height=5}
+scRGNet::plotCellNet(net = net, group = FALSE, title = "My Network")
+```
+
+However, the quality of your network entirely depends on how well the model was tuned.
+Running the model with default hyper-parameters will produce a rather crude result like this one shown above.
+
+A model trained with the same dataset, running 100 epochs with a batch size of 5, and K set to 24 will have the following result:
+
+![](../inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png){width=90%}
+
+#### Degree Distribution
+
+A network is an intuitive visualisation, but it is difficult to generailise information regarding its topological structure. Another visualisation this package provides is the degree distribution:
+
+```{r, fig.width=5, fig.height=4}
+scRGNet::plotDegree(net = net)
+```
+
+Again, you can set your own title with argument <TT>title</TT>.
+This is available in all plotting functions of this package.
+
+A left-skewed distribution could indicate that most cells have interaction with each other, forming large common communities. Contrarily, a right-skewed distribution implies less interaction among cells.
+
+#### Log-log Plot: Rank vs. Frequency.
+
+The log-log plot is helpful in further analysing the topological structure of the network. Many biological networks follows a **scale-free** degree distribution. The easiest way to find whether the cell network is scale-free can be viewed by examining whether the log-log plot has a linear pattern[@graph]:
+
+```{r, fig.width=5, fig.height=4}
+scRGNet::plotLog(net = net)
+```
 
 ## References
 

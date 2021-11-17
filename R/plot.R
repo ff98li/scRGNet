@@ -140,8 +140,8 @@ plotDegree <- function(net,
 #' @importFrom igraph degree
 #' @importFrom graphics plot
 #' @importFrom methods is
-plotLogRank <- function(net,
-                        title = "A log-log Plot of Connectivities for Cell Network") {
+plotLog <- function(net,
+                    title = "A log-log Plot of Connectivities for Cell Network") {
 
 
     if (!methods::is(net, "igraph"))
