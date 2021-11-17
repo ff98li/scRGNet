@@ -60,22 +60,22 @@ browseVignettes(package = "scRGNet")
 
 An example of a cell-cell network produced by this package using
 `plotCellNet()` follows:
-![](./inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png)
+<img src="./inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png" style="width:75.0%" />
 
 The degree distribution of a network can be viewed through
 `plotDegree()`:
 
-![](./inst/extdata/dist.png)
+<img src="./inst/extdata/dist.png" style="width:75.0%" />
 
 It also offers a quick way to plot log-rank against log frequency of
 degree in a network to further analyse the topological structure
 `plotLog()`:
 
-![](./inst/extdata/log.png)
+<img src="./inst/extdata/log.png" style="width:75.0%" />
 
 An overview of the package is illustrated below.
 
-![](./inst/extdata/structure.png)
+<img src="./inst/extdata/structure.png" style="width:75.0%" />
 
 ## Contributions
 
