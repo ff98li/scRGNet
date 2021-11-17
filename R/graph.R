@@ -8,7 +8,7 @@
 #' @return edgeList
 #'
 #' @importFrom stats sd
-calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k) {
+calculate_knn_graph_distance_matrix_Stats <- function(feature_mat, k) {
 
     cell_list  <- rownames(feature_mat)
     ## For each cell, calculate the distance to save memory
@@ -80,7 +80,7 @@ calculate_knn_graph_distance_matrix_StatsSingleThread <- function(feature_mat, k
 generateNetwork <- function(feature_mat, k = 7) {
 
     cell_list <- rownames(feature_mat)
-    edgeList  <- calculate_knn_graph_distance_matrix_StatsSingleThread(feature_mat, k = k)
+    edgeList  <- calculate_knn_graph_distance_matrix_Stats(feature_mat, k = k)
     graph     <- igraph::graph_from_data_frame(edgeList, directed = FALSE)
 
     #adj   <- igraph::as_adj(graph, attr = "weight")
