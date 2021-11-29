@@ -30,7 +30,6 @@ Imports:
     methods
 Remotes: 
     BMEngineeR/scGNNLTMG,
-    mlverse/torch
 Suggests: 
     rmarkdown,
     knitr,
