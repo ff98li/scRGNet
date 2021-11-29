@@ -192,3 +192,5 @@ loss_function_graph <- function(recon_x,
 
     return(loss)
 }
+
+# [END]

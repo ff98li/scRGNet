@@ -86,3 +86,5 @@ generateNetwork <- function(feature_mat, k = 7) {
     #adj   <- igraph::as_adj(graph, attr = "weight")
     return(graph)
 }
+
+# [END]

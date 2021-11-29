@@ -59,3 +59,5 @@ AE <- torch::nn_module(
     }
 )
 # TODO: if have time, do a variational auto-encoder
+
+# [END]

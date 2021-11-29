@@ -260,3 +260,5 @@ setHardware <- function(
 
     return(hardwareSetup)
 }
+
+# [END]

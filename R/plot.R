@@ -166,3 +166,5 @@ plotLog <- function(net,
          xlab = "log(rank)", ylab = "log(frequency)",
          main = title)
 }
+
+# [END]

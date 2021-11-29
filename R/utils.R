@@ -42,3 +42,5 @@ scDataset <- torch::dataset(
         )
     }
 )
+
+# [END]
