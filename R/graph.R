@@ -82,6 +82,9 @@ generateNetwork <- function(feature_mat, k = NULL) {
 
     if (is.null(k)) {
         k <- floor(sqrt(dim(feature_mat)[1])) ## Best heuristic for k
+    } else {
+        if ((!is.numeric(k)) | k < 1 | k %% 1 != 0) ## Lazy evaluation :)
+            stop("Invalid argument for k: Must be a positive integer greater than 0.")
     }
 
     cell_list <- rownames(feature_mat)
