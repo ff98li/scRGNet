@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 scRGNet is an R package for inferring cell-cell networks from scRNA-seq data.
 It is the first R package that attempts to perform dimensional reduction using an feature(that is, gene) autoencoder from the novel single cell graph neural network (scGNN) framework.[@scGNN] It generate a feature matrix containing the low-dimensional representation of gene expression in each cell, and build a Cell-Cell network from the feature matrix using KNN. In training the feature autoencoder, discretized regulatory signals quantified from gene expression modeled by a left-truncated mixture Gaussian (LTMG) model can also be used as a regulariser.[@LTMG] It is unique from other R packages for scRNA-seq analysis in that scRGNet offers an option to analyse scRNA-seq data without assuming any statistical distribution or relationships for gene expression.
 
-- R requirement: 4.1.1 or later version
+- R requirement: 4.1.2 or later version
 - Development environment: Ubuntu 20.04 LTS
 
 ## Installation

@@ -57,6 +57,7 @@ calculate_knn_graph_distance_matrix_Stats <- function(feature_mat, k) {
 #'
 #'#' @references
 #' \insertRef{scGNN}{scRGNet}
+#' \insertRef{defaultk}{scRGNet}
 #' \insertRef{igraph}{scRGNet}
 #'
 #' @examples
@@ -77,7 +78,11 @@ calculate_knn_graph_distance_matrix_Stats <- function(feature_mat, k) {
 #' @export
 #' @importFrom Rdpack reprompt
 #' @importFrom igraph graph_from_data_frame
-generateNetwork <- function(feature_mat, k = 7) {
+generateNetwork <- function(feature_mat, k = NULL) {
+
+    if (is.null(k)) {
+        k <- floor(sqrt(dim(feature_mat)[1])) ## Best heuristic for k
+    }
 
     cell_list <- rownames(feature_mat)
     edgeList  <- calculate_knn_graph_distance_matrix_Stats(feature_mat, k = k)

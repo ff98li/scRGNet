@@ -22,7 +22,7 @@ It is unique from other R packages for scRNA-seq analysis in that
 scRGNet offers an option to analyse scRNA-seq data without assuming any
 statistical distribution or relationships for gene expression.
 
--   R requirement: 4.1.1 or later version
+-   R requirement: 4.1.2 or later version
 -   Development environment: Ubuntu 20.04 LTS
 
 ## Installation
