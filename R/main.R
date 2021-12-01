@@ -48,7 +48,7 @@ runFeatureAE <- function(scDataset,
                          "reduction"    = "sum"),
                          hardwareSetup = list(
                              "CUDA"      = F,
-                             "coresUage" = 5L ## reset to 1 on submission
+                             "coresUage" = 1L ## reset to 1 on submission
                          )
                         ) {
 
