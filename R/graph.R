@@ -36,6 +36,8 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
         preds     <- stats::predict(iso, feature_mat[nn, ])
         pruned    <- nn[which(preds <= 0.5)] ## Use 0.5 cutoff for outliers
         new_edges <- sapply(pruned, simplify = FALSE, function(x) return(c(i, x)))
+        ## TODO: check if repetitively adding existing edges
+
         edgeList  <- c(edgeList, new_edges)
         ## Old KNN method consider mean + 1 std away as outliers
         #k_dist     <- dist_array[nn]
