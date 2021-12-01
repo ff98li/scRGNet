@@ -47,20 +47,20 @@ plotCellNet <- function(net,
 
     if (group) {
         clp <- igraph::cluster_label_prop(net)
-        plot(clp, net,
-             vertex.shape     = "none",
-             vertex.label.cex = 0.5,
-             vertex.size      = 9,
-             main             = title
-            )
+        plotCellNet_output(clp, net)
     } else {
-        plot(net,
-             vertex.shape     = "none",
-             vertex.label.cex = 0.5,
-             vertex.size      = 9,
-             main             = title
-            )
+        plotCellNet_output(net)
     }
+
+}
+
+plotCellNet_output <- function(...) {
+    graphics::plot(...,
+                   vertex.shape     = "none",
+                   vertex.label.cex = 0.5,
+                   vertex.size      = 9,
+                   main             = title
+    )
 }
 
 #' Show Degree Distribution in Network

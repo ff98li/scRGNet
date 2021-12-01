@@ -19,9 +19,9 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
     edgeList   <- list()
 
     for (i in seq(dim(feature_mat)[1])) {
-        if ((i %% 10000) == 0)
-            message(sprintf("Start pruning %i th cell. Cost %f seconds...", i, Sys.time() - start_time))
-
+        #if ((i %% 10000) == 0)
+        #    message(sprintf("Start pruning %i th cell. Cost %f seconds...", i, Sys.time() - start_time))
+        # Calculate Euclidean distance for i-th sample
         dist_array <- array(
             apply(feature_mat, 1, function(x)
                 sqrt(sum((feature_mat[i, ] - x)**2))
@@ -50,9 +50,8 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
             })
 
             ## Drop existing edges from new edges
-            if (any(exist_edges)) {
+            if (any(exist_edges))
                 new_edges <- new_edges[-which(exist_edges)]
-            }
         }
 
         edgeList  <- c(edgeList, new_edges)
