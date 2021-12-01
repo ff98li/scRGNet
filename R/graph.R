@@ -1,14 +1,16 @@
-#' One standard-deviation based KNN graph
+#' Isolation forest based KNN graph
 #'
-#' Calculate a KNN graph from a feature matrix using stats one-std based methods.
+#' Calculate a KNN graph from a feature matrix and
+#' prune the graph using isolation forest.
 #'
 #' @param feature_mat A feature matrix based on which KNN graph is computed
 #' @param k Number of neighbours in KNN graph.
-#' @param hardwareSetup Hardware setup for running isolation forest
+#' @param hardwareSetup Hardware setup for parallelising isolation forest
 #'
 #' @return edgeList
 #'
-#' @importFrom stats sd
+#' @importFrom stats sd predict
+#' @importFrom isotree isolation.forest
 calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
 
     cell_list  <- rownames(feature_mat)
@@ -16,7 +18,7 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
     start_time <- Sys.time()
     edgeList   <- list()
 
-    for (i in seq(nrow(feature_mat))) {
+    for (i in seq(dim(feature_mat)[1])) {
         if ((i %% 10000) == 0)
             message(sprintf("Start pruning %i th cell. Cost %f seconds...", i, Sys.time() - start_time))
 
@@ -26,24 +28,32 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
                 )
             )
 
-        nn         <- order(dist_array)[1:k]
-        k_dist     <- dist_array[nn]
-        boundary   <- mean(k_dist) + stats::sd(k_dist)
-        for (j in seq(k)) {
-            if (dist_array[nn[j]] <= boundary) {
-                weight <- 1.0
-            } else {
-                weight <- 0.0
-            }
-            edgeList[[i]] <- c(i, nn[j], weight)
-        }
+        nn  <- order(dist_array)[1:(k + 1)]
+        nn  <- nn[nn != i] ## Excluding self in nearest neighbours
+        iso <- isotree::isolation.forest(data     = feature_mat[nn, ],
+                                         ntrees   = 100, ## as in original isolation forest paper
+                                         nthreads = hardwareSetup$coresUage) ## parallelising
+        preds     <- stats::predict(iso, feature_mat[nn, ])
+        pruned    <- nn[which(preds <= 0.5)] ## Use 0.5 cutoff for outliers
+        new_edges <- sapply(pruned, simplify = FALSE, function(x) return(c(i, x)))
+        edgeList  <- c(edgeList, new_edges)
+        ## Old KNN method consider mean + 1 std away as outliers
+        #k_dist     <- dist_array[nn]
+        #for (j in seq(k)) {
+        #    if (dist_array[nn[j]] <= boundary) {
+        #        weight <- 1.0
+        #    } else {
+        #        weight <- 0.0
+        #    }
+        #    edgeList[[i]] <- c(i, nn[j], weight)
+        #}
     }
 
     edgeList <- do.call(rbind, edgeList)
     edgeList <- as.data.frame(edgeList)
     edgeList[, 1] <- cell_list[edgeList[, 1]]
     edgeList[, 2] <- cell_list[edgeList[, 2]]
-    colnames(edgeList) <- c("V1", "V2", "weight")
+    #colnames(edgeList) <- c("V1", "V2", "weight") # removed 0 weighted edges
 
     return(edgeList)
 }
@@ -97,7 +107,7 @@ generateNetwork <- function(feature_mat, k = NULL, hardwareSetup = NULL) {
         hardwareSetup <- setHardware()
 
     cell_list <- rownames(feature_mat)
-    edgeList  <- calculate_knn_graph(feature_mat, k = k)
+    edgeList  <- calculate_knn_graph(feature_mat, k, hardwareSetup)
     graph     <- igraph::graph_from_data_frame(edgeList, directed = FALSE)
 
     #adj   <- igraph::as_adj(graph, attr = "weight")
