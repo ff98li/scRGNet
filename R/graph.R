@@ -36,7 +36,24 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
         preds     <- stats::predict(iso, feature_mat[nn, ])
         pruned    <- nn[which(preds <= 0.5)] ## Use 0.5 cutoff for outliers
         new_edges <- sapply(pruned, simplify = FALSE, function(x) return(c(i, x)))
-        ## TODO: check if repetitively adding existing edges
+        ## check if repetitively adding existing edges
+        if (length(edgeList) > 0) {
+            exist_edges <- vapply(new_edges, FUN.VALUE = logical(1), function(x) {
+                hasEdge <- vapply(edgeList, FUN.VALUE = logical(1), function(y) {
+                    return(setequal(x, y)) ## compare a fixed new edge with all existing edges
+                })
+                if (any(hasEdge)){
+                    return(TRUE)
+                } else {
+                    return(FALSE)
+                    }
+            })
+
+            ## Drop existing edges from new edges
+            if (any(exist_edges)) {
+                new_edges <- new_edges[-which(exist_edges)]
+            }
+        }
 
         edgeList  <- c(edgeList, new_edges)
         ## Old KNN method consider mean + 1 std away as outliers
