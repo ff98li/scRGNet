@@ -178,7 +178,7 @@ Again, note that in scDataset, the pre-processed matrix has been transposed, mea
 After we have found the lower dimensional feature matrix, scRGNet fits this feature matrix to a KNN model: for a user defined value of $K$ (default 7), for each cell sample, this KNN model selects K cells neartest in Euclidean distance, and then computes the mean and standard deviation of the distances from the current cell sample to the K selected cells. If the pair-wise distance between two cells are lower than the mean plus one standard deviation, then an edge will be assigned to the two cells:
 
 ```{r}
-net <- scRGNet::generateNetwork(feature_mat = z, k = 7)
+net <- scRGNet::generateNetwork(feature_mat = z)
 ```
 ### Step 5. Plot and analysis
 
