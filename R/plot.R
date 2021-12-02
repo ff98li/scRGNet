@@ -30,14 +30,16 @@
 #'}
 #'
 #' @export
+#' @import visNetwork
 #' @import igraph
 #' @importFrom Rdpack reprompt
 #' @importFrom methods is
 plotCellNet <- function(net,
                         group           = TRUE,
                         title           = "Inferred Cell Network",
+                        show_legend     = TRUE,
                         node_label_size = 0.5,
-                        node_size       = 9) {
+                        node_size       = 25) {
 
     if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
@@ -74,22 +76,18 @@ plotCellNet <- function(net,
         colnames(nodes)[3] <- "group"
     }
 
-    visNetwork::visNetwork(nodes = nodes,
-                           edges = edges,
-                           main  = title)
-}
+    net_plot <- visNetwork::visNetwork(nodes = nodes,
+                                       edges = edges,
+                                       main  = title)
 
-## Helper function to handle multiple graph object
-#' @param ...
-#' @NoRd
-#' @import magrittr
-plotCellNet_output <- function(..., plot_args) {
-    graphics::plot(...,
-                   vertex.shape     = plot_args$node_shape,
-                   vertex.label.cex = plot_args$node_label_size,
-                   vertex.size      = plot_args$node_size,
-                   main             = plot_args$title
-    )
+    ## add legend
+    if (show_legend) {
+        net_plot<- visNetwork::visLegend(graph    = net_plot,
+                                         main     = "Group",
+                                         position = "right")
+    }
+
+    return(net_plot)
 }
 
 #' Show Degree Distribution in Network
