@@ -12,7 +12,7 @@
 #'
 #' @export
 #' @importFrom shiny runApp
-runTestingPackage <- function() {
+runscRGNet <- function() {
     appDir <- system.file("shiny-scripts", package = "scRGNet")
     shiny::runApp(appDir, display.mode = "normal")
     return()

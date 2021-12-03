@@ -6,13 +6,13 @@ Authors@R:
            family = "Li",
            role = c("aut", "cre"),
            email = "ff.li@mail.utoronto.ca")
-Description: scRGNet is an R package for performing cell-cell relationship prediction and visualising cell clustering UMAP using the single-cell graphical neural network framework.
+Description: scRGNet is an R package for performing cell-cell relationship prediction using the single-cell graphical neural network framework.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Depends: R (>= 4.1.0)
+Depends: R (>= 4.1.2)
 RdMacros: Rdpack
 Imports: 
     R.utils,
@@ -31,7 +31,8 @@ Imports:
     isotree,
     visNetwork,
     magrittr,
-    shiny
+    shiny,
+    shinythemes
 Remotes: 
     BMEngineeR/scGNNLTMG,
 Suggests: 
