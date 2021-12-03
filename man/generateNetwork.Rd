@@ -17,14 +17,6 @@ where N is the sample size.}
 }
 \value{
 An igraph object to plot the cell network.
-
-#' @references
-\insertRef{scGNN}{scRGNet}
-\insertRef{isotree}{scRGNet}
-\insertRef{isolationForest}{scRGNet}
-\insertRef{stats}{scRGNet}
-\insertRef{defaultK}{scRGNet}
-\insertRef{igraph}{scRGNet}
 }
 \description{
 Compute a cell network from a feature matrix using KNN.
@@ -44,4 +36,12 @@ z <- runFeatureAE(scDataset = counts, LTMG_mat = ltmg, hyperParams, hardwareSetu
 net <- generateNetwork(z)
 }
 
+}
+\references{
+\insertRef{scGNN}{scRGNet}
+\insertRef{isotree}{scRGNet}
+\insertRef{isolationForest}{scRGNet}
+\insertRef{stats}{scRGNet}
+\insertRef{defaultK}{scRGNet}
+\insertRef{igraph}{scRGNet}
 }

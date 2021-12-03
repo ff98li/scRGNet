@@ -88,7 +88,7 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
 #'
 #' @return An igraph object to plot the cell network.
 #'
-#'#' @references
+#' @references
 #' \insertRef{scGNN}{scRGNet}
 #' \insertRef{isotree}{scRGNet}
 #' \insertRef{isolationForest}{scRGNet}
