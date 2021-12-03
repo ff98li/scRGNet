@@ -30,7 +30,8 @@ Imports:
     methods,
     isotree,
     visNetwork,
-    magrittr
+    magrittr,
+    shiny
 Remotes: 
     BMEngineeR/scGNNLTMG,
 Suggests: 

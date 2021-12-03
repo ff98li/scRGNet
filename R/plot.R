@@ -76,11 +76,11 @@ plotCellNet <- function(net,
         nodes$"font.id" <- rep(node_label_size, dim(nodes)[1])
 
     if (group) {
-        clp                <- igraph::cluster_label_prop(net)
-        group_label        <- data.frame(as.list(igraph::membership(clp)))
-        group_label        <- as.data.frame(t(group_label))
-        group_label$label  <- rownames(group_label)
-        nodes              <- merge(x = nodes, y = group_label, by.x = "label", by.y = "label")
+        clp               <- igraph::cluster_label_prop(net)
+        group_label       <- data.frame(as.list(igraph::membership(clp)))
+        group_label       <- as.data.frame(t(group_label))
+        group_label$label <- rownames(group_label)
+        nodes             <- merge(x = nodes, y = group_label, by.x = "label", by.y = "label")
         colnames(nodes)[which(colnames(nodes) == "V1")] <- "group"
     }
 
@@ -109,6 +109,7 @@ plotCellNet <- function(net,
 #'
 #' @references
 #' \insertRef{igraph}{scRGNet}
+#' \insertRef{graphics}{scRGNet}
 #'
 #' @examples
 #' # Example 1:
@@ -159,6 +160,7 @@ plotDegree <- function(net,
 #'
 #' @references
 #' \insertRef{igraph}{scRGNet}
+#' \insertRef{graphics}{scRGNet}
 #'
 #' @examples
 #' # Example 1:

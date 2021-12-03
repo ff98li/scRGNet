@@ -90,6 +90,9 @@ calculate_knn_graph <- function(feature_mat, k, hardwareSetup) {
 #'
 #'#' @references
 #' \insertRef{scGNN}{scRGNet}
+#' \insertRef{isotree}{scRGNet}
+#' \insertRef{isolationForest}{scRGNet}
+#' \insertRef{stats}{scRGNet}
 #' \insertRef{defaultK}{scRGNet}
 #' \insertRef{igraph}{scRGNet}
 #'
