@@ -4,7 +4,14 @@
 \alias{plotCellNet}
 \title{Cell network plotting function}
 \usage{
-plotCellNet(net, group = TRUE, title = "Inferred Cell Network")
+plotCellNet(
+  net,
+  group = TRUE,
+  title = "Inferred Cell Network",
+  node_label_size = NULL,
+  node_size = NULL,
+  show_node_select = FALSE
+)
 }
 \arguments{
 \item{net}{An igraph object generayed by generateNetwork.
@@ -14,6 +21,13 @@ It contains the inferred cell-cell relationship.}
 If FALSE, they will not be highlighted. Default TRUE.}
 
 \item{title}{A character vector as the title of the network plot.}
+
+\item{node_label_size}{Size of node label}
+
+\item{node_size}{Size of node}
+
+\item{show_node_select}{Show option to highlight nodes and its neighbours when hovering.
+Intended for use in Shiny.}
 }
 \description{
 A plotting function to plot the inferred cell net-work from generateNetwork.
@@ -37,4 +51,5 @@ plotCellNet(net)
 }
 \references{
 \insertRef{igraph}{scRGNet}
+\insertRef{visNetwork}{scRGNet}
 }

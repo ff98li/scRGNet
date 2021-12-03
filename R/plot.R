@@ -9,9 +9,12 @@
 #' @param title A character vector as the title of the network plot.
 #' @param node_label_size Size of node label
 #' @param node_size Size of node
+#' @param show_node_select Show option to highlight nodes and its neighbours when hovering.
+#'     Intended for use in Shiny.
 #'
 #' @references
 #' \insertRef{igraph}{scRGNet}
+#' \insertRef{visNetwork}{scRGNet}
 #'
 #' @examples
 #' # Example 1:
@@ -30,16 +33,16 @@
 #'}
 #'
 #' @export
-#' @import visNetwork
-#' @import igraph
+#' @importFrom igraph cluster_label_prop membership
+#' @importFrom visNetwork toVisNetworkData visNetwork visNodes visOptions
 #' @importFrom Rdpack reprompt
 #' @importFrom methods is
 plotCellNet <- function(net,
-                        group           = TRUE,
-                        title           = "Inferred Cell Network",
-                        show_legend     = TRUE,
-                        node_label_size = 0.5,
-                        node_size       = 25) {
+                        group            = TRUE,
+                        title            = "Inferred Cell Network",
+                        node_label_size  = NULL,
+                        node_size        = NULL, ## default = 25
+                        show_node_select = FALSE) {
 
     if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
@@ -50,22 +53,27 @@ plotCellNet <- function(net,
     if (!is.character(title))
         stop("Invalid argument for title. Must be a character vector.")
 
-    nodes <- igraph::as_data_frame(net, what = "vertices")
-    edges <- igraph::as_data_frame(net, what = "edges")
-    nodes <- cbind(id = 1:dim(nodes)[1], nodes)
-    colnames(nodes)[1] <- "id"
-    colnames(nodes)[2] <- "label"
-    edges <- merge(x = edges,y = nodes, by.x = "from", by.y = "label", all.x = TRUE)
-    edges <- edges[ , !names(edges) %in% c("from")]
-    edges <- merge(x = edges,y = nodes, by.x = "to", by.y = "label", all.x = TRUE)
-    edges <- edges[ , !names(edges) %in% c("to")]
-    colnames(edges) <- c("from", "to")
+    if (is.null(node_size)) {
+        ; # Use default setting
+    } else {
+        if (!is.numeric(node_size) | node_size < 1) {
+            stop("Invalid argument for node size. Must be a numerical value greater than 1.")
+        }
+    }
 
-    plot_args <- list(
-        node_label_size = node_label_size,
-        node_size       = node_size,
-        title           = title
-    )
+    if (is.null(node_label_size)) {
+        ; # Use default setting
+    } else {
+        if (!is.numeric(node_label_size) | node_label_size < 1) {
+            stop("Invalid argument for node label size. Must be a numerical value greater than 1.")
+        }
+    }
+
+    nodes <- visNetwork::toVisNetworkData(net)$nodes
+    edges <- visNetwork::toVisNetworkData(net)$edges
+
+    if (! is.null(node_label_size))
+        nodes$"font.id" <- rep(node_label_size, dim(nodes)[1])
 
     if (group) {
         clp                <- igraph::cluster_label_prop(net)
@@ -73,18 +81,20 @@ plotCellNet <- function(net,
         group_label        <- as.data.frame(t(group_label))
         group_label$label  <- rownames(group_label)
         nodes              <- merge(x = nodes, y = group_label, by.x = "label", by.y = "label")
-        colnames(nodes)[3] <- "group"
+        colnames(nodes)[which(colnames(nodes) == "V1")] <- "group"
     }
 
     net_plot <- visNetwork::visNetwork(nodes = nodes,
                                        edges = edges,
                                        main  = title)
 
-    ## add legend
-    if (show_legend) {
-        net_plot<- visNetwork::visLegend(graph    = net_plot,
-                                         main     = "Group",
-                                         position = "right")
+    if (! is.null(node_size))
+        net_plot <- visNetwork::visNodes(net_plot, size = node_size)
+
+    if (show_node_select) {
+        net_plot <- visNetwork::visOptions(net_plot,
+                                           highlightNearest = list(enabled = T, hover = T),
+                                           nodesIdSelection = TRUE)
     }
 
     return(net_plot)
