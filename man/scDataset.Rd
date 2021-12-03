@@ -16,7 +16,12 @@ A new \code{scDataset} object.
 
 number of cells
 
-index of sample (cell) and the sample itself
+A list of sample information
+\itemize{
+\item index  - Index of sample in the feature matrix
+\item sample - Name of the sample
+\item expr   - Gene expression values in the sample
+}
 }
 \description{
 Create a new scDataset object.
@@ -27,4 +32,9 @@ Get the expression values of a cell
 }
 \details{
 An R6 class to store scRNA-seq data for analysis using Torch
+}
+\references{
+\insertRef{scGNN}{scRGNet}
+\insertRef{torch}{scRGNet}
+\insertRef{r6}{scRGNet}
 }

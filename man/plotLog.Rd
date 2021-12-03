@@ -33,4 +33,5 @@ plotLogRank(net)
 }
 \references{
 \insertRef{igraph}{scRGNet}
+\insertRef{graphics}{scRGNet}
 }

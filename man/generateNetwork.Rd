@@ -20,6 +20,9 @@ An igraph object to plot the cell network.
 
 #' @references
 \insertRef{scGNN}{scRGNet}
+\insertRef{isotree}{scRGNet}
+\insertRef{isolationForest}{scRGNet}
+\insertRef{stats}{scRGNet}
 \insertRef{defaultK}{scRGNet}
 \insertRef{igraph}{scRGNet}
 }

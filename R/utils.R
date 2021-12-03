@@ -2,6 +2,13 @@
 #'
 #' An R6 class to store scRNA-seq data for analysis using Torch
 #'
+#'
+#' @references
+#' \insertRef{scGNN}{scRGNet}
+#' \insertRef{torch}{scRGNet}
+#' \insertRef{r6}{scRGNet}
+#'
+#' @export
 #' @importFrom torch dataset as_array
 #' @importFrom Matrix t
 scDataset <- torch::dataset(
@@ -23,7 +30,12 @@ scDataset <- torch::dataset(
     },
     #' @description
     #' Get the expression values of a cell
-    #' @return index of sample (cell) and the sample itself
+    #' @return A list of sample information
+    #' \itemize{
+    #'   \item index  - Index of sample in the feature matrix
+    #'   \item sample - Name of the sample
+    #'   \item expr   - Gene expression values in the sample
+    #' }
     .getitem = function(idx) {
         if (is(idx, "torch_tensor"))
             idx <- torch::as_array(idx)
