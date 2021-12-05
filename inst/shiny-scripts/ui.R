@@ -1,3 +1,4 @@
+# ui.R
 library(shiny)
 library(shinythemes)
 
@@ -6,14 +7,13 @@ main_page <- tabPanel(
     titlePanel("Analysis"),
     sidebarLayout(
         sidebarPanel = sidebarPanel(
-            fileInput(inputId = "upload",
-                      label = "Upload csv or csv.gz file containing scRNA-seq data",
-                      accept = c(".csv",
-                                 "text/csv",
-                                 "text/comma-separated-values",
-                                 ".csv.gz")
-                      ),
-            "...or run a demo dataset"
+            uiOutput(outputId = "upload_ui"),
+            textOutput("choose"),
+            textOutput("summary"),
+            actionButton(inputId = 'reset',
+                         label   =  'Clear uploaded file'),
+            actionButton(inputId = "run",
+                         label   = "Run scRGNet")
         ),
         mainPanel = mainPanel(
             tabsetPanel(
@@ -42,9 +42,5 @@ ui <- navbarPage(
     main_page,
     about_page
 )
-
-server <- function(input, output) {
-}
-shiny::shinyApp(ui = ui, server = server)
 
 # [END]

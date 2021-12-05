@@ -14,6 +14,7 @@
 #' @importFrom shiny runApp
 runscRGNet <- function() {
     appDir <- system.file("shiny-scripts", package = "scRGNet")
+    options(shiny.maxRequestSize = 1000*1024^2)
     shiny::runApp(appDir, display.mode = "normal")
     return()
 }
