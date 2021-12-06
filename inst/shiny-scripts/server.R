@@ -38,7 +38,7 @@ server <- function(input, output, session) {
         if (is.null(inFile$upload_state)) {
             return(NULL)
         } else if (inFile$upload_state == 'uploaded') {
-            return(input$raw_counts)
+            return(input$raw_counts$datapath)
         } else if (inFile$upload_state == 'reset') {
             return(NULL)
         } else if (inFile$upload_state == 'demo') {
@@ -47,9 +47,8 @@ server <- function(input, output, session) {
         }
     })
 
-
     output$choose <- reactive({
-        if (is.null(file_input()))
+        if (is.null(inFile$upload_state) || inFile$upload_state == "reset")
         {
             paste(
                 "Use built-in dataset to run a demo by clicking",
@@ -57,20 +56,19 @@ server <- function(input, output, session) {
                 "without uploading a file."
             )
 
-        } else if (file_input() == system.file("extdata", "GSE138852_small.csv",
-                                               package = "scRGNet")) {
+        } else if (inFile$upload_state == "demo") {
             "Now you can run scRGNet with the built-in demo data."
-        } else {
+        } else if (inFile$upload_state == "uploaded") {
             "File format validated. Now you can run scRGNet with your own data."
         }
     })
     output$upload_summary <- renderText({
         if (is.null(inFile$upload_state) || inFile$upload_state == "reset") {
-            return("Uploaded file:")
+            return("No file uploaded.")
         } else if (inFile$upload_state == "demo") {
             return("Demo dataset loaded.")
         } else if (inFile$upload_state == "uploaded") {
-            return(paste("Uploaded file:", file_input()$name))
+            return(paste("Uploaded file:", input$raw_counts$name))
         }
     })
     # ===== FILE UPLOAD HANDLING ENDS ==========================================
