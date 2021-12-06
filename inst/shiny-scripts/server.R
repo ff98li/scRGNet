@@ -93,23 +93,31 @@ server <- function(input, output, session) {
     })
 
     counts <- NULL
+
     observeEvent(input$preprocess, {
         ## https://stackoverflow.com/a/30490698/12461512
         withCallingHandlers({
             shinyjs::html("preprocess_result", "")
-            counts <- scRGNet::preprocessCSV(
-                path            = file_input(),
-                transpose       = input$transpose,
-                log_transform   = input$log_transform,
-                cell_zero_ratio = input$cell_zero_ratio,
-                gene_zero_ratio = input$gene_zero_ratio
-            )
+            tryCatch({
+                counts <- scRGNet::preprocessCSV(
+                   path            = file_input(),
+                   transpose       = input$transpose,
+                   log_transform   = input$log_transform,
+                   cell_zero_ratio = input$cell_zero_ratio,
+                   gene_zero_ratio = input$gene_zero_ratio
+                )
+            },
+            warning = function(warn){
+               showNotification(paste0(warn), type = 'warning')
+            },
+            error = function(err) {
+               showNotification(paste0(err), type = 'err')
+            })
         },
         message = function(m) {
             shinyjs::html(id = "preprocess_result", html = m$message, add = TRUE)
         })
     })
-
 
     # ===== PREPROCESS GENE COUNTS ENDS ========================================
 
