@@ -7,6 +7,12 @@ server <- function(input, output, session) {
 
     is_local <- Sys.getenv('SHINY_PORT') == ""
 
+    scRGNet_data <- reactiveValues(
+        counts  = NULL,
+        encoded = NULL,
+        net     = NULL
+    )
+
     # ===== FILE UPLOAD HANDLING STARTS ========================================
     inFile <- reactiveValues(
         upload_state = NULL
@@ -92,41 +98,75 @@ server <- function(input, output, session) {
         }
     })
 
-    counts <- NULL
+
+    counts <- reactive({
+        scRGNet::preprocessCSV(
+            path            = file_input(),
+            transpose       = input$transpose,
+            log_transform   = input$log_transform,
+            cell_zero_ratio = input$cell_zero_ratio,
+            gene_zero_ratio = input$gene_zero_ratio
+        )
+    })
 
     observeEvent(input$preprocess, {
-        shinybusy::show_modal_spinner(
-            spin = "cube-grid",
-            color = "#E95420",
-            text = "Preprocessing scRNA-seq counts..."
-        )
-        ## https://stackoverflow.com/a/30490698/12461512
+        shinybusy::show_modal_spinner(spin = "cube-grid",
+                                      color = "#E95420",
+                                      text = "Preprocessing scRNA-seq counts...")
         withCallingHandlers({
             shinyjs::html("preprocess_result", "")
             tryCatch({
-                counts <- scRGNet::preprocessCSV(
-                   path            = file_input(),
-                   transpose       = input$transpose,
-                   log_transform   = input$log_transform,
-                   cell_zero_ratio = input$cell_zero_ratio,
-                   gene_zero_ratio = input$gene_zero_ratio
-                )
+                scRGNet_data$counts <- counts()
             },
-            warning = function(warn){
-                counts <- NULL
-                showNotification(paste0(warn), type = 'warning')
+            warning = function(warn) {
+                scRGNet_data$counts <- NULL
+                showNotification(paste(warn), type = 'warning')
             },
             error = function(err) {
-                counts <- NULL
-                showNotification(paste0(err), type = 'err')
+                scRGNet_data$counts <- NULL
+                showNotification(paste(err), type = 'err')
             })
         },
         message = function(m) {
-            shinyjs::html(id = "preprocess_result", html = m$message, add = TRUE)
+            shinyjs::html(id = "preprocess_result",
+                          html = m$message,
+                          add = TRUE)
         })
         shinybusy::remove_modal_spinner()
     })
+
+    observeEvent(input$print, {
+        print(is.null(scRGNet_data$counts))
+    })
+
     # ===== PREPROCESS GENE COUNTS ENDS ========================================
+
+    # ===== HARDWARE SETUP STARTS ==============================================
+    #print(counts())
+    #print(scRGNet_data$counts)
+    #output$hardware_ui <- renderUI({
+    #    splitLayout(
+    #        tags$b("Hardware")
+    #    )
+    #})
+#
+    #if (is.null(scRGNet_data$counts)) {
+    #    shinyjs::hide("hardware_ui")
+    #} else {
+    #    if (is_local) {
+    #        shinyjs::show("hardware_ui")
+    #    }
+    #}
+
+    # ===== HARDWARE SETUP ENDS ================================================
+    # ===== HYPERPARAMETERS SETUP STARTS =======================================
+    # ===== HYPERPARAMETERS SETUP ENDS =========================================
+    # ===== MODAL TRAINING ENDS ================================================
+    # ===== MODAL TRAINING ENDS ================================================
+    # ===== GENERATING NETWORK STARTS ==========================================
+    # ===== GENERATING NETWORK ENDS ============================================
+    # ===== PLOTTING STARTS ====================================================
+    # ===== PLOTTING ENDS ======================================================
 
 
 }

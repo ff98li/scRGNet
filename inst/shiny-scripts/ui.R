@@ -11,6 +11,7 @@ main_page <- tabPanel(
     titlePanel("Analysis"),
     sidebarLayout(
         sidebarPanel = sidebarPanel(
+            shinyjs::useShinyjs(),
             # ===== FILE UPLOAD HANDLING STARTS ================================
             uiOutput(outputId = "upload_ui"),
             actionButton(inputId = "demo",
@@ -38,8 +39,22 @@ main_page <- tabPanel(
                          min = 0,
                          max = 1),
             actionButton(inputId = "preprocess",
-                         label   = "Preprocess data")
+                         label   = "Preprocess data"),
             # ===== PREPROCESS GENE COUNTS ENDS ================================
+            actionButton(inputId = "print",
+                         label = "print"),
+            # ===== HARDWARE SETUP STARTS ======================================
+            uiOutput(outputId = "hardware_ui")
+            # ===== HARDWARE SETUP ENDS ========================================
+            # ===== HYPERPARAMETERS SETUP STARTS ===============================
+            # ===== HYPERPARAMETERS SETUP ENDS =================================
+            # ===== MODAL TRAINING ENDS ========================================
+            # ===== MODAL TRAINING ENDS ========================================
+            # ===== GENERATING NETWORK STARTS ==================================
+            # ===== GENERATING NETWORK ENDS ====================================
+            # ===== PLOTTING STARTS ============================================
+            # ===== PLOTTING ENDS ==============================================
+
         ),
         mainPanel = mainPanel(
             tabsetPanel(
@@ -64,8 +79,7 @@ ui <- navbarPage(
     title = "scRGNet",
     theme = shinythemes::shinytheme('united'),
     main_page,
-    about_page,
-    shinyjs::useShinyjs()
+    about_page
 )
 
 # [END]
