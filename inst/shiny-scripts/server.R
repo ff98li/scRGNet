@@ -75,7 +75,7 @@ server <- function(input, output, session) {
     # ===== FILE UPLOAD HANDLING ENDS ==========================================
 
 
-    # ===== PREPROCESS GENE COUNTS STARTS =======================================
+    # ===== PREPROCESS GENE COUNTS STARTS ======================================
     observe({
         if (is.null(file_input())) {
             shinyjs::hide("transpose")
@@ -95,6 +95,11 @@ server <- function(input, output, session) {
     counts <- NULL
 
     observeEvent(input$preprocess, {
+        shinybusy::show_modal_spinner(
+            spin = "cube-grid",
+            color = "#E95420",
+            text = "Preprocessing scRNA-seq counts..."
+        )
         ## https://stackoverflow.com/a/30490698/12461512
         withCallingHandlers({
             shinyjs::html("preprocess_result", "")
@@ -108,17 +113,19 @@ server <- function(input, output, session) {
                 )
             },
             warning = function(warn){
-               showNotification(paste0(warn), type = 'warning')
+                counts <- NULL
+                showNotification(paste0(warn), type = 'warning')
             },
             error = function(err) {
-               showNotification(paste0(err), type = 'err')
+                counts <- NULL
+                showNotification(paste0(err), type = 'err')
             })
         },
         message = function(m) {
             shinyjs::html(id = "preprocess_result", html = m$message, add = TRUE)
         })
+        shinybusy::remove_modal_spinner()
     })
-
     # ===== PREPROCESS GENE COUNTS ENDS ========================================
 
 

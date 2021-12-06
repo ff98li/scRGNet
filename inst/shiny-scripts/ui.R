@@ -20,6 +20,7 @@ main_page <- tabPanel(
             actionButton(inputId = 'reset',
                          label   = 'Clear loaded data'),
             # ===== FILE UPLOAD HANDLING ENDS ==================================
+            # ===== PREPROCESS GENE COUNTS STARTS ==============================
             checkboxInput(inputId = "transpose",
                           label = "Transpose count matrix",
                           value = FALSE),
@@ -38,15 +39,13 @@ main_page <- tabPanel(
                          max = 1),
             actionButton(inputId = "preprocess",
                          label   = "Preprocess data")
+            # ===== PREPROCESS GENE COUNTS ENDS ================================
         ),
         mainPanel = mainPanel(
             tabsetPanel(
                 tabPanel(
                     title = "Preprocessing Result",
                     verbatimTextOutput("preprocess_result")
-                ),
-                tabPanel(
-                    title = "LTMG"
                 ),
                 tabPanel(
                     title = "Network")
