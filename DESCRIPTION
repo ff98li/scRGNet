@@ -32,7 +32,9 @@ Imports:
     visNetwork,
     magrittr,
     shiny,
-    shinythemes
+    shinythemes,
+    shinyjs,
+    shinybusy
 Remotes: 
     BMEngineeR/scGNNLTMG,
 Suggests: 

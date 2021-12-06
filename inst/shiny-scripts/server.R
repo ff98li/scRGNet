@@ -1,15 +1,18 @@
 # server.R
 library(shiny)
+library(shinyjs)
 
 server <- function(input, output, session) {
 
-    values <- reactiveValues(
+    is_local <- Sys.getenv('SHINY_PORT') == ""
+
+    # ===== FILE UPLOAD HANDLING STARTS ========================================
+    inFile <- reactiveValues(
         upload_state = NULL
     )
-
-    # ===== FILE UPLOAD HANDLING STARTS =======================================
     output$upload_ui <- renderUI({
         input$reset ## Create a dependency with the reset button
+        input$demo
         fileInput(inputId  = "raw_counts",
                   label    = "Upload csv or csv.gz file containing scRNA-seq data",
                   multiple = FALSE,
@@ -21,43 +24,69 @@ server <- function(input, output, session) {
     })
 
     observeEvent(input$raw_counts, {
-        values$upload_state <- 'uploaded'
+        inFile$upload_state <- 'uploaded'
     })
     observeEvent(input$reset, {
-        values$upload_state <- 'reset'
+        inFile$upload_state <- 'reset'
+    })
+
+    observeEvent(input$demo, {
+        inFile$upload_state <- "demo"
     })
 
     file_input <- reactive({
-        if (is.null(values$upload_state)) {
+        if (is.null(inFile$upload_state)) {
             return(NULL)
-        } else if (values$upload_state == 'uploaded') {
+        } else if (inFile$upload_state == 'uploaded') {
             return(input$raw_counts)
-        } else if (values$upload_state == 'reset') {
+        } else if (inFile$upload_state == 'reset') {
             return(NULL)
+        } else if (inFile$upload_state == 'demo') {
+            return(system.file("extdata", "GSE138852_small.csv",
+                               package = "scRGNet"))
         }
     })
+
 
     output$choose <- reactive({
         if (is.null(file_input()))
         {
-            "Run a demo dataset without uploading a file"
+            paste(
+                "Use built-in dataset to run a demo by clicking",
+                "Use demo data",
+                "without uploading a file."
+            )
+
+        } else if (file_input() == system.file("extdata", "GSE138852_small.csv",
+                                               package = "scRGNet")) {
+            "Now you can run scRGNet with the built-in demo data."
         } else {
             "File format validated. Now you can run scRGNet with your own data."
         }
     })
-    output$summary <- renderText({
-        return(paste("Uploaded file:", file_input()$name))
+    output$upload_summary <- renderText({
+        if (is.null(inFile$upload_state) || inFile$upload_state == "reset") {
+            return("Uploaded file:")
+        } else if (inFile$upload_state == "demo") {
+            return("Demo dataset loaded.")
+        } else if (inFile$upload_state == "uploaded") {
+            return(paste("Uploaded file:", file_input()$name))
+        }
     })
-    # ===== FILE UPLOAD HANDLING ENDS =======================================
+    # ===== FILE UPLOAD HANDLING ENDS ==========================================
 
-    observeEvent(input$run, {
+
+    # ===== PREPROCESS GENE COUNTS STARTS =======================================
+    observe({
         if (is.null(file_input())) {
-            print(TRUE)
+            shinyjs::disable("preprocess")
         } else {
-            print(FALSE)
+            shinyjs::enable("preprocess")
         }
     })
 
+
+    # ===== PREPROCESS GENE COUNTS ENDS ========================================
 
 
 }
