@@ -8,9 +8,12 @@ server <- function(input, output, session) {
     is_local <- Sys.getenv('SHINY_PORT') == ""
 
     scRGNet_data <- reactiveValues(
-        counts  = NULL,
-        encoded = NULL,
-        net     = NULL
+        counts        = NULL,
+        LTMG_mat      = NULL,
+        hardwareSetup = NULL,
+        encoded       = NULL,
+        k             = NULL,
+        net           = NULL
     )
 
     # ===== FILE UPLOAD HANDLING STARTS ========================================
@@ -135,30 +138,76 @@ server <- function(input, output, session) {
         shinybusy::remove_modal_spinner()
     })
 
-    observeEvent(input$print, {
-        print(is.null(scRGNet_data$counts))
-    })
-
     # ===== PREPROCESS GENE COUNTS ENDS ========================================
 
     # ===== HARDWARE SETUP STARTS ==============================================
-    #print(counts())
-    #print(scRGNet_data$counts)
-    #output$hardware_ui <- renderUI({
-    #    splitLayout(
-    #        tags$b("Hardware")
-    #    )
-    #})
-#
-    #if (is.null(scRGNet_data$counts)) {
-    #    shinyjs::hide("hardware_ui")
-    #} else {
-    #    if (is_local) {
-    #        shinyjs::show("hardware_ui")
-    #    }
-    #}
+
+    ## Hardware setting UI
+    output$hardware_ui <- renderUI({
+        verticalLayout(
+            numericInput(
+                inputId = "coresUsage",
+                label   = "CPU cores usage",
+                value   = 1
+            ),
+            checkboxInput(
+                inputId = "cuda",
+                label   = "Enable CUDA",
+                value   = FALSE
+            ),
+            fluid = TRUE
+        )
+    })
+
+    observe({
+        if (is.null(scRGNet_data$counts)) {
+            shinyjs::hide("hardware_ui")
+        } else {
+            if (is_local) {
+                shinyjs::show("hardware_ui")
+            }
+        }
+    })
+
+    if (is_local) {
+        set_hardware <- eventReactive({
+            input$coresUsage
+            input$cuda
+        }, {
+            scRGNet::setHardware(coresUsage = input$coresUsage,
+                                 CUDA       = input$cuda)
+        })
+
+    } else {
+        set_hardware <- reactive({
+            scRGNet::setHardware()
+        })
+    }
+
+    observe({
+        if (!is.null(scRGNet_data$counts)) {
+            tryCatch({
+                scRGNet_data$hardwareSetup <- set_hardware()
+            },
+            warning = function(warn) {
+                scRGNet_data$hardwareSetup <- NULL
+                showNotification(paste(warn), type = 'warning')
+            },
+            error = function(err) {
+                scRGNet_data$hardwareSetup <- NULL
+                showNotification(paste(err), type = 'err')
+            })
+        } else {
+            scRGNet_data$hardwareSetup <- NULL
+        }
+    })
 
     # ===== HARDWARE SETUP ENDS ================================================
+
+    observeEvent(input$print, {
+        print(scRGNet_data$hardwareSetup)
+    })
+
     # ===== HYPERPARAMETERS SETUP STARTS =======================================
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
     # ===== MODAL TRAINING ENDS ================================================
