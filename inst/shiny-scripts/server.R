@@ -1,6 +1,7 @@
 # server.R
 library(shiny)
 library(shinyjs)
+library(shinybusy)
 
 server <- function(input, output, session) {
 
@@ -77,10 +78,36 @@ server <- function(input, output, session) {
     # ===== PREPROCESS GENE COUNTS STARTS =======================================
     observe({
         if (is.null(file_input())) {
-            shinyjs::disable("preprocess")
+            shinyjs::hide("transpose")
+            shinyjs::hide("log_transform")
+            shinyjs::hide("cell_zero_ratio")
+            shinyjs::hide("gene_zero_ratio")
+            shinyjs::hide("preprocess")
         } else {
-            shinyjs::enable("preprocess")
+            shinyjs::show("transpose")
+            shinyjs::show("log_transform")
+            shinyjs::show("cell_zero_ratio")
+            shinyjs::show("gene_zero_ratio")
+            shinyjs::show("preprocess")
         }
+    })
+
+    counts <- NULL
+    observeEvent(input$preprocess, {
+        ## https://stackoverflow.com/a/30490698/12461512
+        withCallingHandlers({
+            shinyjs::html("preprocess_result", "")
+            counts <- scRGNet::preprocessCSV(
+                path            = file_input(),
+                transpose       = input$transpose,
+                log_transform   = input$log_transform,
+                cell_zero_ratio = input$cell_zero_ratio,
+                gene_zero_ratio = input$gene_zero_ratio
+            )
+        },
+        message = function(m) {
+            shinyjs::html(id = "preprocess_result", html = m$message, add = TRUE)
+        })
     })
 
 

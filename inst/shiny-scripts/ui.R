@@ -1,6 +1,7 @@
 # ui.R
 library(shiny)
 library(shinyjs)
+library(shinybusy)
 library(shinythemes)
 
 is_local <- Sys.getenv('SHINY_PORT') == ""
@@ -19,13 +20,30 @@ main_page <- tabPanel(
             actionButton(inputId = 'reset',
                          label   = 'Clear loaded data'),
             # ===== FILE UPLOAD HANDLING ENDS ==================================
+            checkboxInput(inputId = "transpose",
+                          label = "Transpose count matrix",
+                          value = FALSE),
+            checkboxInput(inputId = "log_transform",
+                          label = "Log transform",
+                          value = TRUE),
+            numericInput(inputId = "cell_zero_ratio",
+                         label = "Cell zero ratio",
+                         value = 0.99,
+                         min = 0,
+                         max = 1),
+            numericInput(inputId = "gene_zero_ratio",
+                         label = "Gene zero ratio",
+                         value = 0.99,
+                         min = 0,
+                         max = 1),
             actionButton(inputId = "preprocess",
                          label   = "Preprocess data")
         ),
         mainPanel = mainPanel(
             tabsetPanel(
                 tabPanel(
-                    title = "Preprocessed data"
+                    title = "Preprocessing Result",
+                    verbatimTextOutput("preprocess_result")
                 ),
                 tabPanel(
                     title = "LTMG"
