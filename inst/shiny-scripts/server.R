@@ -34,6 +34,17 @@ server <- function(input, output, session) {
         coresUsage = 1
     )
 
+    # Initialise default hyperparams
+    hyper_params <- reactiveValues(
+        ltmg        = FALSE,
+        batch_size  = 1,
+        regu_epochs = 5,
+        L1          = 0.5,
+        L2          = 0.5,
+        regu_alpha  = 0.5,
+        reduction   = "sum"
+    )
+
     # ===== FILE UPLOAD HANDLING STARTS ========================================
     inFile <- reactiveValues(
         upload_state = NULL
@@ -272,16 +283,31 @@ server <- function(input, output, session) {
 #
     })
 
-    set_hyper <- reactive({
-        scRGNet::setHyperParams(batch_size  = input$batch_size,
-                                regu_epochs = input$regu_epochs,
-                                L1          = input$L1,
-                                L2          = input$L2,
-                                regu_alpha  = input$regu_alpha,
-                                reduction   = input$reduction)
+    observe({
+        if (!is.null(input$ltmg))
+            hyper_params$ltmg <- input$ltmg
+        if (!is.null(input$batch_size))
+            hyper_params$batch_size <- input$batch_size
+        if (!is.null(input$regu_epochs))
+            hyper_params$regu_epochs <- input$regu_epochs
+        if (!is.null(input$L1))
+            hyper_params$L1 <- input$L1
+        if (!is.null(input$L2))
+            hyper_params$L2 <- input$L2
+        if (!is.null(input$regu_alpha))
+            hyper_params$regu_alpha <- input$regu_alpha
+        if (!is.null(input$reduction))
+            hyper_params$reduction <- input$reduction
     })
 
-    use_ltmg <- reactive({input$ltmg})
+    set_hyper <- reactive({
+        scRGNet::setHyperParams(batch_size  = hyper_params$batch_size,
+                                regu_epochs = hyper_params$regu_epochs,
+                                L1          = hyper_params$L1,
+                                L2          = hyper_params$L2,
+                                regu_alpha  = hyper_params$regu_alpha,
+                                reduction   = hyper_params$reduction)
+    })
 
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
 
@@ -291,6 +317,11 @@ server <- function(input, output, session) {
     })
 
     # ===== MODAL TRAINING ENDS ================================================
+
+    run_ltmg <- reactive({
+        scRGNet::runLTMG(scDataset = scRGNet_data$counts)
+    })
+
     # ===== MODAL TRAINING ENDS ================================================
     # ===== GENERATING NETWORK STARTS ==========================================
     # ===== GENERATING NETWORK ENDS ============================================
