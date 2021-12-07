@@ -3,9 +3,21 @@ library(shiny)
 library(shinyjs)
 library(shinybusy)
 
+hide_UI <- function(output_ids){
+    lapply(output_ids, function(output_id){
+        shinyjs::hide(id = output_id)
+    })
+}
+
+show_UI <- function(output_ids){
+    lapply(output_ids, function(output_id){
+        shinyjs::show(id = output_id, anim = TRUE)
+    })
+}
+
 server <- function(input, output, session) {
 
-    is_local <- Sys.getenv('SHINY_PORT') == ""
+    is_local <- Sys.getenv('SHINY_PORT') == "" # disable hardware UI on server
 
     scRGNet_data <- reactiveValues(
         counts        = NULL,
@@ -87,17 +99,27 @@ server <- function(input, output, session) {
     # ===== PREPROCESS GENE COUNTS STARTS ======================================
     observe({
         if (is.null(file_input())) {
-            shinyjs::hide("transpose")
-            shinyjs::hide("log_transform")
-            shinyjs::hide("cell_zero_ratio")
-            shinyjs::hide("gene_zero_ratio")
-            shinyjs::hide("preprocess")
+            hide_UI(c("preprocess",
+                      "transpose",
+                      "log_transform",
+                      "cell_zero_ratio",
+                      "gene_zero_ratio"))
+            #shinyjs::hide("transpose")
+            #shinyjs::hide("log_transform")
+            #shinyjs::hide("cell_zero_ratio")
+            #shinyjs::hide("gene_zero_ratio")
+            #shinyjs::hide("preprocess")
         } else {
-            shinyjs::show("transpose")
-            shinyjs::show("log_transform")
-            shinyjs::show("cell_zero_ratio")
-            shinyjs::show("gene_zero_ratio")
-            shinyjs::show("preprocess")
+            show_UI(c("preprocess",
+                      "transpose",
+                      "log_transform",
+                      "cell_zero_ratio",
+                      "gene_zero_ratio"))
+            #shinyjs::show("transpose")
+            #shinyjs::show("log_transform")
+            #shinyjs::show("cell_zero_ratio")
+            #shinyjs::show("gene_zero_ratio")
+            #shinyjs::show("preprocess")
         }
     })
 
@@ -113,9 +135,10 @@ server <- function(input, output, session) {
     })
 
     observeEvent(input$preprocess, {
-        shinybusy::show_modal_spinner(spin = "cube-grid",
+        shinybusy::show_modal_spinner(spin  = "cube-grid",
                                       color = "#E95420",
-                                      text = "Preprocessing scRNA-seq counts...")
+                                      text  = "Preprocessing scRNA-seq counts...")
+        # console message to shiny: https://stackoverflow.com/a/30490698
         withCallingHandlers({
             shinyjs::html("preprocess_result", "")
             tryCatch({
@@ -131,9 +154,9 @@ server <- function(input, output, session) {
             })
         },
         message = function(m) {
-            shinyjs::html(id = "preprocess_result",
+            shinyjs::html(id   = "preprocess_result",
                           html = m$message,
-                          add = TRUE)
+                          add  = TRUE)
         })
         shinybusy::remove_modal_spinner()
     })
@@ -160,7 +183,7 @@ server <- function(input, output, session) {
     })
 
     observe({
-        if (is.null(scRGNet_data$counts)) {
+        if (is.null(file_input()) | is.null(scRGNet_data$counts)) {
             shinyjs::hide("hardware_ui")
         } else {
             if (is_local) {
@@ -209,6 +232,22 @@ server <- function(input, output, session) {
     })
 
     # ===== HYPERPARAMETERS SETUP STARTS =======================================
+
+    #observe({
+    #    if (is.null(file_input()) | is.null(scRGNet_data$counts)) {
+    #        hide_UI(c("transpose", "log_transform", "cell_zero_ratio", "gene_zero_ratio"))
+    #    } else {
+    #        show_UI(c("transpose", "log_transform", "cell_zero_ratio", "gene_zero_ratio"))
+    #    }
+#
+    #})
+
+    set_hyper <- reactive({
+        scRGNet::setHyperParams()
+    })
+
+
+
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
     # ===== MODAL TRAINING ENDS ================================================
     # ===== MODAL TRAINING ENDS ================================================
