@@ -68,11 +68,15 @@ runFeatureAE <- function(scDataset,
     #if (dir.exists(outputDir) == FALSE)
     #    dir.create(outputDir)
 
-    if (hardwareSetup$CUDA){
-        device <- torch::torch_device(type = "cuda")
+    if (is.null(hardwareSetup)) {
+        stop("Invalid hardware setup.")
     } else {
-        device <- torch::torch_device(type = "cpu")
-        torch::torch_set_num_threads(hardwareSetup$coresUage)
+        if (hardwareSetup$CUDA) {
+            device <- torch::torch_device(type = "cuda")
+        } else {
+            device <- torch::torch_device(type = "cpu")
+            torch::torch_set_num_threads(hardwareSetup$coresUage)
+        }
     }
 
     sample_list <- scDataset$features@Dimnames[[1]]
@@ -244,12 +248,10 @@ setHardware <- function(
     if ((!is.numeric(coresUsage)) || coresUsage %% 1 != 0) {
         stop("Invalid argument for coresUsage. Must be an integer number.")
     } else {
-        if (!CUDA) {
-            if (coresUsage < 1) {
-                stop("Invalid argument for coresUsage. Must use at least 1 core.")
-            } else {
-                coresUsage <- as.integer(coresUsage)
-            }
+        if (coresUsage < 1) {
+            stop("Invalid argument for coresUsage. Must use at least 1 core.")
+        } else {
+            coresUsage <- as.integer(coresUsage)
         }
     }
 

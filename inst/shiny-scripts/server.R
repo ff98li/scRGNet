@@ -145,15 +145,15 @@ server <- function(input, output, session) {
     })
 
 
-    counts <- reactive({
-        scRGNet::preprocessCSV(
-            path            = file_input(),
-            transpose       = input$transpose,
-            log_transform   = input$log_transform,
-            cell_zero_ratio = input$cell_zero_ratio,
-            gene_zero_ratio = input$gene_zero_ratio
-        )
-    })
+    #counts <- reactive({
+    #    scRGNet::preprocessCSV(
+    #        path            = file_input(),
+    #        transpose       = input$transpose,
+    #        log_transform   = input$log_transform,
+    #        cell_zero_ratio = input$cell_zero_ratio,
+    #        gene_zero_ratio = input$gene_zero_ratio
+    #    )
+    #})
 
     observeEvent(input$preprocess, {
         shinybusy::show_modal_spinner(spin  = "cube-grid",
@@ -163,7 +163,14 @@ server <- function(input, output, session) {
         withCallingHandlers({
             shinyjs::html("preprocess_result", "")
             tryCatch({
-                scRGNet_data$counts <- counts()
+                #scRGNet_data$counts <- counts()
+                scRGNet_data$counts <- scRGNet::preprocessCSV(
+                    path            = file_input(),
+                    transpose       = input$transpose,
+                    log_transform   = input$log_transform,
+                    cell_zero_ratio = input$cell_zero_ratio,
+                    gene_zero_ratio = input$gene_zero_ratio
+                )
             },
             warning = function(warn) {
                 scRGNet_data$counts <- NULL
@@ -214,38 +221,51 @@ server <- function(input, output, session) {
         }
     })
 
+    #if (is_local) {
+    #    observe({
+    #        if (!is.null(input$CUDA))
+    #            hardware_args$CUDA <- input$CUDA
+    #        if (!is.null(input$coresUsage))
+    #            hardware_args$coresUsage <- input$coresUsage
+    #    })
+    #}
+
+    #set_hardware <- reactive({
+    #    scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
+    #                         CUDA       = hardware_args$CUDA)
+    #})
+
     if (is_local) {
         observe({
-            inputToReactive(input_var = input,
-                            react_var = hardware_args,
-                            ids       = c("CUDA", "coresUsage"))
-            #if (!is.null(input$CUDA))
-            #    hardware_args$CUDA <- input$CUDA
-            #if (!is.null(input$coresUsage))
-            #    hardware_args$coresUsage <- input$coresUsage
+            inputToReactive(
+                input_var = input,
+                react_var = hardware_args,
+                ids       = c("CUDA", "coresUsage")
+            )
+            if (is.null(scRGNet_data$counts)) {
+                scRGNet_data$hardwareSetup <- NULL
+            } else {
+                tryCatch({
+                    #scRGNet_data$hardwareSetup <- set_hardware()
+                    scRGNet_data$hardwareSetup <- scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
+                                                                       CUDA       = hardware_args$CUDA)
+                },
+                warning = function(warn) {
+                    scRGNet_data$hardwareSetup <- NULL
+                    showNotification(paste(warn), type = 'warning')
+                },
+                error = function(err) {
+                    scRGNet_data$hardwareSetup <- NULL
+                    showNotification(paste(err), type = 'err')
+                })
+            }
         })
+
+    } else {
+        scRGNet_data$hardwareSetup <- scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
+                                                           CUDA       = hardware_args$CUDA)
     }
 
-    set_hardware <- reactive({
-        scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
-                             CUDA       = hardware_args$CUDA)
-    })
-
-    observe({
-        if (is.null(scRGNet_data$counts)) {
-            scRGNet_data$hardwareSetup <- NULL
-        } else {
-            tryCatch({
-                scRGNet_data$hardwareSetup <- set_hardware()
-            },
-            warning = function(warn) {
-                showNotification(paste(warn), type = 'warning')
-            },
-            error = function(err) {
-                showNotification(paste(err), type = 'err')
-            })
-        }
-    })
 
     # ===== HARDWARE SETUP ENDS ================================================
 
@@ -334,7 +354,7 @@ server <- function(input, output, session) {
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
 
     observeEvent(input$print, {
-        print(hyper_params$reduction)
+        print(scRGNet_data$hardwareSetup)
     })
 
     # ===== MODAL TRAINING STARTS ================================================
