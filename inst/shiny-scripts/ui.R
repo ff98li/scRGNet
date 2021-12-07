@@ -99,10 +99,8 @@ main_page <- tabPanel(
                                    none = "none"),
                     multiple = FALSE,
                     selected = "sum"
-                )
-                #numericInput(
-                #    inputId = "k",
-                #    label   = "k (default best heuristic)")
+                ),
+                uiOutput("choose_k")
             ),
             # ===== HYPERPARAMETERS SETUP ENDS =================================
             actionButton(inputId = "print",

@@ -28,6 +28,12 @@ server <- function(input, output, session) {
         net           = NULL
     )
 
+    # Initialise default reactive hardware values
+    hardware_args <- reactiveValues(
+        CUDA       = FALSE,
+        coresUsage = 1
+    )
+
     # ===== FILE UPLOAD HANDLING STARTS ========================================
     inFile <- reactiveValues(
         upload_state = NULL
@@ -115,11 +121,6 @@ server <- function(input, output, session) {
                       "log_transform",
                       "cell_zero_ratio",
                       "gene_zero_ratio"))
-            #shinyjs::show("transpose")
-            #shinyjs::show("log_transform")
-            #shinyjs::show("cell_zero_ratio")
-            #shinyjs::show("gene_zero_ratio")
-            #shinyjs::show("preprocess")
         }
     })
 
@@ -174,13 +175,14 @@ server <- function(input, output, session) {
                 value   = 1
             ),
             checkboxInput(
-                inputId = "cuda",
+                inputId = "CUDA",
                 label   = "Enable CUDA",
                 value   = FALSE
             ),
             fluid = TRUE
         )
     })
+
 
     observe({
         if (is.null(file_input()) | is.null(scRGNet_data$counts)) {
@@ -192,63 +194,102 @@ server <- function(input, output, session) {
         }
     })
 
-    if (is_local) {
-        set_hardware <- eventReactive({
-            input$coresUsage
-            input$cuda
-        }, {
-            scRGNet::setHardware(coresUsage = input$coresUsage,
-                                 CUDA       = input$cuda)
-        })
+    set_hardware <- reactive({
+        scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
+                             CUDA       = hardware_args$CUDA)
+    })
 
-    } else {
-        set_hardware <- reactive({
-            scRGNet::setHardware()
+    if (is_local) {
+        observe({
+            if (!is.null(input$CUDA))
+                hardware_args$CUDA <- input$CUDA
+            if (!is.null(input$coresUsage))
+                hardware_args$coresUsage <- input$coresUsage
         })
     }
 
     observe({
-        if (!is.null(scRGNet_data$counts)) {
+        if (is.null(scRGNet_data$counts)) {
+            scRGNet_data$hardwareSetup <- NULL
+        } else {
             tryCatch({
                 scRGNet_data$hardwareSetup <- set_hardware()
             },
             warning = function(warn) {
-                scRGNet_data$hardwareSetup <- NULL
                 showNotification(paste(warn), type = 'warning')
             },
             error = function(err) {
-                scRGNet_data$hardwareSetup <- NULL
                 showNotification(paste(err), type = 'err')
             })
-        } else {
-            scRGNet_data$hardwareSetup <- NULL
         }
     })
 
     # ===== HARDWARE SETUP ENDS ================================================
 
-    observeEvent(input$print, {
-        print(scRGNet_data$hardwareSetup)
+    # ===== HYPERPARAMETERS SETUP STARTS =======================================
+    observe({
+        if (is.null(scRGNet_data$counts)) {
+            output$choose_k <- renderUI({
+                numericInput(inputId = "k",
+                             label   = "k (default best heuristic)",
+                             value   = 1)
+            })
+        } else {
+            output$choose_k <- renderUI({
+                numericInput(
+                    inputId = "k",
+                    label   = "k (default best heuristic)",
+                    value   = floor(sqrt(
+                        length(scRGNet_data$counts)
+                    )),
+                    min = 1,
+                    max = length(scRGNet_data$counts)
+                )
+            })
+        }
     })
 
-    # ===== HYPERPARAMETERS SETUP STARTS =======================================
-
-    #observe({
-    #    if (is.null(file_input()) | is.null(scRGNet_data$counts)) {
-    #        hide_UI(c("transpose", "log_transform", "cell_zero_ratio", "gene_zero_ratio"))
-    #    } else {
-    #        show_UI(c("transpose", "log_transform", "cell_zero_ratio", "gene_zero_ratio"))
-    #    }
+    observe({
+        if (is.null(file_input()) || is.null(scRGNet_data$counts)) {
+            hide_UI(c("ltmg",
+                      "batch_size",
+                      "regu_epochs",
+                      "L1",
+                      "L2",
+                      "regu_alpha",
+                      "reduction",
+                      "choose_k"))
+        } else {
+            show_UI(c("ltmg",
+                      "batch_size",
+                      "regu_epochs",
+                      "L1",
+                      "L2",
+                      "regu_alpha",
+                      "reduction",
+                      "choose_k"))
+        }
 #
-    #})
+    })
 
     set_hyper <- reactive({
-        scRGNet::setHyperParams()
+        scRGNet::setHyperParams(batch_size  = input$batch_size,
+                                regu_epochs = input$regu_epochs,
+                                L1          = input$L1,
+                                L2          = input$L2,
+                                regu_alpha  = input$regu_alpha,
+                                reduction   = input$reduction)
     })
 
-
+    use_ltmg <- reactive({input$ltmg})
 
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
+
+    observeEvent(input$print, {
+        print(hardware_args$CUDA)
+        print(hardware_args$coresUsage)
+    })
+
     # ===== MODAL TRAINING ENDS ================================================
     # ===== MODAL TRAINING ENDS ================================================
     # ===== GENERATING NETWORK STARTS ==========================================

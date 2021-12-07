@@ -241,7 +241,7 @@ setHardware <- function(
         stop("Invalid argument for CUDA. Must be logical.")
     }
 
-    if (!is.numeric(coresUsage)) {
+    if ((!is.numeric(coresUsage)) || coresUsage %% 1 != 0) {
         stop("Invalid argument for coresUsage. Must be an integer number.")
     } else {
         if (!CUDA) {
