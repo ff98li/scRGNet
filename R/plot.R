@@ -93,7 +93,8 @@ plotCellNet <- function(net,
 
     if (show_node_select) {
         net_plot <- visNetwork::visOptions(net_plot,
-                                           highlightNearest = list(enabled = T, hover = T),
+                                           highlightNearest = list(enabled = TRUE,
+                                                                   hover   = TRUE),
                                            nodesIdSelection = TRUE)
     }
 

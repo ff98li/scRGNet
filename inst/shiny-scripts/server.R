@@ -3,16 +3,25 @@ library(shiny)
 library(shinyjs)
 library(shinybusy)
 
-hide_UI <- function(output_ids){
+hideUI <- function(output_ids){
     lapply(output_ids, function(output_id){
         shinyjs::hide(id = output_id)
     })
 }
 
-show_UI <- function(output_ids){
+showUI <- function(output_ids){
     lapply(output_ids, function(output_id){
         shinyjs::show(id = output_id, anim = TRUE)
     })
+}
+
+## This is one of those few cases where vectorised operations don't apply
+## reactiveValues doesn't actually work like a list so I have to do for-loop
+inputToReactive <- function(input_var, react_var, ids) {
+    for (i in seq_along(ids)) {
+        if (!is.null(input_var[[ids[i]]]))
+            react_var[[ids[i]]] <- input_var[[ids[i]]]
+    }
 }
 
 server <- function(input, output, session) {
@@ -116,7 +125,7 @@ server <- function(input, output, session) {
     # ===== PREPROCESS GENE COUNTS STARTS ======================================
     observe({
         if (is.null(file_input())) {
-            hide_UI(c("preprocess",
+            hideUI(c("preprocess",
                       "transpose",
                       "log_transform",
                       "cell_zero_ratio",
@@ -127,7 +136,7 @@ server <- function(input, output, session) {
             #shinyjs::hide("gene_zero_ratio")
             #shinyjs::hide("preprocess")
         } else {
-            show_UI(c("preprocess",
+            showUI(c("preprocess",
                       "transpose",
                       "log_transform",
                       "cell_zero_ratio",
@@ -205,19 +214,22 @@ server <- function(input, output, session) {
         }
     })
 
+    if (is_local) {
+        observe({
+            inputToReactive(input_var = input,
+                            react_var = hardware_args,
+                            ids       = c("CUDA", "coresUsage"))
+            #if (!is.null(input$CUDA))
+            #    hardware_args$CUDA <- input$CUDA
+            #if (!is.null(input$coresUsage))
+            #    hardware_args$coresUsage <- input$coresUsage
+        })
+    }
+
     set_hardware <- reactive({
         scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
                              CUDA       = hardware_args$CUDA)
     })
-
-    if (is_local) {
-        observe({
-            if (!is.null(input$CUDA))
-                hardware_args$CUDA <- input$CUDA
-            if (!is.null(input$coresUsage))
-                hardware_args$coresUsage <- input$coresUsage
-        })
-    }
 
     observe({
         if (is.null(scRGNet_data$counts)) {
@@ -262,7 +274,7 @@ server <- function(input, output, session) {
 
     observe({
         if (is.null(file_input()) || is.null(scRGNet_data$counts)) {
-            hide_UI(c("ltmg",
+            hideUI(c("ltmg",
                       "batch_size",
                       "regu_epochs",
                       "L1",
@@ -271,7 +283,7 @@ server <- function(input, output, session) {
                       "reduction",
                       "choose_k"))
         } else {
-            show_UI(c("ltmg",
+            showUI(c("ltmg",
                       "batch_size",
                       "regu_epochs",
                       "L1",
@@ -284,43 +296,53 @@ server <- function(input, output, session) {
     })
 
     observe({
-        if (!is.null(input$ltmg))
-            hyper_params$ltmg <- input$ltmg
-        if (!is.null(input$batch_size))
-            hyper_params$batch_size <- input$batch_size
-        if (!is.null(input$regu_epochs))
-            hyper_params$regu_epochs <- input$regu_epochs
-        if (!is.null(input$L1))
-            hyper_params$L1 <- input$L1
-        if (!is.null(input$L2))
-            hyper_params$L2 <- input$L2
-        if (!is.null(input$regu_alpha))
-            hyper_params$regu_alpha <- input$regu_alpha
-        if (!is.null(input$reduction))
-            hyper_params$reduction <- input$reduction
+        inputToReactive(input_var = input,
+                        react_var = hyper_params,
+                        ids       = c("ltmg",
+                                      "batch_size",
+                                      "regu_epochs",
+                                      "L1",
+                                      "L2",
+                                      "regu_alpha",
+                                      "reduction"))
+        #if (!is.null(input$ltmg))
+        #    hyper_params$ltmg <- input$ltmg
+        #if (!is.null(input$batch_size))
+        #    hyper_params$batch_size <- input$batch_size
+        #if (!is.null(input$regu_epochs))
+        #    hyper_params$regu_epochs <- input$regu_epochs
+        #if (!is.null(input$L1))
+        #    hyper_params$L1 <- input$L1
+        #if (!is.null(input$L2))
+        #    hyper_params$L2 <- input$L2
+        #if (!is.null(input$regu_alpha))
+        #    hyper_params$regu_alpha <- input$regu_alpha
+        #if (!is.null(input$reduction))
+        #    hyper_params$reduction <- input$reduction
     })
 
-    set_hyper <- reactive({
-        scRGNet::setHyperParams(batch_size  = hyper_params$batch_size,
-                                regu_epochs = hyper_params$regu_epochs,
-                                L1          = hyper_params$L1,
-                                L2          = hyper_params$L2,
-                                regu_alpha  = hyper_params$regu_alpha,
-                                reduction   = hyper_params$reduction)
-    })
+    # Execute it on press
+    #set_hyper <- reactive({
+    #    scRGNet::setHyperParams(batch_size  = hyper_params$batch_size,
+    #                            regu_epochs = hyper_params$regu_epochs,
+    #                            L1          = hyper_params$L1,
+    #                            L2          = hyper_params$L2,
+    #                            regu_alpha  = hyper_params$regu_alpha,
+    #                            reduction   = hyper_params$reduction)
+    #})
 
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
 
     observeEvent(input$print, {
-        print(hardware_args$CUDA)
-        print(hardware_args$coresUsage)
+        print(hyper_params$reduction)
     })
 
-    # ===== MODAL TRAINING ENDS ================================================
+    # ===== MODAL TRAINING STARTS ================================================
 
-    run_ltmg <- reactive({
-        scRGNet::runLTMG(scDataset = scRGNet_data$counts)
-    })
+
+    #run_ltmg <- reactive({
+    #    scRGNet::runLTMG(scDataset = scRGNet_data$counts)
+    #})
 
     # ===== MODAL TRAINING ENDS ================================================
     # ===== GENERATING NETWORK STARTS ==========================================
