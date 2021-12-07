@@ -2,6 +2,8 @@
 library(shiny)
 library(shinyjs)
 library(shinybusy)
+library(torch)
+library(Matrix)
 
 hideUI <- function(output_ids){
     lapply(output_ids, function(output_id){
@@ -32,6 +34,7 @@ server <- function(input, output, session) {
         counts        = NULL,
         LTMG_mat      = NULL,
         hardwareSetup = NULL,
+        hyperParams   = NULL,
         encoded       = NULL,
         k             = NULL,
         net           = NULL
@@ -44,15 +47,15 @@ server <- function(input, output, session) {
     )
 
     # Initialise default hyperparams
-    hyper_params <- reactiveValues(
-        ltmg        = FALSE,
-        batch_size  = 1,
-        regu_epochs = 5,
-        L1          = 0.5,
-        L2          = 0.5,
-        regu_alpha  = 0.5,
-        reduction   = "sum"
-    )
+    #hyper_params <- reactiveValues(
+    #    ltmg        = FALSE,
+    #    batch_size  = 1,
+    #    regu_epochs = 5,
+    #    L1          = 0.5,
+    #    L2          = 0.5,
+    #    regu_alpha  = 0.5,
+    #    reduction   = "sum"
+    #)
 
     # ===== FILE UPLOAD HANDLING STARTS ========================================
     inFile <- reactiveValues(
@@ -245,7 +248,6 @@ server <- function(input, output, session) {
                 scRGNet_data$hardwareSetup <- NULL
             } else {
                 tryCatch({
-                    #scRGNet_data$hardwareSetup <- set_hardware()
                     scRGNet_data$hardwareSetup <- scRGNet::setHardware(
                         coresUsage = hardware_args$coresUsage,
                         CUDA       = hardware_args$CUDA
@@ -357,26 +359,68 @@ server <- function(input, output, session) {
     # ===== MODAL TRAINING STARTS ================================================
 
     observeEvent(input$run, {
-        if (input$ltmg) {
-            shinybusy::show_modal_spinner(spin  = "cube-grid",
-                                          color = "#E95420",
-                                          text  = "Inferring LTMG signals...")
-            tryCatch({
-                scRGNet_data$LTMG_mat <- scRGNet::runLTMG(scDataset = scRGNet_data$counts)
-            },
-            error = function(err) {
-                scRGNet_data$LTMG_mat <- NULL
-                showNotification(paste(err), type = 'err')
-            })
-            shinybusy::remove_modal_spinner()
-        }
+        tryCatch({
+            scRGNet_data$hyperParams <- scRGNet::setHyperParams(
+                batch_size  = input$batch_size,
+                regu_epochs = input$regu_epochs,
+                L1          = input$L1,
+                L2          = input$L2,
+                regu_alpha  = input$regu_alpha,
+                reduction   = input$reduction
+            )
+        },
+        warning = function(warn) {
+            scRGNet_data$hyperParams <- NULL
+            showNotification(paste(warn), type = 'warning')
+        },
+        error = function(err) {
+            scRGNet_data$hyperParams <- NULL
+            showNotification(paste(err), type = 'err')
+        })
+        if (!is.null(scRGNet_data$hyperParams)) {
+            if (input$ltmg) {
+                shinybusy::show_modal_spinner(spin  = "cube-grid",
+                                              color = "#E95420",
+                                              text  = "Inferring LTMG signals...")
+                tryCatch({
+                    scRGNet_data$LTMG_mat <-
+                        scRGNet::runLTMG(scDataset = scRGNet_data$counts)
+                },
+                error = function(err) {
+                    scRGNet_data$LTMG_mat <- NULL
+                    showNotification(paste(err), type = 'err')
+                })
+                shinybusy::remove_modal_spinner()
+            }
+            #if (hyper_params$CUDA) {
+            #    device <- torch::torch_device(type = "cuda")
+            #} else {
+            #    device <- torch::torch_device(type = "cpu")
+            #    torch::torch_set_num_threads(hyper_params$coresUage)
+            #}
+            #sample_list <- scRGNet_data$counts$features@Dimnames[[1]]
+            #gene_list   <- scRGNet_data$counts$features@Dimnames[[2]]
+            #train_loader <- torch::dataloader(dataset     = scDataset,
+            #                                  batch_size  = hyper_params$batch_size$batch_size,
+            #                                  shuffle     = FALSE,
+            #                                  pin_memory  = ifelse(hardwareSetup$CUDA, TRUE, FALSE),
+            #                                  num_workers = ifelse(hardwareSetup$CUDA, 1, 0))
+            #
+            #useLTMG <- FALSE
+            #if (!is.null(scRGNet_data$LTMG_mat)) {
+            #    useLTMG  <- TRUE
+            #    LTMG_mat <- torch::torch_tensor(LTMG_mat)
+            #}
+            #model     <- AE(scRGNet_data$counts$features@Dim[2])$to(device = device)
+            #optimiser <- torch::optim_adam(params = model$parameters, lr = 1e-3)
 
+        }
     })
 
     # ===== MODAL TRAINING ENDS ================================================
 
     observeEvent(input$print, {
-        print(scRGNet_data$LTMG_mat)
+        print(scRGNet_data$hyperParams)
     })
 
     # ===== GENERATING NETWORK STARTS ==========================================

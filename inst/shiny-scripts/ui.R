@@ -70,27 +70,40 @@ main_page <- tabPanel(
                 numericInput(
                     inputId = "batch_size",
                     label   = "Batch size",
-                    value   = 1
+                    value   = 1,
+                    min     = 1,
+                    step    = 1
                 ),
                 numericInput(
                     inputId = "regu_epochs",
                     label   = "Epochs",
-                    value   = 5
+                    value   = 5,
+                    min     = 1,
+                    step    = 1
                 ),
                 numericInput(
                     inputId = "L1",
                     label   = "L1 Regularisation intensity",
-                    value   = 0.5
+                    value   = 0.5,
+                    min     = 0,
+                    max     = 1,
+                    step    = 0.01
                 ),
                 numericInput(
                     inputId = "L2",
                     label   = "L2 Regularisation intensity",
-                    value   = 0.5
+                    value   = 0.5,
+                    min     = 0,
+                    max     = 1,
+                    step    = 0.01
                 ),
                 numericInput(
                     inputId = "regu_alpha",
                     label   = "LTMG Regularisation intensity",
-                    value   = 0.5
+                    value   = 0.5,
+                    min     = 0,
+                    max     = 1,
+                    step    = 0.01
                 ),
                 selectInput(
                     inputId = "reduction",
