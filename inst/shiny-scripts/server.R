@@ -5,7 +5,7 @@ library(shinybusy)
 
 hideUI <- function(output_ids){
     lapply(output_ids, function(output_id){
-        shinyjs::hide(id = output_id)
+        shinyjs::hide(id = output_id, anim = TRUE)
     })
 }
 
@@ -210,7 +210,6 @@ server <- function(input, output, session) {
         )
     })
 
-
     observe({
         if (is.null(file_input()) | is.null(scRGNet_data$counts)) {
             shinyjs::hide("hardware_ui")
@@ -247,8 +246,10 @@ server <- function(input, output, session) {
             } else {
                 tryCatch({
                     #scRGNet_data$hardwareSetup <- set_hardware()
-                    scRGNet_data$hardwareSetup <- scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
-                                                                       CUDA       = hardware_args$CUDA)
+                    scRGNet_data$hardwareSetup <- scRGNet::setHardware(
+                        coresUsage = hardware_args$coresUsage,
+                        CUDA       = hardware_args$CUDA
+                        )
                 },
                 warning = function(warn) {
                     scRGNet_data$hardwareSetup <- NULL
@@ -262,8 +263,10 @@ server <- function(input, output, session) {
         })
 
     } else {
-        scRGNet_data$hardwareSetup <- scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
-                                                           CUDA       = hardware_args$CUDA)
+        scRGNet_data$hardwareSetup <- scRGNet::setHardware(
+            coresUsage = hardware_args$coresUsage,
+            CUDA       = hardware_args$CUDA
+            )
     }
 
 
@@ -272,12 +275,14 @@ server <- function(input, output, session) {
     # ===== HYPERPARAMETERS SETUP STARTS =======================================
     observe({
         if (is.null(scRGNet_data$counts)) {
+            ## Initialising widget
             output$choose_k <- renderUI({
                 numericInput(inputId = "k",
                              label   = "k (default best heuristic)",
                              value   = 1)
             })
         } else {
+            ## Change default value to calculated best heuristic from counts when available
             output$choose_k <- renderUI({
                 numericInput(
                     inputId = "k",
@@ -294,52 +299,48 @@ server <- function(input, output, session) {
 
     observe({
         if (is.null(file_input()) || is.null(scRGNet_data$counts)) {
-            hideUI(c("ltmg",
-                      "batch_size",
-                      "regu_epochs",
-                      "L1",
-                      "L2",
-                      "regu_alpha",
-                      "reduction",
-                      "choose_k"))
+            hideUI(
+                c(
+                    "ltmg",
+                    "batch_size",
+                    "regu_epochs",
+                    "L1",
+                    "L2",
+                    "regu_alpha",
+                    "reduction",
+                    "choose_k",
+                    "run"
+                )
+            )
         } else {
-            showUI(c("ltmg",
-                      "batch_size",
-                      "regu_epochs",
-                      "L1",
-                      "L2",
-                      "regu_alpha",
-                      "reduction",
-                      "choose_k"))
+            showUI(
+                c(
+                    "ltmg",
+                    "batch_size",
+                    "regu_epochs",
+                    "L1",
+                    "L2",
+                    "regu_alpha",
+                    "reduction",
+                    "choose_k",
+                    "run"
+                )
+            )
         }
-#
+        #
     })
 
-    observe({
-        inputToReactive(input_var = input,
-                        react_var = hyper_params,
-                        ids       = c("ltmg",
-                                      "batch_size",
-                                      "regu_epochs",
-                                      "L1",
-                                      "L2",
-                                      "regu_alpha",
-                                      "reduction"))
-        #if (!is.null(input$ltmg))
-        #    hyper_params$ltmg <- input$ltmg
-        #if (!is.null(input$batch_size))
-        #    hyper_params$batch_size <- input$batch_size
-        #if (!is.null(input$regu_epochs))
-        #    hyper_params$regu_epochs <- input$regu_epochs
-        #if (!is.null(input$L1))
-        #    hyper_params$L1 <- input$L1
-        #if (!is.null(input$L2))
-        #    hyper_params$L2 <- input$L2
-        #if (!is.null(input$regu_alpha))
-        #    hyper_params$regu_alpha <- input$regu_alpha
-        #if (!is.null(input$reduction))
-        #    hyper_params$reduction <- input$reduction
-    })
+    #observe({
+    #    inputToReactive(input_var = input,
+    #                    react_var = hyper_params,
+    #                    ids       = c("ltmg",
+    #                                  "batch_size",
+    #                                  "regu_epochs",
+    #                                  "L1",
+    #                                  "L2",
+    #                                  "regu_alpha",
+    #                                  "reduction"))
+    #})
 
     # Execute it on press
     #set_hyper <- reactive({
@@ -353,18 +354,31 @@ server <- function(input, output, session) {
 
     # ===== HYPERPARAMETERS SETUP ENDS =========================================
 
-    observeEvent(input$print, {
-        print(scRGNet_data$hardwareSetup)
-    })
-
     # ===== MODAL TRAINING STARTS ================================================
 
+    observeEvent(input$run, {
+        if (input$ltmg) {
+            shinybusy::show_modal_spinner(spin  = "cube-grid",
+                                          color = "#E95420",
+                                          text  = "Inferring LTMG signals...")
+            tryCatch({
+                scRGNet_data$LTMG_mat <- scRGNet::runLTMG(scDataset = scRGNet_data$counts)
+            },
+            error = function(err) {
+                scRGNet_data$LTMG_mat <- NULL
+                showNotification(paste(err), type = 'err')
+            })
+            shinybusy::remove_modal_spinner()
+        }
 
-    #run_ltmg <- reactive({
-    #    scRGNet::runLTMG(scDataset = scRGNet_data$counts)
-    #})
+    })
 
     # ===== MODAL TRAINING ENDS ================================================
+
+    observeEvent(input$print, {
+        print(scRGNet_data$LTMG_mat)
+    })
+
     # ===== GENERATING NETWORK STARTS ==========================================
     # ===== GENERATING NETWORK ENDS ============================================
     # ===== PLOTTING STARTS ====================================================

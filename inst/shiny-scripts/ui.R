@@ -19,7 +19,8 @@ main_page <- tabPanel(
             textOutput("choose"),
             textOutput("upload_summary"),
             actionButton(inputId = 'reset',
-                         label   = 'Clear loaded data'),
+                         label   = 'Clear loaded data',
+                         icon    = icon("sync")),
             # ===== FILE UPLOAD HANDLING ENDS ==================================
 
             # ===== PREPROCESS GENE COUNTS STARTS ==============================
@@ -100,7 +101,11 @@ main_page <- tabPanel(
                     multiple = FALSE,
                     selected = "sum"
                 ),
-                uiOutput("choose_k")
+                uiOutput("choose_k"),
+                actionButton(
+                    inputId = "run",
+                    label   = "Start analysis"
+                )
             ),
             # ===== HYPERPARAMETERS SETUP ENDS =================================
             actionButton(inputId = "print",
