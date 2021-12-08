@@ -323,75 +323,73 @@ server <- function(input, output, session) {
         # ===== HYPERPARAMETERS SETUP ENDS =====================================
 
         # ===== MODAL TRAINING STARTS ==========================================
-        if (!is.null(scRGNet_data$hyperParams)) {
-            if (input$ltmg) {
-                shinybusy::show_modal_spinner(spin  = "cube-grid",
-                                              color = "#E95420",
-                                              text  = "Inferring LTMG signals...")
-                tryCatch({
-                    scRGNet_data$LTMG_mat <-
-                        scRGNet::runLTMG(scDataset = scRGNet_data$counts)
-                },
-                error = function(err) {
-                    scRGNet_data$LTMG_mat <- NULL
-                    showNotification(paste(err), type = 'err')
-                })
-                shinybusy::remove_modal_spinner()
-            }
-            shinybusy::show_modal_spinner(spin  = "self-building-square",
+        req(!is.null(scRGNet_data$hyperParams))
+        if (input$ltmg) {
+            shinybusy::show_modal_spinner(spin  = "cube-grid",
                                           color = "#E95420",
-                                          text  = "Encoding Expression Values...")
-            withCallingHandlers({
-                shinyjs::html("console", "")
-                tryCatch({
-                    scRGNet_data$encoded <- scRGNet::runFeatureAE(
-                        scDataset     = scRGNet_data$counts,
-                        LTMG_mat      = scRGNet_data$LTMG_mat,
-                        hyperParams   = scRGNet_data$hyperParams,
-                        hardwareSetup = scRGNet_data$hardwareSetup
-                    )
-                },
-                warning = function(warn) {
-                    scRGNet_data$encoded <- NULL
-                    showNotification(paste(warn), type = 'warning')
-                },
-                error = function(err) {
-                    scRGNet_data$encoded <- NULL
-                    showNotification(paste(err), type = 'err')
-                })
+                                          text  = "Inferring LTMG signals...")
+            tryCatch({
+                scRGNet_data$LTMG_mat <-
+                    scRGNet::runLTMG(scDataset = scRGNet_data$counts)
             },
-            message = function(m) {
-                shinyjs::html(id   = "console",
-                              html = m$message,
-                              add  = TRUE)
+            error = function(err) {
+                scRGNet_data$LTMG_mat <- NULL
+                showNotification(paste(err), type = 'err')
             })
             shinybusy::remove_modal_spinner()
-            # ===== MODAL TRAINING ENDS ========================================
-
-            # ===== GENERATING NETWORK STARTS ==================================
-            if (!is.null(scRGNet_data$encoded)) {
-                shinybusy::show_modal_spinner(spin  = "rotating-plane",
-                                              color = "#E95420",
-                                              text  = "Calculating Cell Graph...")
-                tryCatch({
-                    scRGNet_data$net <- scRGNet::generateNetwork(
-                        feature_mat   = scRGNet_data$encoded,
-                        k             = input$k,
-                        hardwareSetup = scRGNet_data$hardwareSetup
-                    )
-                },
-                warning = function(warn) {
-                    scRGNet_data$net <- NULL
-                    showNotification(paste(warn), type = 'warning')
-                },
-                error = function(err) {
-                    scRGNet_data$net <- NULL
-                    showNotification(paste(err), type = 'err')
-                })
-                shinybusy::remove_modal_spinner()
-            }
-            # ===== GENERATING NETWORK ENDS ====================================
         }
+        shinybusy::show_modal_spinner(spin  = "self-building-square",
+                                      color = "#E95420",
+                                      text  = "Encoding Expression Values...")
+        withCallingHandlers({
+            shinyjs::html("console", "")
+            tryCatch({
+                scRGNet_data$encoded <- scRGNet::runFeatureAE(
+                    scDataset     = scRGNet_data$counts,
+                    LTMG_mat      = scRGNet_data$LTMG_mat,
+                    hyperParams   = scRGNet_data$hyperParams,
+                    hardwareSetup = scRGNet_data$hardwareSetup
+                )
+            },
+            warning = function(warn) {
+                scRGNet_data$encoded <- NULL
+                showNotification(paste(warn), type = 'warning')
+            },
+            error = function(err) {
+                scRGNet_data$encoded <- NULL
+                showNotification(paste(err), type = 'err')
+            })
+        },
+        message = function(m) {
+            shinyjs::html(id   = "console",
+                          html = m$message,
+                          add  = TRUE)
+        })
+        shinybusy::remove_modal_spinner()
+        # ===== MODAL TRAINING ENDS ========================================
+
+        # ===== GENERATING NETWORK STARTS ==================================
+        req(!is.null(scRGNet_data$encoded))
+        shinybusy::show_modal_spinner(spin  = "rotating-plane",
+                                      color = "#E95420",
+                                      text  = "Calculating Cell Graph...")
+        tryCatch({
+            scRGNet_data$net <- scRGNet::generateNetwork(
+                feature_mat   = scRGNet_data$encoded,
+                k             = input$k,
+                hardwareSetup = scRGNet_data$hardwareSetup
+            )
+        },
+        warning = function(warn) {
+            scRGNet_data$net <- NULL
+            showNotification(paste(warn), type = 'warning')
+        },
+        error = function(err) {
+            scRGNet_data$net <- NULL
+            showNotification(paste(err), type = 'err')
+        })
+        shinybusy::remove_modal_spinner()
+        # ===== GENERATING NETWORK ENDS ====================================
     })
 
     observeEvent(input$print, {
