@@ -7,7 +7,7 @@
 plotCellNet(
   net,
   group = TRUE,
-  title = "Inferred Cell Network",
+  title = "Calculated Cell Network",
   node_label_size = NULL,
   node_size = NULL,
   show_node_select = FALSE

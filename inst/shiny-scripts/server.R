@@ -2,8 +2,8 @@
 library(shiny)
 library(shinyjs)
 library(shinybusy)
-library(torch)
-library(Matrix)
+library(scRGNet)
+library(visNetwork)
 
 hideUI <- function(output_ids){
     lapply(output_ids, function(output_id){
@@ -389,6 +389,13 @@ server <- function(input, output, session) {
             showNotification(paste(err), type = 'err')
         })
         shinybusy::remove_modal_spinner()
+        output$network <- visNetwork::renderVisNetwork({
+            scRGNet::plotCellNet(
+                net = scRGNet_data$net,
+                group = TRUE,
+                show_node_select = TRUE
+            )
+        })
         # ===== GENERATING NETWORK ENDS ====================================
     })
 

@@ -39,7 +39,7 @@
 #' @importFrom methods is
 plotCellNet <- function(net,
                         group            = TRUE,
-                        title            = "Inferred Cell Network",
+                        title            = "Calculated Cell Network",
                         node_label_size  = NULL,
                         node_size        = NULL, ## default = 25
                         show_node_select = FALSE) {

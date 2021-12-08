@@ -1,8 +1,8 @@
 # ui.R
 library(shiny)
 library(shinyjs)
-library(shinybusy)
 library(shinythemes)
+library(visNetwork)
 
 is_local <- Sys.getenv('SHINY_PORT') == ""
 
@@ -115,17 +115,20 @@ main_page <- tabPanel(
                     multiple = FALSE,
                     selected = "sum"
                 ),
-                uiOutput("choose_k"),
+                uiOutput("choose_k")
+            ),
+            # ===== HYPERPARAMETERS SETUP ENDS =================================
+            # ===== MODAL TRAINING STARTS ======================================
+
+            shinyjs::hidden(
                 actionButton(
                     inputId = "run",
                     label   = "Start analysis"
                 )
             ),
-            # ===== HYPERPARAMETERS SETUP ENDS =================================
+            # ===== MODAL TRAINING ENDS ========================================
             actionButton(inputId = "print",
                          label   = "print")
-            # ===== MODAL TRAINING ENDS ========================================
-            # ===== MODAL TRAINING ENDS ========================================
             # ===== GENERATING NETWORK STARTS ==================================
             # ===== GENERATING NETWORK ENDS ====================================
             # ===== PLOTTING STARTS ============================================
@@ -139,7 +142,49 @@ main_page <- tabPanel(
                     verbatimTextOutput("console")
                 ),
                 tabPanel(
-                    title = "Network")
+                    title = "Network",
+                    fluidRow(
+                        #placeholder
+                        column(2,
+                               actionButton(inputId = "a1", label = "a1")),
+                        column(2,
+                               actionButton(inputId = "a2", label = "a2")),
+                        column(2,
+                               actionButton(inputId = "a3", label = "a3"))
+                    ),
+                    fluidRow(
+                        visNetwork::visNetworkOutput("network", height = "1000px")
+                    )
+                ),
+                tabPanel(
+                    title = "Connectivity",
+                    fluidRow(
+                        column(2,
+                               textInput(inputId = "con_dist_title",
+                                         label   = "Title")
+                               ),
+                        column(2,
+                               actionButton(inputId = "render_con_dist",
+                                            label = "Re-render"))
+                    ),
+                    fluidRow(
+                        ...
+                    )
+                ),
+                tabPanel(title = "Log-rank",
+                    fluidRow(
+                        column(2,
+                               textInput(inputId = "log_title",
+                                         label   = "Title")
+                               ),
+                        column(2,
+                               actionButton(inputId = "render_log",
+                                            label = "Re-render"))
+                    ),
+                    fluidRow(
+                        ...
+                    )
+                )
             )
         )
     )
