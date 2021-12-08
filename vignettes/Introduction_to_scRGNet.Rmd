@@ -31,12 +31,13 @@ library(scRGNet)
 The goal of **scRGNet** is to explore cell-cell relationship using scRNA-seq data.
 Different from conventional dimensional reduction methods used by any existing R packages that assume statistical distribution for gene expression data,
 for scRNA-seq data analysis,
-scRGNet performs dimensional reduction by applying the feature autoencoder of
+scRGNet encodes gene expression data by applying the feature autoencoder of
 the novel single cell graph neural network (scGNN) framework recently proposed by Wang. et al[@scGNN] that requires no statistical assumptions.
 It attempts to capture the relationships among cell samples in the scRNA-seq data through topological abstraction based on gene expression and transcriptional regulation information;
 the package also provides an option for whether to include cell-type specific regulatory signals as a regulariser in trainning the feature autoendoer using a left-truncated mixture Gaussian (LTMG) model.[@LTMG]
-Once the lower dimensional representations of the expression values for each cell sample are obtained, they will be used to fit a K-nearest neighbours (KNN)
-model to build the cell-cell network, with each node in the KNN graph representing a call sample.
+Once the lower dimensional representations of the encoded expression values for each cell sample are obtained, they will be used to fit a K-nearest neighbours (KNN)
+model to build the cell-cell network, with each node in the KNN graph representing a call sample,
+and outlier cell samples in the KNN graph will be pruned using the isolation forest modal.[@isolationForest][@isotree]
 Although this tool offers a way for statistical hypothesis-free analysis,
 it comes with a price: the feature autoencoder is a neural network
 consists of 2 hidden layers, making the task computational-intensive.
@@ -44,7 +45,7 @@ Hence, this document introduces scRGNet using a small subset of scRNA-seq data f
 
 ## Workflow
 
-### Step 1. Pre-preocessing scRNA-seq data from csv file
+### Step 1. Pre-preocessing scRNA-seq Data from csv File
 
 Before using the scRNA-seq data to train the feature autoencoder,
 we need to pre-process the raw data matrix first.
@@ -57,6 +58,8 @@ To load the demo data in the package:
 ```{r load_data}
 inputCountsPath <- system.file("extdata", "GSE138852_small.csv", package = "scRGNet")
 ```
+
+Note that a compressed `csv.gz` file downloaded from the GEO database can also be directly loaded with this function without unzipping.
 
 Then, we can pre-process the raw count matrix by calling
 
@@ -86,7 +89,7 @@ And index specific cell sample by simply indexing:
 counts[5]
 ```
 
-### Step 2. Infer LTMG signals (Optional)
+### Step 2. Infer LTMG Signals (Optional)
 
 Before performing the dimensional reduction using the feature autoencoder, user can choose whether to include the LTMG signals in feature autoencoder training. To infer LTMG tags, use
 
@@ -102,7 +105,7 @@ ltmg <- scRGNet::runLTMG(scDataset   = counts,
 <TT>runLTMG</TT> takes either a <TT>scDataset</TT> object containing the data, or, if <TT>fromFile</TT> is set to <TT>TRUE</TT>, a path to an csv file containing pre-processed scRNA-seq data. If you would like to save the LTMG tags to file, set <TT>toFile</TT> to <TT>TRUE</TT> and enter the directory path to save the file using <TT>outdir_path</TT> and the name of the saved file <TT>savename</TT>.
 
 
-### Step 3. Dimensional reduction
+### Step 3. Encoding Gene Expression Values
 
 The two subsections below are intended for advanced user. If you only want to run a quick demo, you can safely skip to the training section. If you would like to run your own dataset, please make sure that you have enough computational resources; running with a whole scRNA-seq dataset can take up 12G ram.
 
@@ -121,6 +124,7 @@ hyperParams <- scRGNet::setHyperParams(
 )
 ```
 Here I'm showing the default hyperparameters to run a fast demo.
+It does not produce a convergent result.
 
 - <TT>batch_size</TT>: the input batch size for training the feature autoencoder
 - <TT>regu_epochs</TT>: number of epochs to train in the feature autoencoder
@@ -129,7 +133,8 @@ Here I'm showing the default hyperparameters to run a fast demo.
 - <TT>regu_alpha</TT>: intensity of LTMG regularisation
 - <TT>reduction</TT>: Type of reduction method to use in loss functions.
 
-If you would like to run your own dataset, you might want to tune these hyperparameters to  different values with less averaged loss.
+One can tell whether the result has converged by reading the averaged loss value printed on the console.
+If a LTMG matrix is applied, then the averaged loss will stop decreasing at certain value (depending on the intensity of regularisation and the batch size) because the LTMG signals are regularising.
 
 #### Hardware
 
@@ -173,21 +178,29 @@ where <TT>hyperParams</TT> and <TT>hardwareSetup</TT> are user-defined.
 At the end of training, <TT>runFeatureAE</TT> returns a matrix of the low-dimensional representation of the dataset in scDataset.
 Again, note that in scDataset, the pre-processed matrix has been transposed, meaning that now rows are cells and columns are genes. Hence, the selected genes are used as our "features" in the feature auto-encoder, and it finds the low-dimensional features from the gene expression values for each cell.
 
-### Step 4. Generate a network
+### Step 4. Generate a Network
 
-After we have found the lower dimensional feature matrix, scRGNet fits this feature matrix to a KNN model: for a user defined value of $k$ (default uses the best heuristic value from the given feature matrix), for each cell sample, this KNN model selects K cells nearest in Euclidean distance, and then for the $k$ selected nearest cells of the current cell sample, fit them in an isolation forest model to prune outlier cells from the graph:
+After we have found the encoded feature matrix, scRGNet fits this feature matrix to a KNN model: for a user defined value of $k$ (default uses the best heuristic value from the given feature matrix), for each cell sample, this KNN model selects K cells nearest in Euclidean distance, and then for the $k$ selected nearest cells of the current cell sample, fit them in an isolation forest model[@isolationForest][@isotree] to prune outlier cells from the graph:
 
 ```{r}
 net <- scRGNet::generateNetwork(feature_mat = z)
 ```
-### Step 5. Plot and analysis
+
+Note that the pruning of outliers by the isolation forest can be done faster with multiple CPU cores (for non MacOS users only, sorry again):
+
+```{r, eval=FALSE}
+net <- scRGNet::generateNetwork(feature_mat   = z,
+                                hardwareSetup = hardwareSetup)
+```
+
+### Step 5. Plot and Analysis
 
 scRGNet offers 3 visualisations for analysis
 
 #### Cell-Cell Network
 
-The most straight-forward visualisation is the cell-cell network.
-It shows the topological structure representing the cell-cell relationship inferred from the low-dimensional feature matrix:
+The most straight-forward visualisation[@visNetwork] is the cell-cell network.
+It shows the topological structure representing the cell-cell relationship inferred from the encoded gene expression values:
 
 ```{r, fig.width=8, fig.height=5}
 scRGNet::plotCellNet(net = net)
@@ -196,15 +209,42 @@ scRGNet::plotCellNet(net = net)
 If you would like to view a plot without the highlight, and set your own title for the network, you can set <TT>group</TT> to <TT>FALSE</TT> and enter your <TT>title</TT>:
 
 ```{r, fig.width=8, fig.height=5}
-scRGNet::plotCellNet(net = net, group = FALSE, title = "My Network")
+scRGNet::plotCellNet(net   = net,
+                     group = FALSE,
+                     title = "My Network")
 ```
 
-However, the quality of your network entirely depends on how well the model was tuned.
-Running the model with default hyper-parameters will produce a rather crude result like this one shown above.
+If you would like to select multiple cell samples at once by the group it belongs to, set `show_select_by = "group"`:
 
-A model trained with the same dataset, running 100 epochs with a batch size of 5, and K set to 24 will have the following result:
+```{r, fig.width=8, fig.height=5}
+scRGNet::plotCellNet(net            = net,
+                     group          = TRUE,
+                     show_select_by = "group")
+```
 
-![](../inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png){width=90%}
+Or, you might be interested in a particular specific cell sample and the other cell samples which are connected to it:
+
+```{r, fig.width=8, fig.height=5}
+scRGNet::plotCellNet(net            = net,
+                     group          = FALSE,
+                     show_select_by = "node")
+```
+
+You can also change the node size with the `node_size` argument, whose default value is 25:
+
+```{r, fig.width=8, fig.height=5}
+scRGNet::plotCellNet(net            = net,
+                     group          = TRUE,
+                     node_size      = 50) ## doubling the node size
+```
+
+Note that the quality of your network entirely depends on how well the model was tuned.
+Running the model with default hyper-parameters will produce a rather crude result that haven't converged like those shown above.
+
+A model trained with the same dataset, running 500 epochs using a full batch, with default k will have the following convergent result:
+
+![](../inst/extdata/network_batch_500 epochs_LTMG.png){width=90%}
+
 
 #### Degree Distribution
 
@@ -231,6 +271,13 @@ scRGNet::plotLog(net = net)
 
 ```{r}
 utils::sessionInfo()
+```
+
+## Citation
+
+To cite this package:
+```{r}
+utils::citation("scRGNet")
 ```
 
 
