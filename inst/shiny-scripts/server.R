@@ -461,7 +461,7 @@ server <- function(input, output, session) {
     )
 
     output$download_link <- renderUI({
-        downloadLink('download_net', 'Download network with better resolution')
+        downloadLink('download_net', 'Download network as html file')
     })
 
     ## TODO: think of a better way to handle download link when net is not available
@@ -488,6 +488,27 @@ server <- function(input, output, session) {
         }
     })
 
+    output$download_degree_plot <- downloadHandler(
+        filename =  function() {
+            paste("Degree", Sys.Date(), ".png", sep="_")
+        },
+        # content is a function with argument file. content writes the plot to the device
+        content = function(file) {
+            png(file)
+            scRGNet::plotDegree(
+                net   = scRGNet_data$net,
+                title = input$degree_plot_title
+            )
+            dev.off()
+
+        }
+    )
+
+    output$download_degree_button <- renderUI({
+        downloadButton(outputId = "download_degree_plot",
+                       label    = "Download plot")
+    })
+
     observeEvent(input$render_log, {
         has_net <- !is.null(scRGNet_data$net)
         if (has_net) {
@@ -502,8 +523,36 @@ server <- function(input, output, session) {
                              type = "error")
         }
     })
-    # ===== PLOTTING ENDS ======================================================
 
+    output$download_log_plot <- downloadHandler(
+        filename =  function() {
+            paste("Log", Sys.Date(), ".png", sep = "_")
+        },
+        # content is a function with argument file. content writes the plot to the device
+        content = function(file) {
+            png(file)
+            scRGNet::plotLog(net   = scRGNet_data$net,
+                             title = input$log_title)
+            dev.off()
+
+        }
+    )
+
+    output$download_log_button <- renderUI({
+        downloadButton(outputId = "download_log_plot",
+                       label    = "Download plot")
+    })
+
+    observe({
+        has_net <- !is.null(scRGNet_data$net)
+        if (has_net) {
+            showUI(c("download_degree_button", "download_log_button"))
+        } else {
+            hideUI(c("download_degree_button", "download_log_button"))
+        }
+    })
+
+    # ===== PLOTTING ENDS ======================================================
 
 }
 

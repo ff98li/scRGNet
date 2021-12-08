@@ -119,9 +119,8 @@ main_page <- tabPanel(
             ),
             # ===== HYPERPARAMETERS SETUP ENDS =================================
             # ===== MODAL TRAINING STARTS ======================================
-
             shinyjs::hidden(actionButton(inputId = "run",
-                                         label   = "Start analysis")),
+                                         label   = "Start analysis"))
             # ===== MODAL TRAINING ENDS ========================================
         ),
         mainPanel = mainPanel(tabsetPanel(
@@ -188,8 +187,16 @@ main_page <- tabPanel(
                         value   = "Distribution of Vertices in the Cell Network"
                     )
                 )),
-                actionButton(inputId = "render_degree",
-                             label = "Re-render"),
+                fluidRow(
+                    column(2,
+                           actionButton(inputId = "render_degree",
+                                        label   = "Re-render")),
+                    column(2,
+                           shinyjs::hidden(
+                               uiOutput("download_degree_button")
+                           )
+                        )
+                ),
                 hr(),
                 fluidRow(plotOutput("degree_plot"))
             ),
@@ -204,8 +211,16 @@ main_page <- tabPanel(
                         value   = "A log-log Plot of Connectivities for Cell Network"
                     )
                 )),
-                actionButton(inputId = "render_log",
-                             label   = "Re-render"),
+                fluidRow(
+                    column(2,
+                           actionButton(inputId = "render_log",
+                                        label   = "Re-render")),
+                    column(2,
+                           shinyjs::hidden(
+                               uiOutput("download_log_button")
+                           )
+                    )
+                ),
                 hr(),
                 fluidRow(plotOutput("log_plot"))
                 # ===== PLOTTING ENDS ==========================================
