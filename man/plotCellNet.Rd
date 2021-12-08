@@ -10,7 +10,7 @@ plotCellNet(
   title = "Calculated Cell Network",
   node_label_size = NULL,
   node_size = NULL,
-  show_node_select = FALSE
+  show_select_by = NULL
 )
 }
 \arguments{
@@ -26,8 +26,8 @@ If FALSE, they will not be highlighted. Default TRUE.}
 
 \item{node_size}{Size of node}
 
-\item{show_node_select}{Show option to highlight nodes and its neighbours when hovering.
-Intended for use in Shiny.}
+\item{show_select_by}{Show option to highlight either by "node" or "group".
+Options: "node" | "group" | NULL. Default NULL.}
 }
 \description{
 A plotting function to plot the inferred cell net-work from generateNetwork.

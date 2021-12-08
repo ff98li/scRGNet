@@ -144,45 +144,61 @@ main_page <- tabPanel(
                 tabPanel(
                     title = "Network",
                     fluidRow(
-                        #placeholder
+                        column(6,
+                               textInput(inputId = "net_title",
+                                         label   = "Title",
+                                         width   = "600px",
+                                         value   = "My Cell Network")),
                         column(2,
-                               actionButton(inputId = "a1", label = "a1")),
+                               checkboxInput(inputId = "highlight_net_group",
+                                             label   = "Colour by group",
+                                             value   = TRUE)),
                         column(2,
-                               actionButton(inputId = "a2", label = "a2")),
-                        column(2,
-                               actionButton(inputId = "a3", label = "a3"))
+                               radioButtons(inputId = "sel_by",
+                                            label   = "Select by",
+                                            choices = list("Node"  = "node",
+                                                           "Group" = "group",
+                                                           "None"  = NULL),
+                                            selected = "group"))
                     ),
+                    actionButton(inputId = "render_net",
+                                 label   = "Re-render"),
+                    hr(),
                     fluidRow(
-                        visNetwork::visNetworkOutput("network", height = "1000px")
+                        visNetwork::visNetworkOutput("network", height = "900px")
                     )
                 ),
                 tabPanel(
                     title = "Connectivity",
                     fluidRow(
-                        column(2,
-                               textInput(inputId = "con_dist_title",
-                                         label   = "Title")
-                               ),
-                        column(2,
-                               actionButton(inputId = "render_con_dist",
-                                            label = "Re-render"))
+                        column(8,
+                               textInput(inputId = "degree_plot_title",
+                                         label   = "Title",
+                                         width   = "600px",
+                                         value   = "Distribution of Vertices in the Cell Network")
+                               )
                     ),
+                    actionButton(inputId = "render_degree",
+                                 label = "Re-render"),
+                    hr(),
                     fluidRow(
-                        ...
+                        plotOutput("degree_plot")
                     )
                 ),
                 tabPanel(title = "Log-rank",
                     fluidRow(
-                        column(2,
+                        column(8,
                                textInput(inputId = "log_title",
-                                         label   = "Title")
-                               ),
-                        column(2,
-                               actionButton(inputId = "render_log",
-                                            label = "Re-render"))
+                                         label   = "Title",
+                                         width   = "600px",
+                                         value   = "A log-log Plot of Connectivities for Cell Network")
+                               )
                     ),
+                    actionButton(inputId = "render_log",
+                                            label = "Re-render"),
+                    hr(),
                     fluidRow(
-                        ...
+                        plotOutput("log_plot")
                     )
                 )
             )

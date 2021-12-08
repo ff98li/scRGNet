@@ -9,8 +9,8 @@
 #' @param title A character vector as the title of the network plot.
 #' @param node_label_size Size of node label
 #' @param node_size Size of node
-#' @param show_node_select Show option to highlight nodes and its neighbours when hovering.
-#'     Intended for use in Shiny.
+#' @param show_select_by Show option to highlight either by "node" or "group".
+#'      Options: "node" | "group" | NULL. Default NULL.
 #'
 #' @references
 #' \insertRef{igraph}{scRGNet}
@@ -38,11 +38,11 @@
 #' @importFrom Rdpack reprompt
 #' @importFrom methods is
 plotCellNet <- function(net,
-                        group            = TRUE,
-                        title            = "Calculated Cell Network",
-                        node_label_size  = NULL,
-                        node_size        = NULL, ## default = 25
-                        show_node_select = FALSE) {
+                        group             = TRUE,
+                        title             = "Calculated Cell Network",
+                        node_label_size   = NULL,
+                        node_size         = NULL, ## default = 25
+                        show_select_by    = NULL) {
 
     if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
@@ -91,11 +91,19 @@ plotCellNet <- function(net,
     if (! is.null(node_size))
         net_plot <- visNetwork::visNodes(net_plot, size = node_size)
 
-    if (show_node_select) {
-        net_plot <- visNetwork::visOptions(net_plot,
-                                           highlightNearest = list(enabled = TRUE,
-                                                                   hover   = TRUE),
-                                           nodesIdSelection = TRUE)
+    if (!is.null(show_select_by)) {
+        if (show_select_by == "node") {
+           net_plot <- visNetwork::visOptions(net_plot,
+                                              highlightNearest = list(enabled = TRUE,
+                                                                      hover   = TRUE),
+                                              nodesIdSelection = TRUE)
+        } else if (show_select_by == "group") {
+            net_plot <- visNetwork::visOptions(net_plot,
+                                           selectedBy = "group")
+        } else {
+            stop("Invalid argument for show_select_by: should be node, group, or leave empty as NULL")
+        }
+
     }
 
     return(net_plot)
