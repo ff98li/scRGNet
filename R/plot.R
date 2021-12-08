@@ -9,7 +9,7 @@
 #' @param title A character vector as the title of the network plot.
 #' @param node_size Size of node
 #' @param show_select_by Show option to highlight either by "node" or "group".
-#'      Options: "node" | "group" | "none. Default "none".
+#'      Options: "node" | "group" | "none". Default "none".
 #'
 #' @references
 #' \insertRef{igraph}{scRGNet}
@@ -109,12 +109,16 @@ plotCellNet <- function(net,
                                                                       hover   = TRUE),
                                               nodesIdSelection = TRUE)
         } else if (show_select_by == "group") {
-            net_plot <- visNetwork::visOptions(net_plot,
-                                           selectedBy = "group")
+            if (group) {
+                net_plot <- visNetwork::visOptions(net_plot,
+                                                   selectedBy = "group")
+            } else {
+                message('group is FALSE. Ignore argument show_select_by = "group"')
+            }
         } else if (show_select_by == "none") {
             ;
         } else {
-            stop("Invalid argument for show_select_by: should be node, group, or none")
+            stop('Invalid argument for show_select_by: should be "node", "group", or "none"')
         }
     } else {
         stop("Invalid argument for show_select_by: cannot be NULL")

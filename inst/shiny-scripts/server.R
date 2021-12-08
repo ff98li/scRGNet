@@ -5,21 +5,41 @@ library(shinybusy)
 library(scRGNet)
 library(visNetwork)
 
-hideUI <- function(output_ids){
-    lapply(output_ids, function(output_id){
-        shinyjs::hide(id = output_id, anim = TRUE)
+hideUI <- function(input_ids){
+    # Purpose:
+    #     Hides multiple UI widgets by their input IDs
+    # Parameters:
+    #     input_ids: A character vector of widgets' input ID
+    # Value:
+    #     result: hide multiple widgets
+    lapply(input_ids, function(input_id){
+        shinyjs::hide(id = input_id, anim = TRUE)
     })
 }
 
-showUI <- function(output_ids){
-    lapply(output_ids, function(output_id){
-        shinyjs::show(id = output_id, anim = TRUE)
+showUI <- function(input_ids){
+    # Purpose:
+    #     Makes multiple UI widgets reappear
+    # Parameters:
+    #     input_ids: A character vector of widgets' input ID
+    # Value:
+    #     result: show multiple widgets
+    lapply(input_ids, function(input_id){
+        shinyjs::show(id = input_id, anim = TRUE)
     })
 }
 
 ## This is one of those few cases where vectorised operations don't apply
 ## reactiveValues doesn't actually work like a list so I have to do for-loop
 inputToReactive <- function(input_var, react_var, ids) {
+    # Purpose:
+    #     A helper function to save multiple input values into reactive values
+    # Parameters:
+    #     input_var: the input object
+    #     react_var: a reactiveValues object
+    #     ids: a character vector of IDs
+    # Value:
+    #     result: save multiple input values to reactive by matching IDs
     for (i in seq_along(ids)) {
         if (!is.null(input_var[[ids[i]]]))
             react_var[[ids[i]]] <- input_var[[ids[i]]]
@@ -409,22 +429,18 @@ server <- function(input, output, session) {
 
     # ===== PLOTTING STARTS ====================================================
 
-    observeEvent(input$render_net, {
+    observe({
         has_net <- !is.null(scRGNet_data$net)
-        if (has_net) {
-            output$network <- visNetwork::renderVisNetwork({
-                scRGNet::plotCellNet(
-                    net            = scRGNet_data$net,
-                    group          = input$highlight_net_group,
-                    title          = input$net_title,
-                    show_select_by = input$sel_by,
-                    node_size      = input$node_size
-                )
-            })
-        } else {
-            showNotification("A network must be calculated first.",
-                             type = "error")
-        }
+        req(has_net)
+        output$network <- visNetwork::renderVisNetwork({
+            scRGNet::plotCellNet(
+                net            = scRGNet_data$net,
+                group          = input$highlight_net_group,
+                title          = input$net_title,
+                show_select_by = input$sel_by,
+                node_size      = input$node_size
+            )
+        })
     })
 
     observeEvent(input$render_degree, {

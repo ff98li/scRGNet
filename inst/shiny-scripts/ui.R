@@ -78,7 +78,7 @@ main_page <- tabPanel(
                 numericInput(
                     inputId = "regu_epochs",
                     label   = "Epochs",
-                    value   = 5,
+                    value   = 50,
                     min     = 1,
                     step    = 1
                 ),
@@ -120,110 +120,103 @@ main_page <- tabPanel(
             # ===== HYPERPARAMETERS SETUP ENDS =================================
             # ===== MODAL TRAINING STARTS ======================================
 
-            shinyjs::hidden(
-                actionButton(
-                    inputId = "run",
-                    label   = "Start analysis"
-                )
-            ),
+            shinyjs::hidden(actionButton(inputId = "run",
+                                         label   = "Start analysis")),
             # ===== MODAL TRAINING ENDS ========================================
-            actionButton(inputId = "print",
-                         label   = "print")
-            # ===== GENERATING NETWORK STARTS ==================================
-            # ===== GENERATING NETWORK ENDS ====================================
-            # ===== PLOTTING STARTS ============================================
-            # ===== PLOTTING ENDS ==============================================
-
         ),
-        mainPanel = mainPanel(
-            tabsetPanel(
-                tabPanel(
-                    title = "Console Output",
-                    verbatimTextOutput("console")
-                ),
-                tabPanel(
-                    title = "Network",
-                    fluidRow(
-                        column(6,
-                               textInput(inputId = "net_title",
-                                         label   = "Title",
-                                         width   = "600px",
-                                         value   = "My Cell Network")),
-                        column(2,
-                               checkboxInput(inputId = "highlight_net_group",
-                                             label   = "Colour by group",
-                                             value   = TRUE)),
-                        column(2,
-                               radioButtons(inputId = "sel_by",
-                                            label   = "Select by",
-                                            choices = list("Node"  = "node",
-                                                           "Group" = "group",
-                                                           "None"  = "none"),
-                                            selected = "group"))
+        mainPanel = mainPanel(tabsetPanel(
+            tabPanel(title = "Console Output",
+                     verbatimTextOutput("console")),
+            # ===== GENERATING NETWORK STARTS ==================================
+            tabPanel(
+                title = "Network",
+                fluidRow(
+                    column(
+                        6,
+                        textInput(
+                            inputId = "net_title",
+                            label   = "Title",
+                            width   = "600px",
+                            value   = "My Cell Network"
+                        )
                     ),
-                    sliderInput(inputId = "node_size",
-                                label   = "Node size",
-                                min     = 1,
-                                max     = 50,
-                                value   = 25,
-                                width   = "600px",
-                                animate = TRUE),
-                    #actionButton(inputId = "render_net",
-                    #             label   = "Re-render"),
-                    hr(),
-                    fluidRow(
-                        visNetwork::visNetworkOutput("network", height = "900px")
+                    column(
+                        2,
+                        checkboxInput(
+                            inputId = "highlight_net_group",
+                            label   = "Colour by group",
+                            value   = TRUE
+                        )
+                    ),
+                    column(
+                        2,
+                        radioButtons(
+                            inputId = "sel_by",
+                            label   = "Select by",
+                            choices = list("Node"  = "node",
+                                           "Group" = "group"),
+                            selected = "group"
+                        )
                     )
                 ),
-                tabPanel(
-                    title = "Connectivity",
-                    fluidRow(
-                        column(8,
-                               textInput(inputId = "degree_plot_title",
-                                         label   = "Title",
-                                         width   = "600px",
-                                         value   = "Distribution of Vertices in the Cell Network")
-                               )
-                    ),
-                    actionButton(inputId = "render_degree",
-                                 label = "Re-render"),
-                    hr(),
-                    fluidRow(
-                        plotOutput("degree_plot")
-                    )
+                sliderInput(
+                    inputId = "node_size",
+                    label   = "Node size",
+                    min     = 1,
+                    max     = 50,
+                    value   = 25,
+                    width   = "600px"
                 ),
-                tabPanel(title = "Log-rank",
-                    fluidRow(
-                        column(8,
-                               textInput(inputId = "log_title",
-                                         label   = "Title",
-                                         width   = "600px",
-                                         value   = "A log-log Plot of Connectivities for Cell Network")
-                               )
-                    ),
-                    actionButton(inputId = "render_log",
-                                            label = "Re-render"),
-                    hr(),
-                    fluidRow(
-                        plotOutput("log_plot")
+                hr(),
+                fluidRow(visNetwork::visNetworkOutput("network", height = "900px"))
+            ),
+            # ===== GENERATING NETWORK ENDS ====================================
+
+            # ===== PLOTTING STARTS ============================================
+            tabPanel(
+                title = "Connectivity",
+                fluidRow(column(
+                    8,
+                    textInput(
+                        inputId = "degree_plot_title",
+                        label   = "Title",
+                        width   = "600px",
+                        value   = "Distribution of Vertices in the Cell Network"
                     )
-                )
+                )),
+                actionButton(inputId = "render_degree",
+                             label = "Re-render"),
+                hr(),
+                fluidRow(plotOutput("degree_plot"))
+            ),
+            tabPanel(
+                title = "Log-rank",
+                fluidRow(column(
+                    8,
+                    textInput(
+                        inputId = "log_title",
+                        label   = "Title",
+                        width   = "600px",
+                        value   = "A log-log Plot of Connectivities for Cell Network"
+                    )
+                )),
+                actionButton(inputId = "render_log",
+                             label   = "Re-render"),
+                hr(),
+                fluidRow(plotOutput("log_plot"))
+                # ===== PLOTTING ENDS ==========================================
             )
-        )
+        ))
     )
 )
 
-about_page <- tabPanel(
-    title = "About scRGNet",
-    titlePanel("About scRGNet"),
-    "TODO"
-    )
+about_page <- tabPanel(title = "About scRGNet",
+                       titlePanel("About scRGNet"),
+                       "TODO")
 
-ui <- navbarPage(
-    title = "scRGNet",
-    theme = shinythemes::shinytheme('united'),
-    main_page,
-    about_page
-)
+ui <- navbarPage(title = "scRGNet",
+                 theme = shinythemes::shinytheme('united'),
+                 main_page,
+                 about_page)
 
 # [END]

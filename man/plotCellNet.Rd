@@ -24,7 +24,7 @@ If FALSE, they will not be highlighted. Default TRUE.}
 \item{node_size}{Size of node}
 
 \item{show_select_by}{Show option to highlight either by "node" or "group".
-Options: "node" | "group" | "none. Default "none".}
+Options: "node" | "group" | "none". Default "none".}
 }
 \description{
 A plotting function to plot the inferred cell net-work from generateNetwork.
