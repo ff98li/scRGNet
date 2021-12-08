@@ -46,17 +46,6 @@ server <- function(input, output, session) {
         coresUsage = 1
     )
 
-    # Initialise default hyperparams
-    #hyper_params <- reactiveValues(
-    #    ltmg        = FALSE,
-    #    batch_size  = 1,
-    #    regu_epochs = 5,
-    #    L1          = 0.5,
-    #    L2          = 0.5,
-    #    regu_alpha  = 0.5,
-    #    reduction   = "sum"
-    #)
-
     # ===== FILE UPLOAD HANDLING STARTS ========================================
     inFile <- reactiveValues(
         upload_state = NULL
@@ -147,26 +136,14 @@ server <- function(input, output, session) {
         }
     })
 
-
-    #counts <- reactive({
-    #    scRGNet::preprocessCSV(
-    #        path            = file_input(),
-    #        transpose       = input$transpose,
-    #        log_transform   = input$log_transform,
-    #        cell_zero_ratio = input$cell_zero_ratio,
-    #        gene_zero_ratio = input$gene_zero_ratio
-    #    )
-    #})
-
     observeEvent(input$preprocess, {
         shinybusy::show_modal_spinner(spin  = "cube-grid",
                                       color = "#E95420",
                                       text  = "Preprocessing scRNA-seq counts...")
         # console message to shiny: https://stackoverflow.com/a/30490698
         withCallingHandlers({
-            shinyjs::html("preprocess_result", "")
+            shinyjs::html("console", "")
             tryCatch({
-                #scRGNet_data$counts <- counts()
                 scRGNet_data$counts <- scRGNet::preprocessCSV(
                     path            = file_input(),
                     transpose       = input$transpose,
@@ -185,7 +162,7 @@ server <- function(input, output, session) {
             })
         },
         message = function(m) {
-            shinyjs::html(id   = "preprocess_result",
+            shinyjs::html(id   = "console",
                           html = m$message,
                           add  = TRUE)
         })
@@ -223,20 +200,6 @@ server <- function(input, output, session) {
         }
     })
 
-    #if (is_local) {
-    #    observe({
-    #        if (!is.null(input$CUDA))
-    #            hardware_args$CUDA <- input$CUDA
-    #        if (!is.null(input$coresUsage))
-    #            hardware_args$coresUsage <- input$coresUsage
-    #    })
-    #}
-
-    #set_hardware <- reactive({
-    #    scRGNet::setHardware(coresUsage = hardware_args$coresUsage,
-    #                         CUDA       = hardware_args$CUDA)
-    #})
-
     if (is_local) {
         observe({
             inputToReactive(
@@ -270,8 +233,6 @@ server <- function(input, output, session) {
             CUDA       = hardware_args$CUDA
             )
     }
-
-
     # ===== HARDWARE SETUP ENDS ================================================
 
     # ===== HYPERPARAMETERS SETUP STARTS =======================================
@@ -332,33 +293,15 @@ server <- function(input, output, session) {
         #
     })
 
-    #observe({
-    #    inputToReactive(input_var = input,
-    #                    react_var = hyper_params,
-    #                    ids       = c("ltmg",
-    #                                  "batch_size",
-    #                                  "regu_epochs",
-    #                                  "L1",
-    #                                  "L2",
-    #                                  "regu_alpha",
-    #                                  "reduction"))
-    #})
-
-    # Execute it on press
-    #set_hyper <- reactive({
-    #    scRGNet::setHyperParams(batch_size  = hyper_params$batch_size,
-    #                            regu_epochs = hyper_params$regu_epochs,
-    #                            L1          = hyper_params$L1,
-    #                            L2          = hyper_params$L2,
-    #                            regu_alpha  = hyper_params$regu_alpha,
-    #                            reduction   = hyper_params$reduction)
-    #})
-
-    # ===== HYPERPARAMETERS SETUP ENDS =========================================
-
-    # ===== MODAL TRAINING STARTS ================================================
-
     observeEvent(input$run, {
+        is_valid_k <- input$k >= 1 & input$k <= length(scRGNet_data$counts)
+        if (!is_valid_k) {
+            showNotification(
+                paste("Invalid value for k. Must be between 1 and", length(scRGNet_data)),
+                type = 'error'
+            )
+        }
+        req(is_valid_k)
         tryCatch({
             scRGNet_data$hyperParams <- scRGNet::setHyperParams(
                 batch_size  = input$batch_size,
@@ -377,6 +320,9 @@ server <- function(input, output, session) {
             scRGNet_data$hyperParams <- NULL
             showNotification(paste(err), type = 'err')
         })
+        # ===== HYPERPARAMETERS SETUP ENDS =====================================
+
+        # ===== MODAL TRAINING STARTS ==========================================
         if (!is.null(scRGNet_data$hyperParams)) {
             if (input$ltmg) {
                 shinybusy::show_modal_spinner(spin  = "cube-grid",
@@ -392,39 +338,66 @@ server <- function(input, output, session) {
                 })
                 shinybusy::remove_modal_spinner()
             }
-            #if (hyper_params$CUDA) {
-            #    device <- torch::torch_device(type = "cuda")
-            #} else {
-            #    device <- torch::torch_device(type = "cpu")
-            #    torch::torch_set_num_threads(hyper_params$coresUage)
-            #}
-            #sample_list <- scRGNet_data$counts$features@Dimnames[[1]]
-            #gene_list   <- scRGNet_data$counts$features@Dimnames[[2]]
-            #train_loader <- torch::dataloader(dataset     = scDataset,
-            #                                  batch_size  = hyper_params$batch_size$batch_size,
-            #                                  shuffle     = FALSE,
-            #                                  pin_memory  = ifelse(hardwareSetup$CUDA, TRUE, FALSE),
-            #                                  num_workers = ifelse(hardwareSetup$CUDA, 1, 0))
-            #
-            #useLTMG <- FALSE
-            #if (!is.null(scRGNet_data$LTMG_mat)) {
-            #    useLTMG  <- TRUE
-            #    LTMG_mat <- torch::torch_tensor(LTMG_mat)
-            #}
-            #model     <- AE(scRGNet_data$counts$features@Dim[2])$to(device = device)
-            #optimiser <- torch::optim_adam(params = model$parameters, lr = 1e-3)
+            shinybusy::show_modal_spinner(spin  = "self-building-square",
+                                          color = "#E95420",
+                                          text  = "Encoding Expression Values...")
+            withCallingHandlers({
+                shinyjs::html("console", "")
+                tryCatch({
+                    scRGNet_data$encoded <- scRGNet::runFeatureAE(
+                        scDataset     = scRGNet_data$counts,
+                        LTMG_mat      = scRGNet_data$LTMG_mat,
+                        hyperParams   = scRGNet_data$hyperParams,
+                        hardwareSetup = scRGNet_data$hardwareSetup
+                    )
+                },
+                warning = function(warn) {
+                    scRGNet_data$encoded <- NULL
+                    showNotification(paste(warn), type = 'warning')
+                },
+                error = function(err) {
+                    scRGNet_data$encoded <- NULL
+                    showNotification(paste(err), type = 'err')
+                })
+            },
+            message = function(m) {
+                shinyjs::html(id   = "console",
+                              html = m$message,
+                              add  = TRUE)
+            })
+            shinybusy::remove_modal_spinner()
+            # ===== MODAL TRAINING ENDS ========================================
 
+            # ===== GENERATING NETWORK STARTS ==================================
+            if (!is.null(scRGNet_data$encoded)) {
+                shinybusy::show_modal_spinner(spin  = "rotating-plane",
+                                              color = "#E95420",
+                                              text  = "Calculating Cell Graph...")
+                tryCatch({
+                    scRGNet_data$net <- scRGNet::generateNetwork(
+                        feature_mat   = scRGNet_data$encoded,
+                        k             = input$k,
+                        hardwareSetup = scRGNet_data$hardwareSetup
+                    )
+                },
+                warning = function(warn) {
+                    scRGNet_data$net <- NULL
+                    showNotification(paste(warn), type = 'warning')
+                },
+                error = function(err) {
+                    scRGNet_data$net <- NULL
+                    showNotification(paste(err), type = 'err')
+                })
+                shinybusy::remove_modal_spinner()
+            }
+            # ===== GENERATING NETWORK ENDS ====================================
         }
     })
 
-    # ===== MODAL TRAINING ENDS ================================================
-
     observeEvent(input$print, {
-        print(scRGNet_data$hyperParams)
+        print(scRGNet_data$encoded)
     })
 
-    # ===== GENERATING NETWORK STARTS ==========================================
-    # ===== GENERATING NETWORK ENDS ============================================
     # ===== PLOTTING STARTS ====================================================
     # ===== PLOTTING ENDS ======================================================
 

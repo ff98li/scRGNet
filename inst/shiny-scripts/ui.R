@@ -11,6 +11,7 @@ main_page <- tabPanel(
     titlePanel("Analysis"),
     sidebarLayout(
         sidebarPanel = sidebarPanel(
+            width = 3,
             shinyjs::useShinyjs(),
             # ===== FILE UPLOAD HANDLING STARTS ================================
             uiOutput(outputId = "upload_ui"),
@@ -134,8 +135,8 @@ main_page <- tabPanel(
         mainPanel = mainPanel(
             tabsetPanel(
                 tabPanel(
-                    title = "Preprocessing Result",
-                    verbatimTextOutput("preprocess_result")
+                    title = "Console Output",
+                    verbatimTextOutput("console")
                 ),
                 tabPanel(
                     title = "Network")
