@@ -428,14 +428,49 @@ server <- function(input, output, session) {
         has_net <- !is.null(scRGNet_data$net)
         req(has_net)
         output$network <- visNetwork::renderVisNetwork({
-            scRGNet::plotCellNet(
-                net            = scRGNet_data$net,
-                group          = input$highlight_net_group,
-                title          = input$net_title,
-                show_select_by = input$sel_by,
-                node_size      = input$node_size
+            visNetwork::visExport(
+                scRGNet::plotCellNet(
+                    net            = scRGNet_data$net,
+                    group          = input$highlight_net_group,
+                    title          = input$net_title,
+                    show_select_by = input$sel_by,
+                    node_size      = input$node_size
+                )
             )
         })
+    })
+
+    output$download_net <- downloadHandler(
+        filename = function() {
+            paste('network-', Sys.Date(), '.html', sep='')
+        },
+        content = function(con) {
+            visNetwork::visSave(
+                visNetwork::visExport(
+                    scRGNet::plotCellNet(
+                        net            = scRGNet_data$net,
+                        group          = input$highlight_net_group,
+                        title          = input$net_title,
+                        show_select_by = input$sel_by,
+                        node_size      = input$node_size
+                    )
+                ),
+                con
+            )
+        }
+    )
+
+    output$download_link <- renderUI({
+        downloadLink('download_net', 'Download network with better resolution')
+    })
+
+    ## TODO: think of a better way to handle download link when net is not available
+    observe({
+        if (!is.null(scRGNet_data$net)) {
+            shinyjs::show("download_link")
+        } else {
+            shinyjs::hide("download_link")
+        }
     })
 
     observeEvent(input$render_degree, {

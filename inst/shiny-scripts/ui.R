@@ -160,7 +160,9 @@ main_page <- tabPanel(
                         )
                     )
                 ),
-                #downloadLink('download_net', 'Download network with better resolution'),
+                shinyjs::hidden(
+                    uiOutput(outputId = "download_link")
+                ),
                 sliderInput(
                     inputId = "node_size",
                     label   = "Node size",
