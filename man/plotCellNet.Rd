@@ -8,9 +8,8 @@ plotCellNet(
   net,
   group = TRUE,
   title = "Calculated Cell Network",
-  node_label_size = NULL,
   node_size = NULL,
-  show_select_by = NULL
+  show_select_by = "none"
 )
 }
 \arguments{
@@ -22,12 +21,10 @@ If FALSE, they will not be highlighted. Default TRUE.}
 
 \item{title}{A character vector as the title of the network plot.}
 
-\item{node_label_size}{Size of node label}
-
 \item{node_size}{Size of node}
 
 \item{show_select_by}{Show option to highlight either by "node" or "group".
-Options: "node" | "group" | NULL. Default NULL.}
+Options: "node" | "group" | "none. Default "none".}
 }
 \description{
 A plotting function to plot the inferred cell net-work from generateNetwork.

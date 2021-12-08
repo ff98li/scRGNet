@@ -158,11 +158,18 @@ main_page <- tabPanel(
                                             label   = "Select by",
                                             choices = list("Node"  = "node",
                                                            "Group" = "group",
-                                                           "None"  = NULL),
+                                                           "None"  = "none"),
                                             selected = "group"))
                     ),
-                    actionButton(inputId = "render_net",
-                                 label   = "Re-render"),
+                    sliderInput(inputId = "node_size",
+                                label   = "Node size",
+                                min     = 1,
+                                max     = 50,
+                                value   = 25,
+                                width   = "600px",
+                                animate = TRUE),
+                    #actionButton(inputId = "render_net",
+                    #             label   = "Re-render"),
                     hr(),
                     fluidRow(
                         visNetwork::visNetworkOutput("network", height = "900px")

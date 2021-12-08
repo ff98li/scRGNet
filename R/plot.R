@@ -7,10 +7,9 @@
 #' @param group A logical vector indicating whether to highlight cell communities in the network.
 #'     If FALSE, they will not be highlighted. Default TRUE.
 #' @param title A character vector as the title of the network plot.
-#' @param node_label_size Size of node label
 #' @param node_size Size of node
 #' @param show_select_by Show option to highlight either by "node" or "group".
-#'      Options: "node" | "group" | NULL. Default NULL.
+#'      Options: "node" | "group" | "none. Default "none".
 #'
 #' @references
 #' \insertRef{igraph}{scRGNet}
@@ -40,9 +39,9 @@
 plotCellNet <- function(net,
                         group             = TRUE,
                         title             = "Calculated Cell Network",
-                        node_label_size   = NULL,
+                        #node_label_size   = NULL,
                         node_size         = NULL, ## default = 25
-                        show_select_by    = NULL) {
+                        show_select_by    = "none") {
 
     if (!methods::is(net, "igraph"))
         stop("Invalid argument for net. Must be an igraph object.")
@@ -61,19 +60,20 @@ plotCellNet <- function(net,
         }
     }
 
-    if (is.null(node_label_size)) {
-        ; # Use default setting
-    } else {
-        if (!is.numeric(node_label_size) | node_label_size < 1) {
-            stop("Invalid argument for node label size. Must be a numerical value greater than 1.")
-        }
-    }
+    # Does not work. Will figure it out later...
+    #if (is.null(node_label_size)) {
+    #    ; # Use default setting
+    #} else {
+    #    if (!is.numeric(node_label_size) | node_label_size < 1) {
+    #        stop("Invalid argument for node label size. Must be a numerical value greater than 1.")
+    #    }
+    #}
 
     nodes <- visNetwork::toVisNetworkData(net)$nodes
     edges <- visNetwork::toVisNetworkData(net)$edges
 
-    if (! is.null(node_label_size))
-        nodes$"font.id" <- rep(node_label_size, dim(nodes)[1])
+    #if (! is.null(node_label_size))
+    #    nodes$"font.id" <- rep(node_label_size, dim(nodes)[1])
 
     if (group) {
         clp               <- igraph::cluster_label_prop(net)
@@ -88,8 +88,19 @@ plotCellNet <- function(net,
                                        edges = edges,
                                        main  = title)
 
-    if (! is.null(node_size))
-        net_plot <- visNetwork::visNodes(net_plot, size = node_size)
+    if (! is.null(node_size)) {
+        if (is.numeric(node_size)) {
+            if (node_size > 0) {
+                net_plot <- visNetwork::visNodes(net_plot, size = node_size)
+            } else {
+                stop("Invalid argument for node_size: must be positive value.")
+            }
+        } else {
+            stop("Invalid argument for node_size: must be positive numerical value.")
+        }
+    } else {
+        ;
+    }
 
     if (!is.null(show_select_by)) {
         if (show_select_by == "node") {
@@ -100,10 +111,13 @@ plotCellNet <- function(net,
         } else if (show_select_by == "group") {
             net_plot <- visNetwork::visOptions(net_plot,
                                            selectedBy = "group")
+        } else if (show_select_by == "none") {
+            ;
         } else {
-            stop("Invalid argument for show_select_by: should be node, group, or leave empty as NULL")
+            stop("Invalid argument for show_select_by: should be node, group, or none")
         }
-
+    } else {
+        stop("Invalid argument for show_select_by: cannot be NULL")
     }
 
     return(net_plot)

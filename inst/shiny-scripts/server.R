@@ -394,7 +394,8 @@ server <- function(input, output, session) {
                 net            = scRGNet_data$net,
                 group          = input$highlight_net_group,
                 title          = input$net_title,
-                show_select_by = input$sel_by
+                show_select_by = input$sel_by,
+                node_size      = input$node_size
             )
         })
         output$degree_plot <- renderPlot({scRGNet::plotDegree(net = scRGNet_data$net)})
@@ -411,12 +412,15 @@ server <- function(input, output, session) {
     observeEvent(input$render_net, {
         has_net <- !is.null(scRGNet_data$net)
         if (has_net) {
-            output$network <- scRGNet::plotCellNet(
-                net            = scRGNet_data$net,
-                group          = input$highlight_net_group,
-                title          = input$net_title,
-                show_select_by = input$sel_by
-            )
+            output$network <- visNetwork::renderVisNetwork({
+                scRGNet::plotCellNet(
+                    net            = scRGNet_data$net,
+                    group          = input$highlight_net_group,
+                    title          = input$net_title,
+                    show_select_by = input$sel_by,
+                    node_size      = input$node_size
+                )
+            })
         } else {
             showNotification("A network must be calculated first.",
                              type = "error")
@@ -426,10 +430,12 @@ server <- function(input, output, session) {
     observeEvent(input$render_degree, {
         has_net <- !is.null(scRGNet_data$net)
         if (has_net) {
-            output$degree_plot <- scRGNet::plotDegree(
-                net   = scRGNet_data$net,
-                title = input$degree_plot_title
-            )
+            output$degree_plot <- renderPlot({
+                scRGNet::plotDegree(
+                    net   = scRGNet_data$net,
+                    title = input$degree_plot_title
+                )
+            })
         } else {
             showNotification("A network must be calculated first.",
                              type = "error")
@@ -439,10 +445,12 @@ server <- function(input, output, session) {
     observeEvent(input$render_log, {
         has_net <- !is.null(scRGNet_data$net)
         if (has_net) {
-            output$log_plot <- scRGNet::plotLog(
-                net   = scRGNet_data$net,
-                title = input$log_title
-            )
+            output$log_plot <- renderPlot({
+                scRGNet::plotLog(
+                    net   = scRGNet_data$net,
+                    title = input$log_title
+                )
+            })
         } else {
             showNotification("A network must be calculated first.",
                              type = "error")
