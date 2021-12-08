@@ -42,7 +42,8 @@ ls("package:scRGNet")
 #>  [1] "gene_counts"       "gene_counts_small" "generateNetwork"  
 #>  [4] "plotCellNet"       "plotDegree"        "plotLog"          
 #>  [7] "preprocessCSV"     "runFeatureAE"      "runLTMG"          
-#> [10] "setHardware"       "setHyperParams"
+#> [10] "runscRGNet"        "scDataset"         "setHardware"      
+#> [13] "setHyperParams"
 data(package = "scRGNet")
 ```
 
@@ -82,10 +83,10 @@ An overview of the package is illustrated below.
 The author of the package is Feifei Li. The *runLTMG* function uses the
 LTMG object and the function for inferring LTMG tags from
 `scgnnltmg`([Wang et al. 2021](#ref-scGNN)). `data.table` R
-package([Dowle and Srinivasan 2020](#ref-dt)) is used for fast reading
-in a large size scRNA-seq raw matrix from csv. The `Matrix`([Bates et
-al. 2021](#ref-matrix)) R package is used to store scRNA-seq data as a
-sparse matrix to reduce memory useage, and used to convert a tensor
+package([Dowle and Srinivasan 2021](#ref-dt)) is used for fast reading
+in a large size scRNA-seq raw matrix from csv. The `Matrix`([Bates and
+Maechler 2021](#ref-matrix)) R package is used to store scRNA-seq data
+as a sparse matrix to reduce memory usage, and used to convert a tensor
 object to an R matrix. The *scDataset* object is an `R6` object([Chang
 2021](#ref-r6)) inherited from class `dataset` from `torch`. The feature
 autoencoder is also an R6 object inherited from the basic neural network
@@ -96,48 +97,89 @@ form the `coro` R package. The model training also uses `progress` R
 package to inform users the model trainning progress. The
 *generateNetwork* function makes use of `graph_from_data_frame` from
 `igraph` R package to generate a plottable `igraph` object.([Csardi and
-Nepusz 2006](#ref-igraph)) All plotting functions in this package make
-use of `graphics` R package. `cluster_label_prop` and `degree` function
-from `igraph` R package are used to compute the communities and degrees
-of the network. Except for the LTMG modeling in `runLTMG` uses external
-R package for computation, all other functions for data processing and
-analysis in this package are my original R implementation.
+Nepusz 2006](#ref-igraph)), and the isolation forest model from the
+`isotree` R package([Cortes 2021](#ref-isotree)) is used to prune
+outliers in cell graphs produced by *generateNetwork*. The interactive
+visualisation of produced cell network makes use of the `visNetwork` R
+package([Almende B.V. and Contributors, Thieurmel, and Robert
+2021](#ref-visNetwork)). `plotDegree` and `plotLog` make use of the
+`graphics` R package([R Core Team 2021](#ref-graphics)).
+`cluster_label_prop` and `degree` function from `igraph` R package are
+used to compute the communities and degrees of the network. The shiny
+app of this package is made with `shiny`([Chang et al.
+2021](#ref-shiny)), `shinyjs`([Attali 2020](#ref-shinyjs)), and
+`shinybusy`([Meyer and Perrier 2020](#ref-shinybusy)) R packages. Except
+for the LTMG modeling in `runLTMG` uses external R package for
+computation, all other functions for data processing and analysis in
+this package are my original R implementation.
 
 ## Acknowledgements
 
 This package was developed as part of an assessment for 2021 BCB410H:
-Applied Bioinfor-matics, University of Toronto, Toronto, CANADA.
+Applied Bioinformatics, University of Toronto, Toronto, CANADA.
 
 ## References
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
+<div id="ref-visNetwork" class="csl-entry">
+
+Almende B.V. and Contributors, Benoit Thieurmel, and Titouan Robert.
+2021. *visNetwork: Network Visualization Using ’Vis.js’ Library*.
+<https://CRAN.R-project.org/package=visNetwork>.
+
+</div>
+
+<div id="ref-shinyjs" class="csl-entry">
+
+Attali, Dean. 2020. *Shinyjs: Easily Improve the User Experience of Your
+Shiny Apps in Seconds*. <https://CRAN.R-project.org/package=shinyjs>.
+
+</div>
+
 <div id="ref-matrix" class="csl-entry">
 
-Bates, Douglas, Martin Maechler, Timothy A. Davis, Jens Oehlschlägel,
-and Jason Riedy. 2021. “Matrix: Sparse and Dense Matrix Classes and
-Methods.” <http://Matrix.R-forge.R-project.org/>.
+Bates, Douglas, and Martin Maechler. 2021. *Matrix: Sparse and Dense
+Matrix Classes and Methods*.
+<https://CRAN.R-project.org/package=Matrix>.
 
 </div>
 
 <div id="ref-r6" class="csl-entry">
 
-Chang, Winston. 2021. “R6: Encapsulated Object-Oriented Programming for
-r.” <https://r6.r-lib.org>.
+Chang, Winston. 2021. *R6: Encapsulated Classes with Reference
+Semantics*. <https://CRAN.R-project.org/package=R6>.
+
+</div>
+
+<div id="ref-shiny" class="csl-entry">
+
+Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke,
+Yihui Xie, Jeff Allen, Jonathan McPherson, Alan Dipert, and Barbara
+Borges. 2021. *Shiny: Web Application Framework for r*.
+<https://CRAN.R-project.org/package=shiny>.
+
+</div>
+
+<div id="ref-isotree" class="csl-entry">
+
+Cortes, David. 2021. *Isotree: Isolation-Based Outlier Detection*.
+<https://CRAN.R-project.org/package=isotree>.
 
 </div>
 
 <div id="ref-igraph" class="csl-entry">
 
 Csardi, Gabor, and Tamas Nepusz. 2006. “The Igraph Software Package for
-Complex Network Research.” *InterJournal*. <https://igraph.org>.
+Complex Network Research.” *InterJournal* Complex Systems: 1695.
+<https://igraph.org>.
 
 </div>
 
 <div id="ref-dt" class="csl-entry">
 
-Dowle, M, and A Srinivasan. 2020. “Data. Table: Extension of’data.
-Frame’.” <https://r-datatable.com>.
+Dowle, Matt, and Arun Srinivasan. 2021. *Data.table: Extension of
+‘Data.frame‘*. <https://CRAN.R-project.org/package=data.table>.
 
 </div>
 
@@ -145,7 +187,8 @@ Frame’.” <https://r-datatable.com>.
 
 Falbel, Daniel, Javier Luraschi, Dmitriy Selivanov, Athos Damiani,
 Christophe Regouby, Krzysztof Joachimiak, and Hamada S. Badr. 2021.
-“Torch for r.” RStudio. <https://torch.mlverse.org/>.
+“Torch: Tensors and Neural Networks with ’GPU’ Acceleration.” RStudio.
+<https://torch.mlverse.org/>.
 
 </div>
 
@@ -156,6 +199,21 @@ Choo, Catriona McLean, Rebecca K Simmons, et al. 2019. “A Single-Cell
 Atlas of Entorhinal Cortex from Individuals with Alzheimer’s Disease
 Reveals Cell-Type-Specific Gene Expression Regulation.” *Nature
 Neuroscience* 22 (12): 2087–97.
+
+</div>
+
+<div id="ref-shinybusy" class="csl-entry">
+
+Meyer, Fanny, and Victor Perrier. 2020. *Shinybusy: Busy Indicator for
+’Shiny’ Applications*. <https://CRAN.R-project.org/package=shinybusy>.
+
+</div>
+
+<div id="ref-graphics" class="csl-entry">
+
+R Core Team. 2021. *R: A Language and Environment for Statistical
+Computing*. Vienna, Austria: R Foundation for Statistical Computing.
+<https://www.R-project.org/>.
 
 </div>
 

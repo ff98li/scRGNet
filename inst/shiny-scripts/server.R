@@ -142,11 +142,6 @@ server <- function(input, output, session) {
                       "log_transform",
                       "cell_zero_ratio",
                       "gene_zero_ratio"))
-            #shinyjs::hide("transpose")
-            #shinyjs::hide("log_transform")
-            #shinyjs::hide("cell_zero_ratio")
-            #shinyjs::hide("gene_zero_ratio")
-            #shinyjs::hide("preprocess")
         } else {
             showUI(c("preprocess",
                       "transpose",

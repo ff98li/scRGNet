@@ -154,11 +154,13 @@ main_page <- tabPanel(
                             inputId = "sel_by",
                             label   = "Select by",
                             choices = list("Node"  = "node",
-                                           "Group" = "group"),
+                                           "Group" = "group",
+                                           "None"  = "none"),
                             selected = "group"
                         )
                     )
                 ),
+                #downloadLink('download_net', 'Download network with better resolution'),
                 sliderInput(
                     inputId = "node_size",
                     label   = "Node size",

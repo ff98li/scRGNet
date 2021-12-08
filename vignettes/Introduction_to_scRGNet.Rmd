@@ -175,7 +175,7 @@ Again, note that in scDataset, the pre-processed matrix has been transposed, mea
 
 ### Step 4. Generate a network
 
-After we have found the lower dimensional feature matrix, scRGNet fits this feature matrix to a KNN model: for a user defined value of $K$ (default 7), for each cell sample, this KNN model selects K cells neartest in Euclidean distance, and then computes the mean and standard deviation of the distances from the current cell sample to the K selected cells. If the pair-wise distance between two cells are lower than the mean plus one standard deviation, then an edge will be assigned to the two cells:
+After we have found the lower dimensional feature matrix, scRGNet fits this feature matrix to a KNN model: for a user defined value of $k$ (default uses the best heuristic value from the given feature matrix), for each cell sample, this KNN model selects K cells nearest in Euclidean distance, and then for the $k$ selected nearest cells of the current cell sample, fit them in an isolation forest model to prune outlier cells from the graph:
 
 ```{r}
 net <- scRGNet::generateNetwork(feature_mat = z)
@@ -193,7 +193,7 @@ It shows the topological structure representing the cell-cell relationship infer
 scRGNet::plotCellNet(net = net)
 ```
 
-It also highlights clusters in the network. If you would like to view a plot without the highlight, and set your own title for the network, you can set <TT>group</TT> to <TT>FALSE</TT> and enter your <TT>title</TT>:
+If you would like to view a plot without the highlight, and set your own title for the network, you can set <TT>group</TT> to <TT>FALSE</TT> and enter your <TT>title</TT>:
 
 ```{r, fig.width=8, fig.height=5}
 scRGNet::plotCellNet(net = net, group = FALSE, title = "My Network")
@@ -226,6 +226,13 @@ The log-log plot is helpful in further analysing the topological structure of th
 ```{r, fig.width=5, fig.height=4}
 scRGNet::plotLog(net = net)
 ```
+
+## SessionInfo
+
+```{r}
+utils::sessionInfo()
+```
+
 
 ## References
 
