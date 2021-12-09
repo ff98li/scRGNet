@@ -193,7 +193,7 @@ server <- function(input, output, session) {
         verticalLayout(
             numericInput(
                 inputId = "coresUsage",
-                label   = "CPU cores usage",
+                label   = "CPU cores usage (1 for macOS)",
                 value   = 1
             ),
             checkboxInput(

@@ -201,7 +201,7 @@ main_page <- tabPanel(
                 fluidRow(plotOutput("degree_plot"))
             ),
             tabPanel(
-                title = "Log-rank",
+                title = "Log-log",
                 fluidRow(column(
                     8,
                     textInput(
