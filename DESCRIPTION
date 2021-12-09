@@ -30,7 +30,6 @@ Imports:
     methods,
     isotree,
     visNetwork,
-    magrittr,
     shiny,
     shinythemes,
     shinyjs,
