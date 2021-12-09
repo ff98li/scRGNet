@@ -8,22 +8,26 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-scRGNet is an R package for inferring cell-cell networks from scRNA-seq
-data. It is the first R package that attempts to perform dimensional
-reduction using an feature(that is, gene) autoencoder from the novel
-single cell graph neural network (scGNN) framework.([Wang et al.
-2021](#ref-scGNN)) It generate a feature matrix containing the
+scRGNet is an R package for inferring cell-cell networks from encoded
+scRNA-seq data. It is the first R package that attempts to use
+`torch`([Falbel et al. 2021](#ref-torch)) in R to implement an
+feature(that is, gene) autoencoder from the recently proposed single
+cell graph neural network (scGNN) framework.([Wang et al.
+2021](#ref-scGNN)) It generate an encoded feature matrix containing the
 low-dimensional representation of gene expression in each cell, and
-build a Cell-Cell network from the feature matrix using KNN. In training
+build a Cell-Cell network from the feature matrix using KNN and
+isolation forest([Liu, Ting, and Zhou
+2008](#ref-isolationForest))([Cortes 2021](#ref-isotree)). When using
 the feature autoencoder, discretized regulatory signals quantified from
 gene expression modeled by a left-truncated mixture Gaussian (LTMG)
 model can also be used as a regulariser.([Wan et al. 2019](#ref-LTMG))
 It is unique from other R packages for scRNA-seq analysis in that
-scRGNet offers an option to analyse scRNA-seq data without assuming any
-statistical distribution or relationships for gene expression.
+scRGNet offers an option to analyse scRNA-seq data without assuming
+statistical distributions or relationships for gene expression.
 
 -   R requirement: 4.1.2 or later version
 -   Development environment: Ubuntu 20.04 LTS
+-   Development platform: x86_64-pc-linux-gnu (64-bit)
 
 ## Installation
 
@@ -33,6 +37,14 @@ To install the latest version of scRGNet:
 require("devtools")
 devtools::install_github("ff98li/scRGNet", build_vignettes = TRUE)
 ```
+
+To run the Shiny app:
+
+``` r
+scRGNet::runscRGNet()
+```
+
+A deployed demo is here: coming..
 
 ## Overview
 
@@ -59,20 +71,7 @@ details:
 browseVignettes(package = "scRGNet")
 ```
 
-An example of a cell-cell network produced by this package using
-`plotCellNet()` follows:
-<img src="./inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png" style="width:75.0%" />
-
-The degree distribution of a network can be viewed through
-`plotDegree()`:
-
-<img src="./inst/extdata/dist.png" style="width:75.0%" />
-
-It also offers a quick way to plot log-rank against log frequency of
-degree in a network to further analyse the topological structure
-`plotLog()`:
-
-<img src="./inst/extdata/log.png" style="width:75.0%" />
+insert image here
 
 An overview of the package is illustrated below.
 
@@ -199,6 +198,14 @@ Choo, Catriona McLean, Rebecca K Simmons, et al. 2019. “A Single-Cell
 Atlas of Entorhinal Cortex from Individuals with Alzheimer’s Disease
 Reveals Cell-Type-Specific Gene Expression Regulation.” *Nature
 Neuroscience* 22 (12): 2087–97.
+
+</div>
+
+<div id="ref-isolationForest" class="csl-entry">
+
+Liu, Fei Tony, Kai Ming Ting, and Zhi-Hua Zhou. 2008. “Isolation
+Forest.” In *2008 Eighth IEEE International Conference on Data Mining*,
+413–22. <https://doi.org/10.1109/ICDM.2008.17>.
 
 </div>
 

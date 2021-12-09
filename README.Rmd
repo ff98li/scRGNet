@@ -22,11 +22,12 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-scRGNet is an R package for inferring cell-cell networks from scRNA-seq data.
-It is the first R package that attempts to perform dimensional reduction using an feature(that is, gene) autoencoder from the novel single cell graph neural network (scGNN) framework.[@scGNN] It generate a feature matrix containing the low-dimensional representation of gene expression in each cell, and build a Cell-Cell network from the feature matrix using KNN. In training the feature autoencoder, discretized regulatory signals quantified from gene expression modeled by a left-truncated mixture Gaussian (LTMG) model can also be used as a regulariser.[@LTMG] It is unique from other R packages for scRNA-seq analysis in that scRGNet offers an option to analyse scRNA-seq data without assuming any statistical distribution or relationships for gene expression.
+scRGNet is an R package for inferring cell-cell networks from encoded scRNA-seq data.
+It is the first R package that attempts to use `torch`[@torch] in R to implement an feature(that is, gene) autoencoder from the recently proposed single cell graph neural network (scGNN) framework.[@scGNN] It generate an encoded feature matrix containing the low-dimensional representation of gene expression in each cell, and build a Cell-Cell network from the feature matrix using KNN and isolation forest[@isolationForest][@isotree]. When using the feature autoencoder, discretized regulatory signals quantified from gene expression modeled by a left-truncated mixture Gaussian (LTMG) model can also be used as a regulariser.[@LTMG] It is unique from other R packages for scRNA-seq analysis in that scRGNet offers an option to analyse scRNA-seq data without assuming statistical distributions or relationships for gene expression.
 
 - R requirement: 4.1.2 or later version
 - Development environment: Ubuntu 20.04 LTS
+- Development platform: x86_64-pc-linux-gnu (64-bit)
 
 ## Installation
 
@@ -36,6 +37,14 @@ To install the latest version of scRGNet:
 require("devtools")
 devtools::install_github("ff98li/scRGNet", build_vignettes = TRUE)
 ```
+
+To run the Shiny app:
+
+``` r
+scRGNet::runscRGNet()
+```
+
+A deployed demo is here: coming..
 
 ## Overview
 
@@ -51,16 +60,8 @@ Note that there are two datasets included in this package `gene_counts` and `gen
 browseVignettes(package = "scRGNet")
 ```
 
-An example of a cell-cell network produced by this package using `plotCellNet()` follows:
-![](./inst/extdata/batch_5_epoch_100_loss_21910_ltmg_k24.png){ width=75% }
+insert image here
 
-The degree distribution of a network can be viewed through `plotDegree()`:
-
-![](./inst/extdata/dist.png){ width=75% }
-
-It also offers a quick way to plot log-rank against log frequency of degree in a network to further analyse the topological structure `plotLog()`:
-
-![](./inst/extdata/log.png){ width=75% }
 
 An overview of the package is illustrated below.
 
