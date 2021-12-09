@@ -243,7 +243,7 @@ Running the model with default hyper-parameters will produce a rather crude resu
 
 A model trained with the same dataset, running 500 epochs using a full batch, with default k will have the following convergent result:
 
-![](../inst/extdata/network_batch_500 epochs_LTMG.png){width=90%}
+![](../inst/extdata/network_batch_500_epochs_LTMG.png){width=90%}
 
 
 #### Degree Distribution
