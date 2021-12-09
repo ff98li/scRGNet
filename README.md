@@ -13,7 +13,7 @@ scRNA-seq data. It is the first R package that attempts to use
 `torch`([Falbel et al. 2021](#ref-torch)) in R to implement an
 feature(that is, gene) autoencoder from the recently proposed single
 cell graph neural network (scGNN) framework.([Wang et al.
-2021](#ref-scGNN)) It generate an encoded feature matrix containing the
+2021](#ref-scGNN)) It generates an encoded feature matrix containing the
 low-dimensional representation of gene expression in each cell, and
 build a Cell-Cell network from the feature matrix using KNN and
 isolation forest([Liu, Ting, and Zhou

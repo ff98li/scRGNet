@@ -231,7 +231,22 @@ main_page <- tabPanel(
 
 about_page <- tabPanel(title = "About scRGNet",
                        titlePanel("About scRGNet"),
-                       "TODO")
+                       "scRGNet is an R package for inferring cell-cell networks from encoded scRNA-seq data.
+                       It uses a feature autoconder from the scGNN framework proposed by Wang et al.
+                       to generate a feature matrix containing the low-dimensional representation
+                       of gene expression in each cell, and build a Cell-Cell network from the feature matrix
+                       using KNN and isolation forest. A tutorial for this tool has been included in the vignette
+                       of the scRGNet package.
+                       This project is created purely for studying purposes.
+                       Since the torch R package is still in the experimental stage of the tidyverse life cycle
+                       (not yet in the stable stage), while its modules make up the building block of this project,
+                       there are still lots of problem that need to be addressed
+                       (e.g. unusual high memory usage compared to pyTorch).",
+                       br(),
+                       "Should any questions or concerns arise, feel free to open an issue:",
+                       issue_url <- a("GitHub tracker", href="https://github.com/ff98li/scRGNet/issues"),
+                       h2("Contact Info"),
+                       "<ff.li@mail.utoronto.ca>")
 
 ui <- navbarPage(title = "scRGNet",
                  theme = shinythemes::shinytheme('united'),
