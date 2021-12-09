@@ -60,12 +60,13 @@ Note that there are two datasets included in this package `gene_counts` and `gen
 browseVignettes(package = "scRGNet")
 ```
 
-insert image here
-
-
-An overview of the package is illustrated below.
+An overview of the package structure is provided below:
 
 ![](./inst/extdata/structure.png){ width=75% }
+
+An overview of the package workflow is illustrated below:
+
+![](./inst/extdata/overview.png)
 
 ## Contributions
 

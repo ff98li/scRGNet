@@ -71,11 +71,13 @@ details:
 browseVignettes(package = "scRGNet")
 ```
 
-insert image here
-
-An overview of the package is illustrated below.
+An overview of the package structure is provided below:
 
 <img src="./inst/extdata/structure.png" style="width:75.0%" />
+
+An overview of the package workflow is illustrated below:
+
+![](./inst/extdata/overview.png)
 
 ## Contributions
 
