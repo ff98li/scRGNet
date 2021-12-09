@@ -261,7 +261,7 @@ A left-skewed distribution could indicate that most cells have interaction with 
 
 #### Log-log Plot: Rank vs. Frequency.
 
-The log-log plot is helpful in further analysing the topological structure of the network. Many biological networks follows a **scale-free** degree distribution. The easiest way to find whether the cell network is scale-free can be viewed by examining whether the log-log plot has a linear pattern[@graph]:
+The log-log plot is helpful in further analysing the topological structure of the network. Many biological networks follows a **scale-free** degree distribution. Data from a model of a scale free network when compared against the power law, that is, whether a linear pattern in the log-log plot is observed[@graph]:
 
 ```{r, fig.width=5, fig.height=4}
 scRGNet::plotLog(net = net)
