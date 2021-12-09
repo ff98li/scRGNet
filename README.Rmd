@@ -44,7 +44,7 @@ To run the Shiny app:
 scRGNet::runscRGNet()
 ```
 
-[A deployed demo is here](https://ff98li.shinyapps.io/scrgnet/)
+<!-- [A deployed demo is here](https://ff98li.shinyapps.io/scrgnet/) -->
 
 ## Overview
 
