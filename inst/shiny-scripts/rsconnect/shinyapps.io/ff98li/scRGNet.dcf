@@ -1,11 +1,11 @@
-name: scrgnet
+name: scRGNet
 title:
 username:
 account: ff98li
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5296289
-bundleId: 5348487
+bundleId: 5377855
 url: https://ff98li.shinyapps.io/scrgnet/
-when: 1639023253.66894
-lastSyncTime: 1639023253.66895
+when: 1639607295.18028
+lastSyncTime: 1639607295.18029

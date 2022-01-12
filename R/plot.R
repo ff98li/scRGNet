@@ -76,7 +76,7 @@ plotCellNet <- function(net,
     #    nodes$"font.id" <- rep(node_label_size, dim(nodes)[1])
 
     if (group) {
-        clp               <- igraph::cluster_label_prop(net)
+        clp               <- igraph::cluster_louvain(net)
         group_label       <- data.frame(as.list(igraph::membership(clp)))
         group_label       <- as.data.frame(t(group_label))
         group_label$label <- rownames(group_label)

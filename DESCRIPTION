@@ -33,9 +33,9 @@ Imports:
     shiny,
     shinythemes,
     shinyjs,
-    shinybusy
-Remotes: 
-    BMEngineeR/scGNNLTMG,
+    shinybusy,
+Remotes:  
+    BMEngineeR/scGNNLTMG
 Suggests: 
     rmarkdown,
     knitr,
